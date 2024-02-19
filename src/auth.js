@@ -1,9 +1,7 @@
 /**
- * Given a registered user's email and password,
- * returns their authUserId value.
+ * Reset the state of the application back to the start.
  */
-function adminAuthLogin(email, password) {
-    return {
-        authUserId: 1,
-    }
+function clear() {
+
+    return {};
 }
