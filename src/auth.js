@@ -1,8 +1,8 @@
 /**
- * Register a user with an email, password, and names, 
- * then returns their authUserId value.
+ * Given a registered user's email and password,
+ * returns their authUserId value.
  */
-function adminAuthRegister(email, password, nameFirst, nameLast) {
+function adminAuthLogin(email, password) {
     return {
         authUserId: 1,
     }
