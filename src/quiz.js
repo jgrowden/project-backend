@@ -1,3 +1,17 @@
+/**
+ * Get all of the relevant information about the current quiz.
+ * 
+ * @param {number} authUserId 
+ * @param {number} quizId 
+ * @returns {
+ *      {number} quizId,
+ *      {string} name,
+ *      {number} timeCreated,
+ *      {number} timeLastEdited,
+ *      {string} description 
+ * }
+ */
+
 function adminQuizInfo(authUserId, quizId) {
     return {
         quizId: 1,
