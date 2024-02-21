@@ -4,14 +4,14 @@
  * @param {number} authUserId - unique identifier for user
  * @returns {{
 *    quizzes: [
-    *       {
-    *          quizId: number, 
-    *          name: string
-    *       }
-    *    ]
-    * }} - object with list of all quizzes
-    *
-    */ 
+*       {
+*          quizId: number, 
+*          name: string
+*       }
+*    ]
+* }} - object with list of all quizzes
+*
+*/ 
 
 function adminQuizList(authUserId) {
 
