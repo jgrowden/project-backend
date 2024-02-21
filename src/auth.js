@@ -1,4 +1,27 @@
 /**
+ * Register a user with an email, password, and names, 
+ * then returns their authUserId value.
+ * 
+ * @param {string} email
+ * @param {string} password
+ * @param {string} nameFirst
+ * @param {string} nameLast
+ * @returns {number} authUserId
+ */
+function adminAuthRegister(email, password, nameFirst, nameLast) {
+    return {
+        authUserId: 1,
+    }
+}
+/**
+ * Reset the state of the application back to the start.
+ */
+function clear() {
+
+    return {};
+}
+
+/**
  * Given a registered user's email and password,
  * returns their authUserId value.
  * 
@@ -13,15 +36,6 @@ function adminAuthLogin(email, password) {
 }
 
 /**
- * Reset the state of the application back to the start.
- */
-function clear() {
-
-    return {};
-}
-
-/**
-<<<<<<< HEAD
  * Given an admin user's authUserId, return details about the user.
  * 
  * "name" is the first and last name concatenated with a single space between them.
