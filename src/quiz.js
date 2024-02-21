@@ -1,15 +1,30 @@
 /**
+ * Update the description of the relevant quiz.
+ * 
+ * @param {number} authUserId - unique user identification number
+ * @param {number} quizId - a quiz's unique identification number
+ * @param {string} description - description of the quiz being created
+ * @returns {
+* }
+*/
+
+function adminQuizDescriptionUpdate( authUserId, quizId, description ) {
+    return { }
+}
+
+/** 
  * Update the name of the relevant quiz.
  * 
- * @param {number} authUserId 
- * @param {number} quizId 
- * @param {string} name
+ * @param {number} authUserId - unique user identification number
+ * @param {number} quizId - a quiz's unique identification number
+ * @param {string} name - name of quiz created
  * @returns {
 * }
 */
 
 function adminQuizNameUpdate (authUserId, quizId, name) {
     return { }
+}
 
 /**
  * Provide a list of all quizzes that are owned by the currently logged in user.
