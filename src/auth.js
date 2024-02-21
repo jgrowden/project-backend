@@ -13,13 +13,6 @@ function adminAuthRegister(email, password, nameFirst, nameLast) {
         authUserId: 1,
     }
 }
-/**
- * Reset the state of the application back to the start.
- */
-function clear() {
-
-    return {};
-}
 
 /**
  * Given a registered user's email and password,
