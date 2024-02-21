@@ -1,4 +1,17 @@
 /**
+ * Update the name of the relevant quiz.
+ * 
+ * @param {number} authUserId 
+ * @param {number} quizId 
+ * @param {string} name
+ * @returns {
+* }
+*/
+
+function adminQuizNameUpdate (authUserId, quizId, name) {
+    return { }
+
+/**
  * Provide a list of all quizzes that are owned by the currently logged in user.
  * 
  * @param {number} authUserId - unique identifier for user
