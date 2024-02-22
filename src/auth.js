@@ -38,15 +38,15 @@ function adminAuthLogin(email, password) {
  * 
  * @param {number} authUserId 
  * @return {{
-*      user: {
-    *          userId: number, 
-    *          name: string,
-    *          email: string, 
-    *          numSuccessfulLogins: number, 
-    *          numFailedPasswordsSinceLastLogin: number
-    *      }
-    *  }}
-    */
+ *      user: {
+ *          userId: number, 
+ *          name: string,
+ *          email: string, 
+ *          numSuccessfulLogins: number, 
+ *          numFailedPasswordsSinceLastLogin: number
+ *      }
+ *   }}
+*/
 function adminUserDetails(authUserId) {
 
     return {
@@ -60,7 +60,7 @@ function adminUserDetails(authUserId) {
     };
 }
 
-/*
+/**
  * Given an admin user's authUserId and a set of properties, 
  *  update the properties of this logged in admin user.
  * 
@@ -68,17 +68,23 @@ function adminUserDetails(authUserId) {
  * @param {string} email - user's email
  * @param {string} nameFirst - user's first name
  * @param {string} nameLast - user's last name
- * @return {} // an empty object
- */
+ * @return {} - an empty object
+*/
 function adminUserDetailsUpdate(authUserId, email, nameFirst, nameLast) {
 
     return {};
 }
 
 /**
- * Reset the state of the application back to the start.
- */
-function clear() {
+ * Given details relating to a password change, update the password of a logged in user.
+ * 
+ * @param {number} authUserId - unique identifier for user
+ * @param {string} oldPassword - user's old password
+ * @param {string} newPassword - user's new password
+ * @return {} - an empty object
+*/    
+
+function adminUserPasswordUpdate(authUserId, oldPassword, newPassword) {
 
     return {};
 }
