@@ -18,8 +18,7 @@ function adminQuizDescriptionUpdate( authUserId, quizId, description ) {
  * @param {number} authUserId - unique user identification number
  * @param {number} quizId - a quiz's unique identification number
  * @param {string} name - name of quiz created
- * @returns {
-* }
+ * @returns {} 
 */
 
 function adminQuizNameUpdate (authUserId, quizId, name) {
