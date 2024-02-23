@@ -1,3 +1,9 @@
+Parameters included in function stubs include strings: {email, password, nameFirst, nameLast, name, description, oldPassword, newPassword}, and integers: {authUserId, quizId, numSuccessfulLogins, numFailedPasswordsSinceLastLogin, timeCreated, timeLastEdited}.
+
+These were placed in arrays for either user data or quiz data. 
+
+Additional data structures include an array userQuizzes in user data, which lists all quizzes created/owned by the user, and an ownerId number in quiz data, which associates a quiz with its owner without having to search through every user. 
+
 ```javascript
 let data = {
     users: [
