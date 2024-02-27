@@ -55,5 +55,11 @@ describe('adminQuizList', () => {
             quizzes: []
         });
     });
+    test ('invalid authUserId', () => {
+        clear();
+        expect(adminQuizList(1)).toEqual({
+            'error': 'Invalid authUserId'
+        });
+    });
 });
 
