@@ -1,5 +1,5 @@
 import { clear } from './other.js'
-import { adminUserPasswordUpdate, adminAuthRegister } from './quiz.js'
+import { adminUserPasswordUpdate, adminAuthRegister } from './auth.js'
 
 clear();
 describe('adminUserPasswordUpdate', () => {
