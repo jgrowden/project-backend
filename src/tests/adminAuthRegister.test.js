@@ -27,10 +27,10 @@ test('Check for invalid nameFirst', () => {
         .toMatchObject({ 'error': 'Invalid first name' });
 
     expect(adminAuthRegister('monkey.d.luffy@gmail.com', 'gomugomu5', 'D', 'Monkey'))
-        .toMatchObject({ 'error' : 'nameFirst does satisfy length requirements' });
+        .toMatchObject({ 'error' : 'nameFirst does not satisfy length requirements' });
 
     expect(adminAuthRegister('monkey.d.luffy@gmail.com', 'gomugomu5', 'DDDDDDDDDDDDDDDDDDDDDDDD', 'Monkey'))
-        .toMatchObject({ 'error' : 'nameFirst does satisfy length requirements' });
+        .toMatchObject({ 'error' : 'nameFirst does not satisfy length requirements' });
 });
 
 test('Check for invalid nameLast', () => {
@@ -38,10 +38,10 @@ test('Check for invalid nameLast', () => {
         .toMatchObject({ 'error': 'invalid last name' });
 
     expect(adminAuthRegister('brook@gmail.com', 'S0ul_King', 'Soul', 'K'))
-        .toMatchObject({ 'error': 'nameLast does satisfy length requirements' });
+        .toMatchObject({ 'error': 'nameLast does not satisfy length requirements' });
 
     expect(adminAuthRegister('franky@gmail.com', 'Thous4nd_sunny', 'Cutty', 'Flammmmmmmmmmmmmmmmmmm'))
-        .toMatchObject({ 'error': 'nameLast does satisfy length requirements' });
+        .toMatchObject({ 'error': 'nameLast does not satisfy length requirements' });
 });
 
 test('Check for invalid password', () => {
