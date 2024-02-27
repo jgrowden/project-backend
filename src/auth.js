@@ -85,6 +85,7 @@ function createValidCharsArray() {
 
     return validChars;
 }
+
 /**
  * Returns true if the given string contains at least one letter
  * and at least one number. False otherwise.
