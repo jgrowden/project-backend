@@ -1,3 +1,5 @@
+import { getData, setData } from './dataStore.js'
+import validator from '../node_modules/validator'
 /**
  * Register a user with an email, password, and names, 
  * then returns their authUserId value.
@@ -9,11 +11,88 @@
  * 
  * @returns {number} authUserId - the user's unique identification number 
  */
-function adminAuthRegister(email, password, nameFirst, nameLast) {
+export function adminAuthRegister(email, password, nameFirst, nameLast) {
+    let data = getData();
 
-    return {
-        authUserId: 1,
+    // Check for duplicate email
+    for (const user of data.users) {
+        if (user.email === email) {
+            return { 'error': 'User with given email already exists' };
+        }
     }
+    // Check for invalid email
+    if (!validator.isEmail(email)) {
+        return { 'error': 'invalid email' };
+    }
+    const validChars = createValidCharsArray();
+
+    // Check for invalid first name
+    if (!validator.isWhitelisted(nameFirst, validChars)) {
+        return { 'error': 'Invalid first name' };
+    }
+    if (nameFirst.length < 2 || nameFirst.length > 20) {
+        return { 'error' : 'nameFirst does satisfy length requirements' };
+    }
+
+    // Check for invalid last name
+    if (!validator.isWhitelisted(nameLast, validChars)) {
+        return { 'error': 'invalid last name' };
+    }
+    if (nameLast.length < 2 || nameLast.length > 20) {
+        return { 'error' : 'nameLast does satisfy length requirements' };
+    }
+
+    // Check for invalid password
+    if (password.length < 8) {
+        return { 'error': 'password is less than 8 characters' };
+    }
+    if (!hasLetterAndNumber(password)) {
+        return { 'error': 'password must contain at least one letter and at least one number'};
+    }
+
+    data.users.push({
+        email: email,
+        password: password,
+        nameFirst: nameFirst,
+        nameLast: nameLast,
+    })
+    return {
+        authUserId: data.users.length,
+    }
+}
+
+/**
+ * Creates an array of chars containing only:
+ *      - Lowercase letters
+ *      - Uppercase letters
+ *      - Space, hyphen and apostrophe
+ * @returns Array of chars
+ */
+
+function createValidCharsArray() {
+    const validChars = [];
+
+    // add lowercase letters
+    for (let i = 97; i <= 122; i++) {
+        validChars.push(String.fromCharCode(i));
+    }
+
+    // add uppercase letters
+    for (let i = 65; i <= 90; i++) {
+        validChars.push(String.fromCharCode(i));
+    }
+    validChars.push(' ', '-', '\'');
+
+    return validChars;
+}
+/**
+ * Returns true if the given string contains at least one letter
+ * and at least one number. False otherwise.
+ * @param {string} 
+ * @returns {boolean}
+ */
+function hasLetterAndNumber(str) {
+    return /[a-zA-Z]/.test(str) && /[0-9]/.test(str);
 }
 
 /**
@@ -35,7 +114,7 @@ function adminAuthLogin(email, password) {
 /**
  * Given an admin user's authUserId, return details about the user.
  * 
- * "name" is the first and last name concatenated with a single space between them.
+ * 'name' is the first and last name concatenated with a single space between them.
  * 
  * Note: authUserId seems to be the input number, while the user object contains
  * just 'userId'. They should be mean the same thing though.
