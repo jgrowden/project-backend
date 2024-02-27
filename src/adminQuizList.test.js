@@ -4,7 +4,7 @@ import { adminQuizList, adminAuthRegister, adminQuizCreate } from './quiz.js'
 describe('adminQuizList', () => {
     test('returning list of quizzes', () => {
         clear();
-        const userId = adminAuthRegister('email@gmail.com', 'p@ssword', 'first_name', 'last_name');
+        const userId = adminAuthRegister('email@gmail.com', 'p@ssw0rd', 'first_name', 'last_name');
         const quizId1 = adminQuizCreate(userId, 'quiz1', 'the first quiz');
         const quizId2 = adminQuizCreate(userId, 'quiz2', 'the second quiz');
         expect(adminQuizList(userId)).toEqual({
@@ -22,8 +22,8 @@ describe('adminQuizList', () => {
         });
     test('returning list of quizzes for multiple users', () => {
         clear();
-        const userId1 = adminAuthRegister('email1@gmail.com', 'p@ssword', 'first_name', 'last_name');
-        const userId2 = adminAuthRegister('email2@gmail.com', 'p@ssword', 'first_name', 'last_name');
+        const userId1 = adminAuthRegister('email1@gmail.com', 'p@ssw0rd', 'first_name', 'last_name');
+        const userId2 = adminAuthRegister('email2@gmail.com', 'p@ssw0rd', 'first_name', 'last_name');
         const quizId1 = adminQuizCreate(userId1, 'quiz1', 'the first quiz');
         const quizId2 = adminQuizCreate(userId2, 'quiz2', 'the second quiz');
         const quizId3 = adminQuizCreate(userId1, 'quiz3', 'the third quiz');
@@ -50,7 +50,7 @@ describe('adminQuizList', () => {
     });
     test('returning empty list of quizzes', () => {
         clear();
-        const userId = adminAuthRegister('email@gmail.com', 'p@ssword', 'first_name', 'last_name');
+        const userId = adminAuthRegister('email@gmail.com', 'p@ssw0rd', 'first_name', 'last_name');
         expect(adminQuizList(userId)).toEqual({
             quizzes: []
         });
