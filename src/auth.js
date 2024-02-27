@@ -31,7 +31,7 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
         return { 'error': 'Invalid first name' };
     }
     if (nameFirst.length < 2 || nameFirst.length > 20) {
-        return { 'error' : 'nameFirst does satisfy length requirements' };
+        return { 'error' : 'nameFirst does not satisfy length requirements' };
     }
 
     // Check for invalid last name
@@ -39,7 +39,7 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
         return { 'error': 'invalid last name' };
     }
     if (nameLast.length < 2 || nameLast.length > 20) {
-        return { 'error' : 'nameLast does satisfy length requirements' };
+        return { 'error' : 'nameLast does not satisfy length requirements' };
     }
 
     // Check for invalid password
