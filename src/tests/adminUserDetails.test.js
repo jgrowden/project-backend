@@ -1,5 +1,5 @@
 import { clear } from '../other.js';
-import { adminAuthRegister, adminUserDetails } from '../auth.js';}
+import { adminAuthRegister, adminUserDetails } from '../auth.js';
 
 
 clear();
