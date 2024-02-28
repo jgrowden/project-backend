@@ -1,5 +1,5 @@
 import { getData, setData } from './dataStore.js'
-import validator from '../node_modules/validator'
+import validator from 'validator'
 /**
  * Register a user with an email, password, and names, 
  * then returns their authUserId value.
@@ -56,6 +56,7 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
         nameFirst: nameFirst,
         nameLast: nameLast,
     })
+    setData(data);
     return {
         authUserId: data.users.length,
     }
