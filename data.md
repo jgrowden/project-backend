@@ -7,7 +7,7 @@ Additional data structures include an array userQuizzes in user data, which list
 ```javascript
 let data = {
     users: [
-        user1: {
+        {
             email: "john.smith@gmail.com"
             password: "password123"
             nameFirst: "John"
@@ -19,7 +19,7 @@ let data = {
         }
     ]
     quizzes: [
-        quiz1: {
+        {
             ownerId: 1
             quizId: 1
             name: "The John Smith Test"
