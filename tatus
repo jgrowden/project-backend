@@ -1,0 +1,597 @@
+[33mcommit 829108cb53e297d9dac1eb09bcb58bd3ba6dbac2[m[33m ([m[1;36mHEAD -> [m[1;32mandrew/iter1/adminQuizCreate[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Merge: 382217a ef94f52
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 27 19:28:02 2024 +1100
+
+    Merge branch 'growden/iter1/adminAuthRegister' into 'master'
+    
+    Implementation of adminAuthRegister + tests
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!28
+
+[33mcommit ef94f523ce73bfeff0d30f2b8dbcf268b3c4ee0b[m
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 27 16:20:25 2024 +1100
+
+    fixed typos
+
+[33mcommit eb2939caac305962a994de1f7966110ca55f3321[m
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 27 16:19:01 2024 +1100
+
+    fixed typos
+
+[33mcommit 9721550c11c75cec49d515af20df88fc08c6b197[m
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 27 16:00:05 2024 +1100
+
+    Update auth.js
+
+[33mcommit 49c30906c50f330c3370fc0ac3d03bfc24a429ae[m
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 27 15:55:58 2024 +1100
+
+    Implemented adminAuthRegister and made a few tweaks to tests
+
+[33mcommit e5d4112ba59bd2f67cc88710fc0206f308d20b32[m
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 27 14:12:51 2024 +1100
+
+    corrected and updated test file to be more comprehensive
+
+[33mcommit b0c46a3ccc51acfe5f4612deeed0530cd06c1377[m
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 27 11:24:08 2024 +1100
+
+    Wrote tests for adminAuthRegister feature
+
+[33mcommit 382217ad8b5cded6a0b106b5a5bca281c9d19bbc[m
+Merge: 074486a 4f60a4e
+Author: James Gair <z5360800@ad.unsw.edu.au>
+Date:   Mon Feb 26 21:49:28 2024 +1100
+
+    Merge branch 'gair/clear' into 'master'
+    
+    Implemented clear and basic dataStore functionality
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!27
+
+[33mcommit 4f60a4e5344c82760478aaa5393123be6410888d[m
+Author: James Gair <z5360800@ad.unsw.edu.au>
+Date:   Mon Feb 26 21:41:03 2024 +1100
+
+    Implemented basic clear functionality
+
+[33mcommit 7d5a60367efe5f1ea4b222ae00e303c67904e15e[m
+Author: James Gair <z5360800@ad.unsw.edu.au>
+Date:   Mon Feb 26 21:38:02 2024 +1100
+
+    Updated dataStore to contain two basic objects
+
+[33mcommit 074486a827c18681118eab9db8fb10f179b06f2f[m
+Merge: be88514 8b8a225
+Author: COMP1531 Bot <cs1531@cse.unsw.edu.au>
+Date:   Mon Feb 26 08:22:16 2024 +1100
+
+    Merge changes from starter code into 'master'
+
+[33mcommit 8b8a225ab4a9db26c92d74a9e493bc3ee74925e5[m
+Author: COMP1531 Bot <cs1531@cse.unsw.edu.au>
+Date:   Mon Feb 26 08:22:12 2024 +1100
+
+    Task update 5c53ee3f84510fdbdb3933bb48a5726454840421
+
+[33mcommit 5c53ee3f84510fdbdb3933bb48a5726454840421[m
+Author: cs1531 <cs1531@cse.unsw.edu.au>
+Date:   Mon Feb 26 08:11:28 2024 +1100
+
+    Missing square bracket on a very boring file you don't need to worry about at this stage
+
+[33mcommit be88514f50c5c018ac87000af4841fe3908fc171[m
+Merge: 8f4d082 459c24d
+Author: Andrew Kim <z5487663@ad.unsw.edu.au>
+Date:   Sun Feb 25 22:00:14 2024 +1100
+
+    Merge branch 'update-3f5a3154a531243ad09f3042d4962d2422507b79' into 'master'
+    
+    Updated starter code
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!25
+
+[33mcommit 459c24d8a4a0d66fc41f009b96e34da7aa734f28[m
+Author: Kaelan <z5478371@ad.unsw.edu.au>
+Date:   Sun Feb 25 21:34:09 2024 +1100
+
+    deleted src/user.js
+
+[33mcommit 4d378ef19ac9e97c86d010b63c9e907da0d4e719[m
+Merge: e9c2d79 8f4d082
+Author: Kaelan <z5478371@ad.unsw.edu.au>
+Date:   Sun Feb 25 21:30:34 2024 +1100
+
+    fix merge conflict for iter1 update
+
+[33mcommit e9c2d79ed9602dcfc411a1f1f36494951d179e18[m
+Author: COMP1531 Bot <cs1531@cse.unsw.edu.au>
+Date:   Sat Feb 24 23:22:25 2024 +1100
+
+    Task update 3f5a3154a531243ad09f3042d4962d2422507b79
+
+[33mcommit 3f5a3154a531243ad09f3042d4962d2422507b79[m
+Author: cs1531 <cs1531@cse.unsw.edu.au>
+Date:   Sat Feb 24 21:59:43 2024 +1100
+
+    Iteration 1 Release
+
+[33mcommit 8f4d08263a9248817fe2bf4d94d015b0d457e69b[m
+Merge: 8e6d3b0 d1f94a8
+Author: Kaelan Nah <z5478371@ad.unsw.edu.au>
+Date:   Fri Feb 23 21:42:16 2024 +1100
+
+    Merge branch 'andrew/iter0/general_comments' into 'master'
+    
+    Andrew/iter0/general comments
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!23
+
+[33mcommit d1f94a80f2a718fd0f7e08de89849ed032144001[m[33m ([m[1;31morigin/andrew/iter0/general_comments[m[33m, [m[1;32mandrew/iter0/general_comments[m[33m)[m
+Author: Andrew <z5487663@ad.unsw.edu.au>
+Date:   Fri Feb 23 19:27:48 2024 +1100
+
+    Updated data.md markdown file with additional documentation.
+
+[33mcommit 56d801442da97c324defe6e453b27a782e8eeaab[m
+Author: Andrew <z5487663@ad.unsw.edu.au>
+Date:   Fri Feb 23 19:18:09 2024 +1100
+
+    Fixed and standardised comments and parameter/return value descriptions.
+
+[33mcommit 8e6d3b0a692251fc3a2bbac90ffc55aef8cf9ccf[m[33m ([m[1;32mandrew/iter0/adminQuizCreate[m[33m)[m
+Merge: f989c7f 89f9449
+Author: Andrew Kim <z5487663@ad.unsw.edu.au>
+Date:   Thu Feb 22 16:15:46 2024 +1100
+
+    Merge branch 'kaelan/iter0/relocate_functions' into 'master'
+    
+    moved functions to their correct files
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!22
+
+[33mcommit 89f9449ddab734d573f189cbab0d2ac297c07a30[m
+Author: Kaelan <z5478371@ad.unsw.edu.au>
+Date:   Thu Feb 22 16:10:32 2024 +1100
+
+    moved functions to their correct files
+
+[33mcommit f989c7ffad2a0e57a58506f0c345eb14a61a5566[m
+Merge: 5ab2f67 2db0357
+Author: James Gair <z5360800@ad.unsw.edu.au>
+Date:   Wed Feb 21 22:22:39 2024 +1100
+
+    Merge branch 'gair/iter0/adminQuizDescriptionUpdate' into 'master'
+    
+    Implemented adminQuizDescriptionUpdate stub
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!19
+
+[33mcommit 2db0357b6868633ea793ef4494d1b6b13fd55146[m
+Merge: a55b1ab 5ab2f67
+Author: James Gair <z5360800@ad.unsw.edu.au>
+Date:   Wed Feb 21 22:21:55 2024 +1100
+
+    Merge branch 'master' into 'gair/iter0/adminQuizDescriptionUpdate'
+    
+    # Conflicts:
+    #   src/quiz.js
+
+[33mcommit 5ab2f67694cb6e91f4086ae456cea689f0670145[m
+Merge: aba9f0f 532a888
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Wed Feb 21 21:14:10 2024 +1100
+
+    Merge branch 'z5362762-master-patch-98917' into 'master'
+    
+    merged clear twice, removed repetition
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!21
+
+[33mcommit 532a888196c18dbbad5e608f5a30c3ff38eb6aa8[m
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Wed Feb 21 21:13:52 2024 +1100
+
+    merged clear twice, removed repetition
+
+[33mcommit aba9f0ffd8f715ddefa1054c50b494a6d5af63cc[m
+Merge: 60b98cb 8ef53d2
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Wed Feb 21 21:10:51 2024 +1100
+
+    Merge branch 'growden/iter0/adminAuthRegister' into 'master'
+    
+    Redoing adminAuthRegister
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!17
+
+[33mcommit 8ef53d2551848088df4a154781b554b30b89512c[m
+Merge: 15fcf2a 60b98cb
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Wed Feb 21 21:09:30 2024 +1100
+
+    Merge branch 'master' into 'growden/iter0/adminAuthRegister'
+    
+    # Conflicts:
+    #   src/auth.js
+
+[33mcommit 60b98cbcb56a3911fa1638452b36af89499c18cc[m
+Merge: 7f77dd5 d0151b6
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Wed Feb 21 17:12:57 2024 +1100
+
+    Merge branch 'growden/iter0/adminAuthLogin' into 'master'
+    
+    Redoing adminAuthLogin (again)
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!16
+
+[33mcommit d0151b6abdf79a0a6ad914b6737923d38e1dc775[m
+Merge: de5dae3 7f77dd5
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Wed Feb 21 17:12:29 2024 +1100
+
+    Merge branch 'master' into 'growden/iter0/adminAuthLogin'
+    
+    # Conflicts:
+    #   src/auth.js
+
+[33mcommit 7f77dd596e28016020f01051d03a4f75dc241607[m
+Merge: e50f552 2f2b1d1
+Author: Kaelan Nah <z5478371@ad.unsw.edu.au>
+Date:   Wed Feb 21 17:10:22 2024 +1100
+
+    Merge branch 'kaelan/iter0/adminUserDetails' into 'master'
+    
+    implemented adminUserDetails function stub
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!12
+
+[33mcommit e50f552f45001f500cee8aebb995b804dda17544[m
+Merge: 00746c6 094301d
+Author: James Gair <z5360800@ad.unsw.edu.au>
+Date:   Wed Feb 21 17:09:44 2024 +1100
+
+    Merge branch 'gair/iter0/adminQuizNameUpdate' into 'master'
+    
+    Implemented adminQuizNameUpdate stub
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!18
+
+[33mcommit 094301dc3877118104dcd199d0849812482c0bc5[m
+Merge: a22bd6c 00746c6
+Author: James Gair <z5360800@ad.unsw.edu.au>
+Date:   Wed Feb 21 17:09:11 2024 +1100
+
+    Merge branch 'master' into 'gair/iter0/adminQuizNameUpdate'
+    
+    # Conflicts:
+    #   src/quiz.js
+
+[33mcommit 2f2b1d16b9ebaa0570cd3855e2cc67a1f7e76511[m
+Merge: 83b506f 00746c6
+Author: Kaelan <z5478371@ad.unsw.edu.au>
+Date:   Wed Feb 21 17:08:26 2024 +1100
+
+    merged adminUserDetails
+
+[33mcommit 00746c6cc43afb5c9e53e4992294b5c4db0b4490[m
+Merge: 9ae637a 75c6866
+Author: Kaelan Nah <z5478371@ad.unsw.edu.au>
+Date:   Wed Feb 21 17:02:36 2024 +1100
+
+    Merge branch 'kaelan/iter0/adminUserDetailsUpdate' into 'master'
+    
+    implemented adminUserDetailsUpdate function stubble
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!11
+
+[33mcommit 75c6866c888011784fa947a75042116ec8358216[m
+Author: Kaelan <z5478371@ad.unsw.edu.au>
+Date:   Wed Feb 21 17:01:56 2024 +1100
+
+    merged adminUserDetailsUpdate and fixed a missing bracket
+
+[33mcommit 9ae637a02d2b6e65934cf481500f6235c9269eae[m
+Merge: ace0a15 b82e8ba
+Author: Andrew Kim <z5487663@ad.unsw.edu.au>
+Date:   Wed Feb 21 16:59:33 2024 +1100
+
+    Merge branch 'annabelle/iter0/adminQuizList' into 'master'
+    
+    fixed indentations again
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!20
+
+[33mcommit 29985eab3c126cb17717c541bb4034281d3a68c0[m
+Merge: 43a9f92 ace0a15
+Author: Kaelan Nah <z5478371@ad.unsw.edu.au>
+Date:   Wed Feb 21 16:59:25 2024 +1100
+
+    Merge branch 'master' into 'kaelan/iter0/adminUserDetailsUpdate'
+    
+    # Conflicts:
+    #   src/auth.js
+
+[33mcommit b82e8ba1aa1baf07f4005edadf2f05a80c429d99[m
+Author: Annabelle <z5476222@ad.unsw.edu.au>
+Date:   Wed Feb 21 16:58:20 2024 +1100
+
+    fixed indentations again
+
+[33mcommit ace0a15ead5c64e3dcb532edf0536c08b7754034[m
+Merge: 21c574e f29c579
+Author: Annabelle Qiu <z5476222@ad.unsw.edu.au>
+Date:   Wed Feb 21 16:53:48 2024 +1100
+
+    Merge branch 'annabelle/iter0/adminQuizList' into 'master'
+    
+    implemented adminQuizList function stub
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!14
+
+[33mcommit f29c579f4820c7944b6779bdad6946324f853083[m
+Merge: c221893 21c574e
+Author: Annabelle Qiu <z5476222@ad.unsw.edu.au>
+Date:   Wed Feb 21 16:53:15 2024 +1100
+
+    Merge branch 'master' into 'annabelle/iter0/adminQuizList'
+    
+    # Conflicts:
+    #   src/quiz.js
+
+[33mcommit 21c574e424932896563fe9df7e416d8bf2995030[m
+Merge: 38574fa 8cb3c8b
+Author: Annabelle Qiu <z5476222@ad.unsw.edu.au>
+Date:   Wed Feb 21 16:51:37 2024 +1100
+
+    Merge branch 'annabelle/iter0/adminUserPasswordUpdate' into 'master'
+    
+    Implemented adminUserPasswordUpdate function stub
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!13
+
+[33mcommit 38574fa42cb11ffb8a7a71b96db3aaac875d988a[m
+Merge: b379616 059535e
+Author: Andrew Kim <z5487663@ad.unsw.edu.au>
+Date:   Wed Feb 21 16:50:48 2024 +1100
+
+    Merge branch 'andrew/iter0/adminQuizCreate' into 'master'
+    
+    implemented adminQuizCreate function stubble
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!3
+
+[33mcommit 059535e2a5824f63e03cbf1342c6c519d2b0f576[m
+Merge: cf7c8ac b379616
+Author: Andrew Kim <z5487663@ad.unsw.edu.au>
+Date:   Wed Feb 21 16:44:42 2024 +1100
+
+    Merge branch 'master' into 'andrew/iter0/adminQuizCreate'
+    
+    # Conflicts:
+    #   src/quiz.js
+
+[33mcommit b379616bc81216ce5173c419cb6c0d2399f760f4[m[33m ([m[1;32mmaster[m[33m)[m
+Merge: 37418ad 4568ef0
+Author: Andrew Kim <z5487663@ad.unsw.edu.au>
+Date:   Wed Feb 21 16:40:54 2024 +1100
+
+    Merge branch 'andrew/iter0/adminQuizRemove' into 'master'
+    
+    Implemented adminQuizRemove function stubble
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!4
+
+[33mcommit 4568ef0bca1ab19ec61dfaf1d22d145f655a009b[m[33m ([m[1;31morigin/andrew/iter0/adminQuizRemove[m[33m, [m[1;32mandrew/iter0/adminQuizRemove[m[33m)[m
+Merge: 78b8d4c 37418ad
+Author: Andrew <z5487663@ad.unsw.edu.au>
+Date:   Wed Feb 21 16:39:29 2024 +1100
+
+    fixed merge conflict
+
+[33mcommit 37418ad6a8b56d9ad2ddf90126ed8586cc3769a3[m[33m ([m[1;32mandrew/iter0/adminQuizInfo[m[33m)[m
+Merge: b1cfe92 7e2de25
+Author: Andrew Kim <z5487663@ad.unsw.edu.au>
+Date:   Wed Feb 21 16:29:15 2024 +1100
+
+    Merge branch 'andrew/iter0/adminQuizInfo' into 'master'
+    
+    Implemented adminQuizInfo function stubble
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!5
+
+[33mcommit 78b8d4cdf46560b7e77ab90674d78aae3978dea3[m
+Author: Andrew <z5487663@ad.unsw.edu.au>
+Date:   Wed Feb 21 16:28:52 2024 +1100
+
+    testing commit
+
+[33mcommit a55b1abb16bf9e40fc5914390aa8b61bd8516b82[m
+Author: James Gair <z5360800@ad.unsw.edu.au>
+Date:   Wed Feb 21 14:56:13 2024 +1100
+
+    Implemented adminQuizDescriptionUpdate stub
+
+[33mcommit a22bd6cb940e65c9f68620440d1fe39728ebefa8[m
+Author: James Gair <z5360800@ad.unsw.edu.au>
+Date:   Wed Feb 21 14:48:37 2024 +1100
+
+    Implemented adminQuizNameUpdate stub
+
+[33mcommit c2218935238c2b44ae17eeeb4de7458ac7645d54[m
+Author: Annabelle <z5476222@ad.unsw.edu.au>
+Date:   Tue Feb 20 21:17:09 2024 +1100
+
+    changed comment formatting for adminQuizList
+
+[33mcommit 15fcf2ab9c35d3227d54263c87a1ae9b06a2bb9e[m
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 20 18:27:56 2024 +1100
+
+    Redoing adminAuthRegister
+
+[33mcommit de5dae33bb51b376fd80e26f84f52e0acc0f2385[m
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 20 18:24:29 2024 +1100
+
+    Redoing adminAuthLogin (again)
+
+[33mcommit b1cfe9289d993d91ef4c2ac0bfd6f634ec1abcee[m
+Merge: 38aa469 bb54fb7
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 20 18:03:12 2024 +1100
+
+    Merge branch 'growden/iter0/clear' into 'master'
+    
+    wrote stub for clear
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!9
+
+[33mcommit 38aa46995a99bf2752ad50450f35173c5fdfe515[m
+Merge: 1f02cd0 998aad0
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 20 18:02:49 2024 +1100
+
+    Merge branch 'growden/iter0/adminAuthLogin' into 'master'
+    
+    wrote stub for adminAuthLogin
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!8
+
+[33mcommit 1f02cd0c62e8c727d47ecc2bfe4c8b117f4b0c18[m
+Merge: 7864175 369b200
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 20 18:02:10 2024 +1100
+
+    Merge branch 'growden/iter0/adminAuthRegister' into 'master'
+    
+    wrote stub for adminAuthRegister
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!6
+
+[33mcommit 26d7d36664038162ea97c63f0ea69e51f2cb7350[m
+Author: cs1531 <cs1531@cse.unsw.edu.au>
+Date:   Tue Feb 20 17:42:22 2024 +1100
+
+    Removing unnecessary user.js file
+
+[33mcommit 7e2de25bca07080e9435892ecf7f0e048f6a9247[m[33m ([m[1;31morigin/andrew/iter0/adminQuizInfo[m[33m)[m
+Author: Andrew <z5487663@ad.unsw.edu.au>
+Date:   Tue Feb 20 16:12:50 2024 +1100
+
+    added comments
+
+[33mcommit b1740a50e3624659e1fc7efe00f3f53831adafcd[m
+Author: Andrew <z5487663@ad.unsw.edu.au>
+Date:   Tue Feb 20 16:08:00 2024 +1100
+
+    added comments
+
+[33mcommit cf7c8ac2a702a379b942ed505d4fd3216e21b650[m[33m ([m[1;31morigin/andrew/iter0/adminQuizCreate[m[33m)[m
+Author: Andrew <z5487663@ad.unsw.edu.au>
+Date:   Tue Feb 20 16:04:37 2024 +1100
+
+    added comments
+
+[33mcommit 786417575c2a531fc2013eb19386d777669ec4f0[m
+Merge: 9b8e502 4447355
+Author: Andrew Kim <z5487663@ad.unsw.edu.au>
+Date:   Tue Feb 20 15:49:01 2024 +1100
+
+    Merge branch 'andrew/iter0/dataStructs' into 'master'
+    
+    data.md update
+    
+    See merge request COMP1531/24T1/groups/W15B_EGGS/project-backend!1
+
+[33mcommit ffe3dbf960ec9597e5a2056c88c1090cf3590293[m
+Author: Annabelle <z5476222@ad.unsw.edu.au>
+Date:   Tue Feb 20 13:41:56 2024 +1100
+
+    implemented adminQuizList function stub
+
+[33mcommit 8cb3c8bab611fd883717c389d03ed281f8f96b63[m
+Author: Annabelle <z5476222@ad.unsw.edu.au>
+Date:   Tue Feb 20 13:14:54 2024 +1100
+
+    Implemented adminUserPasswordUpdate function stub
+
+[33mcommit 83b506f575dfa773101e9deaf61b374ae74320fc[m
+Author: Kaelan <z5478371@ad.unsw.edu.au>
+Date:   Tue Feb 20 13:07:39 2024 +1100
+
+    implemented adminUserDetails function stub
+
+[33mcommit 43a9f92e8fcbe42ec1a0ea7ee9faab7bccd11f79[m
+Author: Kaelan <z5478371@ad.unsw.edu.au>
+Date:   Tue Feb 20 13:04:09 2024 +1100
+
+    implemented adminUserDetailsUpdate function stubble
+
+[33mcommit bb54fb7558889bcab3e397878dd7ed3f78fbb580[m
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 20 10:58:32 2024 +1100
+
+    wrote stub for clear
+
+[33mcommit 998aad0c1957aad8ae66878b618cbe78245040c3[m
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 20 10:41:55 2024 +1100
+
+    updated to only include adminAuthLogin
+
+[33mcommit bc3f250b2630c1a513bc5017648dfc56a79f61d0[m
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 20 10:39:26 2024 +1100
+
+    wrote stub code for adminAuthLogin
+
+[33mcommit 369b200bf89ac94fa1f9f06dc3ff4242d89b7fa2[m
+Author: James Growden <z5362762@ad.unsw.edu.au>
+Date:   Tue Feb 20 10:29:06 2024 +1100
+
+    wrote stub for adminAuthRegister
+
+[33mcommit 5cd35934e82f87dfc9f40f91df1aed7cc0ee4f47[m
+Author: Andrew <z5487663@ad.unsw.edu.au>
+Date:   Tue Feb 20 02:01:00 2024 +1100
+
+    Implemented adminQuizInfo function stubble
+
+[33mcommit 1801d9e1146251713432540d8592ec36cc239105[m
+Author: Andrew <z5487663@ad.unsw.edu.au>
+Date:   Tue Feb 20 01:57:52 2024 +1100
+
+    Implemented adminQuizRemove function stubble
+
+[33mcommit 7d8ad5348d5fc8f9106b65e9d38cd069a1bc57f2[m
+Author: Andrew <z5487663@ad.unsw.edu.au>
+Date:   Tue Feb 20 01:47:03 2024 +1100
+
+    implemented adminQuizCreate function stubble
+
+[33mcommit 4447355691ad5ca3f2b2b76ad2257014aac96eaf[m[33m ([m[1;31morigin/andrew/iter0/dataStructs[m[33m)[m
+Author: Andrew <z5487663@ad.unsw.edu.au>
+Date:   Tue Feb 20 01:00:40 2024 +1100
+
+    Added the data structure we agreed upon in yesterday's meeting, also added a ownerId.
+
+[33mcommit 9b8e502a8f312e4c151031a32c25788f6553faf2[m[33m ([m[1;31morigin/Growden[m[33m)[m
+Author: COMP1531 Bot <cs1531@cse.unsw.edu.au>
+Date:   Sun Feb 18 17:41:36 2024 +1100
+
+    Released f96ff28261ca1d0e271deb5b60e4c9614a970dd5 to COMP1531/24T1/groups/W15B_EGGS
+
+[33mcommit f96ff28261ca1d0e271deb5b60e4c9614a970dd5[m
+Author: cs1531 <cs1531@cse.unsw.edu.au>
+Date:   Sun Feb 18 16:35:16 2024 +1100
+
+    Iteration 0 Release
