@@ -55,6 +55,10 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
         password: password,
         nameFirst: nameFirst,
         nameLast: nameLast,
+        authUserId: data.users.length + 1,
+        numSuccessfulLogins: 1,
+        numFailedPasswordsSinceLastLogin: 0,
+        userQuizzes: [],
     })
     return {
         authUserId: data.users.length,
