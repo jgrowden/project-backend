@@ -31,7 +31,7 @@ beforeEach(() => {
 describe('adminUserDetailsUpdate testing', () => {
     test('invalid ID', () => {
         expect(adminUserDetailsUpdate("invalid id", "test@email.com", "John", "Smith"))
-        .toMatchObject({ 'error': 'User with given ID not found' });
+        .toMatchObject({ 'error': 'Invalid ID' });
     });
     test('ID does not exist', () => {
         expect(adminUserDetailsUpdate(5, "test@email.com", "Amog", "Us"))
