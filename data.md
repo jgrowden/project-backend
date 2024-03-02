@@ -12,9 +12,10 @@ let data = {
             password: "password123"
             nameFirst: "John"
             nameLast: "Smith"
-            AuthUserId: 1
+            authUserId: 1
             numSuccessfulLogins: 1
             numFailedPasswordsSinceLastLogin: 123
+            previousPasswords:["oldpassword123", "anotheroldpassword123"]
             userQuizzes: [1, 2, 3]
         }
     ]
