@@ -1,5 +1,5 @@
 import { clear } from '../other.js'
-import {getData, setData } from '../dataStore.js'
+import { getData, setData } from '../dataStore.js'
 import { adminAuthRegister } from '../auth.js'
 import { adminQuizNameUpdate, adminQuizCreate } from '../quiz.js'
 
@@ -20,7 +20,8 @@ describe('adminQuizNameUpdate', () => {
     });
 
     test('user ID not found', () => {    
-        expect(adminQuizNameUpdate(user1.authUserId + 1, quiz1.quizID, 'great quiz'))
+        clear();
+        expect(adminQuizNameUpdate(1, quiz1.quizID, 'great quiz'))
             .toStrictEqual({ 'error': 'User ID not found' });
     });
 
@@ -29,8 +30,10 @@ describe('adminQuizNameUpdate', () => {
             .toStrictEqual({ 'error': 'Invalid quiz ID' });
     });
 
-    test('quiz ID not found', () => {    
-        expect(adminQuizNameUpdate(user1.authUserId, quiz1.quizID + 1, 'great quiz'))
+    test('quiz ID not found', () => { 
+        clear();
+        user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
+        expect(adminQuizNameUpdate(user1.authUserId, 1, 'great quiz'))
             .toStrictEqual({ 'error': 'Quiz ID not found' });
     });
 
