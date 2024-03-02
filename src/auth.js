@@ -58,7 +58,10 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
         authUserId: data.users.length + 1,
         numSuccessfulLogins: 1,
         numFailedPasswordsSinceLastLogin: 0,
+<<<<<<< HEAD
         previousPasswords: [],
+=======
+>>>>>>> master
         userQuizzes: [],
     })
     return {
@@ -165,7 +168,10 @@ export function adminUserDetails(authUserId) {
 }
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> master
 /**
  * Given an admin user's authUserId and a set of properties, 
  *  update the properties of this logged in admin user.
