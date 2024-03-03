@@ -1,7 +1,9 @@
 import { clear } from '../other.js'
 import { adminAuthRegister } from '../auth.js'
 
-beforeEach(clear());
+beforeEach(() => {
+    clear();
+});
 describe ('Testing adminAuthLogin', () => {
     test('Test successful login', () => {
         const user = adminAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
