@@ -34,36 +34,37 @@ describe('Testing adminAuthRegister', () => {
         ({email, password, nameFirst, nameLast}) => {
             expect(adminAuthRegister(email, password, nameFirst, nameLast))
                 .toStrictEqual({ error: expect.any(String)} );
-        })
+        }
+    );
 
-    test('Check for invalid nameLast', () => {
-        expect(adminAuthRegister('nico.robin@gmail.com', '0hara_demon', 'Nico', 'R0bin'))
-            .toMatchObject({ error: expect.any(String) });
+    test.each([
+        { email: 'nico.robin@gmail.com', password: '0hara_demon', 
+            nameFirst: 'Nico', nameLast: 'R0bin' },
+        { email: 'brook@gmail.com', password: 'S0ul_King',
+            nameFirst: 'Soul', nameLast: 'K'},
+        { email: 'franky@gmail.com', password: 'Thous4nd_sunny', 
+            nameFirst: 'Cutty', nameLast: 'Flammmmmmmmmmmmmmmmmmm' },
+    ])('testing for invalid nameLast, variation $#, with nameLast: \'$nameLast\'', 
+        ({email, password, nameFirst, nameLast}) => {
+            expect(adminAuthRegister(email, password, nameFirst, nameLast))
+                .toStrictEqual({ error: expect.any(String)} );
+        }
+    );
 
-        expect(adminAuthRegister('brook@gmail.com', 'S0ul_King', 'Soul', 'K'))
-            .toMatchObject({ error: expect.any(String) });
-
-        expect(adminAuthRegister('franky@gmail.com', 'Thous4nd_sunny', 'Cutty', 'Flammmmmmmmmmmmmmmmmmm'))
-            .toMatchObject({ error: expect.any(String) });
-    });
-
-    test('Check for invalid password', () => {
-        expect(adminAuthRegister('nico.robin@gmail.com', 'ohara_demon', 'Nico', 'Robin'))
-            .toMatchObject({ error: expect.any(String) });
-
-        expect(adminAuthRegister('nico.robin@gmail.com', '123456789', 'Nico', 'Robin'))
-            .toMatchObject({ error: expect.any(String) });
-        
-        expect(adminAuthRegister('nico.robin@gmail.com', '!@#$%^&*()', 'Nico', 'Robin'))
-            .toMatchObject({ error: expect.any(String) });
-
-        expect(adminAuthRegister('nico.robin@gmail.com', '0hara', 'Nico', 'Robin'))
-            .toMatchObject({ error: expect.any(String) });
-    });
+    test.each([
+        { email: 'nico.robin@gmail.com', password: 'ohara_demon', 
+            nameFirst: 'Nico', nameLast: 'Robin' },
+        { email: 'brook@gmail.com', password: '123456789',
+            nameFirst: 'Soul', nameLast: 'K'},
+        { email: 'franky@gmail.com', password: '!@#$%^&*()', 
+            nameFirst: 'Cutty', nameLast: 'Flammmmmmmmmmmmmmmmmmm' },
+        { email: 'nico.robin@gmail.com', password: '0hara',
+            nameFirst: 'Nico', nameLast: 'Robin'}
+    ])('testing for invalid password, variation $#, with password: \'$nameLast\'', 
+        ({email, password, nameFirst, nameLast}) => {
+            expect(adminAuthRegister(email, password, nameFirst, nameLast))
+                .toStrictEqual({ error: expect.any(String)} );
+        }
+    );
 
 });
-/*test.each([
-    { email: , password: , nameFirst: , nameLast: },
-    { email: , password: , nameFirst: , nameLast: },
-    { email: , password: , nameFirst: , nameLast: },
-])*/
