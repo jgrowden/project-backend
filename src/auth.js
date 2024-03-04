@@ -67,7 +67,7 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
  *      - Lowercase letters
  *      - Uppercase letters
  *      - Space, hyphen and apostrophe
- * @returns Array of chars
+ * @returns {Array<string>}
  */
 
 function createValidCharsArray() {
@@ -106,10 +106,17 @@ function hasLetterAndNumber(str) {
  * 
  * @returns {number} authUserId - the user's unique identification number 
  */
-function adminAuthLogin(email, password) {
-
+export function adminAuthLogin(email, password) {
+    let data = getData();
+    const userExists = data.users.find(user => user.email === email);
+    if (!userExists) {
+        return { error: 'user doesn\'t exist' };
+    }
+    if (userExists.password !== password) {
+        return { error: 'incorrect password' };
+    }
     return {
-        authUserId: 1,
+        authUserId: userExists.authUserId,
     }
 }
 
