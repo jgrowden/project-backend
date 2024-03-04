@@ -1,23 +1,5 @@
-
-// invalid ID, invalid email, invalid first name, invalid last name
-// ID does not exist
-// email used by another user
-// email does not satisfy validator https://www.npmjs.com/package/validator
-/*
-AuthUserId is not a valid user.
-      Email is currently used by another user (excluding the current authorised user)
-      Email does not satisfy this: https://www.npmjs.com/package/validator (validator.isEmail)
-      NameFirst contains characters other than lowercase letters, uppercase letters, spaces, hyphens, or apostrophes
-      NameFirst is less than 2 characters or more than 20 characters
-      NameLast contains characters other than lowercase letters, uppercase letters, spaces, hyphens, or apostrophes
-      NameLast is less than 2 characters or more than 20 characters
-
-function adminUserDetailsUpdate(authUserId, email, nameFirst, nameLast) {
-*/
-
 import { clear } from "../other.js";
 import { adminAuthRegister, adminUserDetails, adminUserDetailsUpdate } from "../auth";
-import { getData } from "../dataStore";
 
 describe('adminUserDetailsUpdate testing', () => {
     
