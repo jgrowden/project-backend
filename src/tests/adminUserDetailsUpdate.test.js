@@ -36,7 +36,9 @@ describe('adminUserDetailsUpdate testing', () => {
     });
     
     test('ID does not exist', () => {
-        expect(adminUserDetailsUpdate(5, "test@email.com", "Amog", "Us"))
+        clear();
+        user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
+        expect(adminUserDetailsUpdate(user1.authUserId + 1, "test@email.com", "Amog", "Us"))
         .toMatchObject({ 'error': 'User ID not found' });
     });
 
@@ -91,23 +93,64 @@ describe('adminUserDetailsUpdate testing', () => {
         .toMatchObject({ 'error': 'Names should be 20 or less characters' });
     });
 
+    // tests ensure that data has actually been written to the database
     test('no errors 1', () => {
         expect(JSON.stringify(adminUserDetailsUpdate(user2.authUserId, "test@email.com", "John", "Smith"))).toBe('{}');
-        console.log(getData);
+        expect(adminUserDetails(user2.authUserId)).toMatchObject(
+            { user:
+                {
+                    userId: user2.authUserId,
+                    name: "John Smith",
+                    email: "test@email.com",
+                    numSuccessfulLogins: 1,
+                    numFailedPasswordsSinceLastLogin: 0
+                },
+            },
+        );
     });
 
     test('no errors 2', () => {
         expect(JSON.stringify(adminUserDetailsUpdate(user1.authUserId, "test2@email.com", "Johnny", "Smitho"))).toBe('{}');
-        console.log(getData());
+        expect(adminUserDetails(user1.authUserId)).toMatchObject(
+            { user:
+                {
+                    userId: user1.authUserId,
+                    name: "Johnny Smitho",
+                    email: "test2@email.com",
+                    numSuccessfulLogins: 1,
+                    numFailedPasswordsSinceLastLogin: 0
+                },
+            },
+        );
     });
 
     test('no errors 3, 20 character names', () => {
         expect(JSON.stringify(adminUserDetailsUpdate(user1.authUserId, "test3@email.com", "abcdefghijklmnopqrst", "tsrqponmlkjihgfedcab"))).toBe('{}');
-        console.log(getData());
+        expect(adminUserDetails(user1.authUserId)).toMatchObject(
+            { user:
+                {
+                    userId: user1.authUserId,
+                    name: "abcdefghijklmnopqrst tsrqponmlkjihgfedcab",
+                    email: "test3@email.com",
+                    numSuccessfulLogins: 1,
+                    numFailedPasswordsSinceLastLogin: 0
+                },
+            },
+        );
     });
 
     test('no errors 4, 2 character names', () => {
         expect(JSON.stringify(adminUserDetailsUpdate(user1.authUserId, "test4@email.com", "ab", "ba"))).toBe('{}');
-        console.log(getData());
+        expect(adminUserDetails(user1.authUserId)).toMatchObject(
+            { user:
+                {
+                    userId: user1.authUserId,
+                    name: "ab ba",
+                    email: "test4@email.com",
+                    numSuccessfulLogins: 1,
+                    numFailedPasswordsSinceLastLogin: 0
+                },
+            },
+        );
     });
 })
