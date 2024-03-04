@@ -1,6 +1,7 @@
 import { getData, setData } from './dataStore.js'
 import validator from 'validator'
 /**
+ * James Growden
  * Register a user with an email, password, and names, 
  * then returns their authUserId value.
  * 
@@ -25,12 +26,15 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
         return { 'error': 'invalid email' };
     }
     const validChars = createValidCharsArray();
+    const minNameLength = 2;
+    const maxNameLength = 20;
+    const minPassLength = 8;
 
     // Check for invalid first name
     if (!validator.isWhitelisted(nameFirst, validChars)) {
         return { 'error': 'Invalid first name' };
     }
-    if (nameFirst.length < 2 || nameFirst.length > 20) {
+    if (nameFirst.length < minNameLength || nameFirst.length > maxNameLength) {
         return { 'error' : 'nameFirst does not satisfy length requirements' };
     }
 
@@ -38,12 +42,12 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
     if (!validator.isWhitelisted(nameLast, validChars)) {
         return { 'error': 'invalid last name' };
     }
-    if (nameLast.length < 2 || nameLast.length > 20) {
+    if (nameLast.length < minNameLength || nameLast.length > maxNameLength) {
         return { 'error' : 'nameLast does not satisfy length requirements' };
     }
 
     // Check for invalid password
-    if (password.length < 8) {
+    if (password.length < minPassLength) {
         return { 'error': 'password is less than 8 characters' };
     }
     if (!hasLetterAndNumber(password)) {
@@ -102,6 +106,7 @@ function hasLetterAndNumber(str) {
 }
 
 /**
+ * James Growden
  * Given a registered user's email and password,
  * returns their authUserId value.
  * 
