@@ -18,12 +18,12 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
     // Check for duplicate email
     for (const user of data.users) {
         if (user.email === email) {
-            return { 'error': 'User with given email already exists' };
+            return { error: 'User with given email already exists' };
         }
     }
     // Check for invalid email
     if (!validator.isEmail(email)) {
-        return { 'error': 'invalid email' };
+        return { error: 'invalid email' };
     }
     const validChars = createValidCharsArray();
     const minNameLength = 2;
@@ -32,26 +32,26 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
 
     // Check for invalid first name
     if (!validator.isWhitelisted(nameFirst, validChars)) {
-        return { 'error': 'Invalid first name' };
+        return { error: 'Invalid first name' };
     }
     if (nameFirst.length < minNameLength || nameFirst.length > maxNameLength) {
-        return { 'error' : 'nameFirst does not satisfy length requirements' };
+        return { error : 'nameFirst does not satisfy length requirements' };
     }
 
     // Check for invalid last name
     if (!validator.isWhitelisted(nameLast, validChars)) {
-        return { 'error': 'invalid last name' };
+        return { error: 'invalid last name' };
     }
     if (nameLast.length < minNameLength || nameLast.length > maxNameLength) {
-        return { 'error' : 'nameLast does not satisfy length requirements' };
+        return { error : 'nameLast does not satisfy length requirements' };
     }
 
     // Check for invalid password
     if (password.length < minPassLength) {
-        return { 'error': 'password is less than 8 characters' };
+        return { error: 'password is less than 8 characters' };
     }
     if (!hasLetterAndNumber(password)) {
-        return { 'error': 'password must contain at least one letter and at least one number'};
+        return { error: 'password must contain at least one letter and at least one number'};
     }
 
     data.users.push({
