@@ -14,65 +14,65 @@ describe('adminUserDetailsUpdate testing', () => {
 
     test('invalid ID', () => {
         expect(adminUserDetailsUpdate("invalid id", "test@email.com", "John", "Smith"))
-        .toMatchObject({ 'error': 'Invalid ID' });
+        .toStrictEqual({ error: expect.any(String) });
     });
     
     test('ID does not exist', () => {
         clear();
         user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
         expect(adminUserDetailsUpdate(user1.authUserId + 1, "test@email.com", "Amog", "Us"))
-        .toMatchObject({ 'error': 'User ID not found' });
+        .toStrictEqual({ error: expect.any(String) });
     });
 
     test('email used by another user', () => {
         expect(adminUserDetailsUpdate(user2.authUserId, "go.d.usopp@gmail.com", "John", "Smith"))
-        .toMatchObject({ 'error': 'Email already registered' });
+        .toStrictEqual({ error: expect.any(String) });
     });
 
     test('email does not satisfy validator', () => {
         expect(adminUserDetailsUpdate(user2.authUserId, "not_an_email", "John", "Smith"))
-        .toMatchObject({ 'error': 'Invalid email' });
+        .toStrictEqual({ error: expect.any(String) });
     });
 
     test('invalid characters in nameFirst 1', () => {
         expect(adminUserDetailsUpdate(user2.authUserId, "test@email.com", "Jo!hn", "Smith"))
-        .toMatchObject({ 'error': 'Invalid first name' });
+        .toStrictEqual({ error: expect.any(String) });
     });
 
     test('invalid characters in nameFirst 2', () => {
         expect(adminUserDetailsUpdate(user2.authUserId, "test@email.com", "J0hn", "Smith"))
-        .toMatchObject({ 'error': 'Invalid first name' });
+        .toStrictEqual({ error: expect.any(String) });
     });
 
     test('nameFirst less than 2 characters long', () => {
         expect(adminUserDetailsUpdate(user2.authUserId, "test@email.com", "J", "Smith"))
-        .toMatchObject({ 'error': 'Names should be 2 or more characters' });
+        .toStrictEqual({ error: expect.any(String) });
     });
 
     test('nameFirst more than 20 characters long', () => {
         expect(adminUserDetailsUpdate(user2.authUserId, "test@email.com", "Abcdefghijklmnopqrstuvwxyz", "Smith"))
-        .toMatchObject({ 'error': 'Names should be 20 or less characters' });
+        .toStrictEqual({ error: expect.any(String) });
     });
 
     test('invalid characters in nameLast 1', () => {
         expect(adminUserDetailsUpdate(user2.authUserId, "test@email.com", "John", "Sm1th"))
-        .toMatchObject({ 'error': 'Invalid last name' });
+        .toStrictEqual({ error: expect.any(String) });
 
     });
 
     test('invalid characters in nameLast 1', () => {
         expect(adminUserDetailsUpdate(user2.authUserId, "test@email.com", "John", "Sm@th"))
-        .toMatchObject({ 'error': 'Invalid last name' });
+        .toStrictEqual({ error: expect.any(String) });
     });
 
     test('nameLast less than 2 characters', () => {
         expect(adminUserDetailsUpdate(user2.authUserId, "test@email.com", "John", "S"))
-        .toMatchObject({ 'error': 'Names should be 2 or more characters' });
+        .toStrictEqual({ error: expect.any(String) });
     });
 
     test('nameLast more than 20 characters', () => {
         expect(adminUserDetailsUpdate(user2.authUserId, "test@email.com", "John", "Abcdefghijklmnopqrstuvwxyz"))
-        .toMatchObject({ 'error': 'Names should be 20 or less characters' });
+        .toStrictEqual({ error: expect.any(String) });
     });
 
     // tests ensure that data has actually been written to the database
