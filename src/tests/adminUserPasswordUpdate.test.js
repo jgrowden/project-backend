@@ -1,5 +1,5 @@
 import { clear } from '../other.js'
-import { adminUserPasswordUpdate, adminAuthRegister } from '../auth.js'
+import { adminUserPasswordUpdate, adminAuthRegister, adminAuthLogin } from '../auth.js'
 import { getData } from "../dataStore";
 
 
@@ -39,5 +39,12 @@ describe('adminUserPasswordUpdate', () => {
         expect(adminUserPasswordUpdate(userId.authUserId, 'p@ssw0rd', '12345678'))
         .toMatchObject({ error: expect.any(String) });
     });
+    test('No errors', () => {
+        adminUserPasswordUpdate(userId.authUserId, 'p@ssw0rd', 'valid_p@ssw0rd');
+        expect(adminAuthLogin('email@gmail.com', 'p@ssw0rd'))
+        .toMatchObject({ error: expect.any(String) });
+        expect(adminAuthLogin('email@gmail.com', 'valid_p@ssw0rd'))
+        .toMatchObject({ authUserId: userId.authUserId });
+    })
 });
 
