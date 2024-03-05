@@ -43,6 +43,8 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
 */
 export function adminQuizList(authUserId) {
     let data = getData();
+
+    //check if authUserId is valid
     let userFound = false;
     for (const user of data.users) {
         if (user.authUserId === authUserId) {
@@ -55,6 +57,8 @@ export function adminQuizList(authUserId) {
             { error: 'Invalid authUserId' }
         )
     }
+
+    //creating list of user's quizzes to return
     let quizzes = [];
     for (const quiz of data.quizzes) {
         if (authUserId === quiz.ownerId) {
