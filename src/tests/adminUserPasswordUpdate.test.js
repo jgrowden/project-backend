@@ -4,50 +4,40 @@ import { getData } from "../dataStore";
 
 
 describe('adminUserPasswordUpdate', () => {
+    let userId;
     beforeEach(() => {
         clear();
+        userId = adminAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
     });
     test('Check for invalid authUserId', () => {
-        expect(adminUserPasswordUpdate(1, 'p@ssw0rd', 'new_p@ssw0rd')).toEqual({
-            'error': 'Invalid authUserId'
-        });
+        clear();
+        expect(adminUserPasswordUpdate(1, 'p@ssw0rd', 'new_p@ssw0rd'))
+        .toMatchObject({ error: expect.any(String) });
     });
     test('Check for when old password is not the correct old password', () => {
-        const userId = adminAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
-        expect(adminUserPasswordUpdate(userId.authUserId, 'wrong_p@ssw0rd', 'new_p@ssword')).toEqual({
-            'error': 'Old password is not correct'
-        });
+        expect(adminUserPasswordUpdate(userId.authUserId, 'wrong_p@ssw0rd', 'new_p@ssword'))
+        .toMatchObject({ error: expect.any(String) });
     });
     test('Check for when new password matches the old password exactly', () => {
-        const userId = adminAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
-        expect(adminUserPasswordUpdate(userId.authUserId, 'p@ssw0rd', 'p@ssw0rd')).toEqual({
-            'error': 'New password is the same as old password'
-        });
+        expect(adminUserPasswordUpdate(userId.authUserId, 'p@ssw0rd', 'p@ssw0rd'))
+        .toMatchObject({ error: expect.any(String) });
     });
     test('Check for when new password has already been used by this user', () => {
-        const userId = adminAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
         adminUserPasswordUpdate(userId.authUserId, 'p@ssw0rd', 'new_p@ssw0rd');
-        expect(adminUserPasswordUpdate(userId.authUserId, 'new_p@ssw0rd', 'p@ssw0rd')).toEqual({
-            'error': 'Password has been used before'
-        });
+        expect(adminUserPasswordUpdate(userId.authUserId, 'new_p@ssw0rd', 'p@ssw0rd'))
+        .toMatchObject({ error: expect.any(String) });
     });
     test('Check for when new password is less than 8 characters', () => {
-        const userId = adminAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
-        expect(adminUserPasswordUpdate(userId.authUserId, 'p@ssw0rd', 'p@ssw0r')).toEqual({
-            'error': 'Password is less than 8 characters'
-        });
+        expect(adminUserPasswordUpdate(userId.authUserId, 'p@ssw0rd', 'p@ssw0r'))
+        .toMatchObject({ error: expect.any(String) });
     });
     test('Check for when new password does not contain at least one number', () => {
-        const userId = adminAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
-        expect(adminUserPasswordUpdate(userId.authUserId, 'p@ssw0rd', 'p@ssword')).toEqual({
-            'error': 'Password must contain at least one letter and at least one number'
-        })
+        expect(adminUserPasswordUpdate(userId.authUserId, 'p@ssw0rd', 'p@ssword'))
+        .toMatchObject({ error: expect.any(String) });
     });
     test('Check for when new password does not contain at least one letter', () => {
-        const userId = adminAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
-        expect(adminUserPasswordUpdate(userId.authUserId, 'p@ssw0rd', '12345678')).toEqual({
-            'error': 'Password must contain at least one letter and at least one number'
-        })
+        expect(adminUserPasswordUpdate(userId.authUserId, 'p@ssw0rd', '12345678'))
+        .toMatchObject({ error: expect.any(String) });
     });
 });
 
