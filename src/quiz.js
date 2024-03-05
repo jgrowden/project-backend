@@ -41,10 +41,10 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
 * }} - object with list of all quizzes by their unique ID number and name. 
 *
 */
-function adminQuizList(authUserId) {
+export function adminQuizList(authUserId) {
+    let data = getData();
     let userFound = false;
-    let user;
-    for (user of data.users) {
+    for (const user of data.users) {
         if (user.authUserId === authUserId) {
             userFound = true;
             break;
@@ -56,7 +56,7 @@ function adminQuizList(authUserId) {
         )
     }
     let quizzes = [];
-    for (quiz of data.quizzes) {
+    for (const quiz of data.quizzes) {
         if (authUserId === quiz.ownerId) {
             quizzes.push({
                 quizId: quiz.quizId,
