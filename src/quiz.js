@@ -40,15 +40,29 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
 *
 */ 
 function adminQuizList(authUserId) {
-
-    return {
-        quizzes: [
-            {
-                quizId: 1,
-                name: 'My Quiz',
-            }
-        ]
-    };
+    let userFound = false;
+    let user;
+    for (user of data.users) {
+        if (user.authUserId === authUserId) {
+            userFound = true;
+            break;
+        }
+    }
+    if (userFound === false) {
+        return (
+            { error: 'Invalid authUserId' }
+        )
+    }
+    let quizzes = [];
+    for (quiz of data.quizzes) {
+        if (authUserId === quiz.ownerId) {
+            quizzes.push({
+                quizId: quiz.quizId,
+                name: quiz.name,
+            })
+        }
+    }
+    return { quizzes };
 }
 
 /**

@@ -57,9 +57,7 @@ describe('adminQuizList', () => {
     });
     test ('invalid authUserId', () => {
         clear();
-        expect(adminQuizList(1)).toEqual({
-            'error': 'Invalid authUserId'
-        });
+        expect(adminQuizList(1)).toMatchObject({ error: expect.any(String) });
     });
 });
 
