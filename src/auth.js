@@ -1,7 +1,6 @@
 import { getData, setData } from './dataStore.js'
 import validator from 'validator'
 /**
- * James Growden
  * Register a user with an email, password, and names, 
  * then returns their authUserId value.
  * 
@@ -106,7 +105,6 @@ function hasLetterAndNumber(str) {
 }
 
 /**
- * James Growden
  * Given a registered user's email and password,
  * returns their authUserId value.
  * 
@@ -122,8 +120,12 @@ export function adminAuthLogin(email, password) {
         return { error: 'user doesn\'t exist' };
     }
     if (userExists.password !== password) {
+        userExists.numFailedPasswordsSinceLastLogin++;
         return { error: 'incorrect password' };
     }
+    userExists.numFailedPasswordsSinceLastLogin = 0;
+    userExists.numSuccessfulLogins++;
+    setData(data);
     return {
         authUserId: userExists.authUserId,
     }
