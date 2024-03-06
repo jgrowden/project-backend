@@ -62,7 +62,7 @@ function adminQuizList(authUserId) {
  * 
  * @returns {quizId: 2} - object with a unique quiz identification number
 */
-function adminQuizCreate(authUserId, name, description) {
+export function adminQuizCreate(authUserId, name, description) {
     return {
         quizId: 2
     }
@@ -95,4 +95,43 @@ function adminQuizRemove(authUserId, quizId) {
  * } - returns an object with details about the quiz queried for information.
  */
 export function adminQuizInfo(authUserId, quizId) {
+    let data = getData();
+
+    let userFlag = true;
+    let currUser;
+    for (const user of data.users) {
+        if (user.authUserId == authUserId) {
+            userFlag = false;
+            currUser = user;
+        }
+    }
+
+    let quizFlag = true;
+    let currQuiz;
+    for (const quiz of data.quizzes) {
+        if (quiz.quizId == quizId) {
+            quizFlag = false;
+            currQuiz = quiz;
+        }
+    }
+
+    if (userFlag) {
+        return { 'error': 'invalid user ID' };
+    }
+
+    if (quizFlag) {
+        return { 'error': 'invalid quiz ID' };
+    }
+
+    if (!currUser.userQuizzes.includes(quizId)) {
+        return { 'error': 'you do not own this quiz' };
+    }
+
+    return {
+        quizId: quizId,
+        name: currQuiz.quizId,
+        timeCreated: currQuiz.timeCreated,
+        timeLastEdited: currQuiz.timeLastEdited,
+        description: currQuiz.description,
+    }
 }
