@@ -270,38 +270,40 @@ export function adminUserPasswordUpdate(authUserId, oldPassword, newPassword) {
         }
     }
     if (authUserIdValid === false) {
-        return { 'error': 'Invalid authUserId' }
+        return { error: 'Invalid authUserId' }
     };
 
     //check oldPassword is correct
     if (oldPassword != user.password) {
-        return { 'error': 'Old password is not correct' }
+        return { error: 'Old password is not correct' }
     }
     //check oldPassword and newPassword match exactly
     if (oldPassword === newPassword) {
-        return { 'error': 'New password is the same as old password' }
+        return { error: 'New password is the same as old password' }
     }
 
     //check newPassword has not previously been used
     for (let prev_password of user.previousPasswords) {
         if (prev_password === newPassword) {
-            return { 'error': 'Password has been used before' }
+            return { error: 'Password has been used before' }
         }
     }
 
     //check newPassword is at least 8 characters
     if (newPassword.length < 8) {
-        return { 'error': 'Password is less than 8 characters' }
+        return { error: 'Password is less than 8 characters' }
     }
 
     //check newPassword is at least 1 letter and 1 number
     if (!hasLetterAndNumber(newPassword)) {
-        return { 'error': 'Password must contain at least one letter and at least one number' };
+        return { error: 'Password must contain at least one letter and at least one number' };
     }
 
     //update password if no errors
     user.password = newPassword;
     user.previousPasswords.push(oldPassword);
+
+    setData(data);
 
     return {};
 }
