@@ -5,13 +5,10 @@ import { adminQuizNameUpdate, adminQuizCreate } from '../quiz.js'
 
 describe('adminQuizNameUpdate', () => { 
 
-    let user1;
-    let quiz;
-
     beforeEach(() => {
         clear();
-        user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-        quiz1 = adminQuizCreate(user1.authUserId, 'good quiz', 'is good');
+        let user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
+        let quiz1 = adminQuizCreate(user1.authUserId, 'good quiz', 'is good');
     });
 
     test('invalid user ID', () => {    
@@ -59,7 +56,7 @@ describe('adminQuizNameUpdate', () => {
     });
 
     test('quiz name already used on another quiz by logged in user', () => {    
-        quiz2 = adminQuizCreate(user1.authUserId, 'great quiz', 'is good');
+        let quiz2 = adminQuizCreate(user1.authUserId, 'great quiz', 'is good');
         expect(adminQuizNameUpdate(user1.authUserId, quiz1.quizID, 'great quiz'))
             .toStrictEqual({ 'error': 'Quiz name already taken' });
     });
