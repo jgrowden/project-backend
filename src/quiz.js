@@ -191,7 +191,7 @@ export function adminQuizInfo(authUserId, quizId) {
 
     return {
         quizId: quizId,
-        name: currQuiz.quizId,
+        name: currQuiz.name,
         timeCreated: currQuiz.timeCreated,
         timeLastEdited: currQuiz.timeLastEdited,
         description: currQuiz.description,
