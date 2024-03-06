@@ -67,10 +67,6 @@ function adminQuizList(authUserId) {
  * @returns {quizId: 2} - object with a unique quiz identification number
 */
 export function adminQuizCreate(authUserId, name, description) {
-<<<<<<< HEAD
-    return {
-        quizId: 2
-=======
     let data = getData();
 
     let flag = true;
@@ -80,7 +76,6 @@ export function adminQuizCreate(authUserId, name, description) {
             flag = false;
             currUser = user;
         }
->>>>>>> 4f6289656a7c280a8a04de06f6a7b4a21f603272
     }
 
     if (flag) {
