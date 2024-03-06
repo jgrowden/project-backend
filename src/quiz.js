@@ -1,3 +1,5 @@
+import { getData } from './dataStore'
+
 /**
  * Update the description of the relevant quiz.
  * 
@@ -7,7 +9,7 @@
  * 
  * @returns {} - an empty object
 */
-function adminQuizDescriptionUpdate(authUserId, quizId, description ) {
+function adminQuizDescriptionUpdate(authUserId, quizId, description) {
     return {}
 }
 
@@ -38,7 +40,7 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
 *    ]
 * }} - object with list of all quizzes by their unique ID number and name. 
 *
-*/ 
+*/
 function adminQuizList(authUserId) {
 
     return {
@@ -76,7 +78,7 @@ function adminQuizCreate(authUserId, name, description) {
  */
 function adminQuizRemove(authUserId, quizId) {
     return {}
-} 
+}
 
 /**
  * Get all of the relevant information about the current quiz.
@@ -92,12 +94,5 @@ function adminQuizRemove(authUserId, quizId) {
  *      {string} description 
  * } - returns an object with details about the quiz queried for information.
  */
-function adminQuizInfo(authUserId, quizId) {
-    return {
-        quizId: 1,
-        name: 'My Quiz',
-        timeCreated: 1683125870,
-        timeLastEdited: 1683125871,
-        description: 'This is my quiz',
-    }
+export function adminQuizInfo(authUserId, quizId) {
 }
