@@ -116,15 +116,15 @@ export function adminQuizInfo(authUserId, quizId) {
     }
 
     if (userFlag) {
-        return { 'error': 'invalid user ID' };
+        return { error : 'invalid user ID' };
     }
 
     if (quizFlag) {
-        return { 'error': 'invalid quiz ID' };
+        return { error : 'invalid quiz ID' };
     }
 
     if (!currUser.userQuizzes.includes(quizId)) {
-        return { 'error': 'you do not own this quiz' };
+        return { error : 'you do not own this quiz' };
     }
 
     return {
