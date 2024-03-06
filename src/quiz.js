@@ -1,5 +1,4 @@
-import { setData, getData } from './dataStore.js'
-
+import { getData, setData } from './dataStore.js'
 /**
  * Update the description of the relevant quiz.
  * 
@@ -138,8 +137,58 @@ export function adminQuizCreate(authUserId, name, description) {
  * 
  * @returns {} - an empty object
  */
-function adminQuizRemove(authUserId, quizId) {
-    return {}
+export function adminQuizRemove(authUserId, quizId) {
+
+    let data = getData();
+
+    let userFlag = true;
+    let currUser;
+    for (const user of data.users) {
+        if (user.authUserId == authUserId) {
+            userFlag = false;
+            currUser = user;
+        }
+    }
+
+    let quizFlag = true;
+    let currQuiz;
+    for (const quiz of data.quizzes) {
+        if (quiz.quizId == quizId) {
+            quizFlag = false;
+            currQuiz = quiz;
+        }
+    }
+
+    if (userFlag) {
+        return { error: 'invalid user ID' };
+    }
+
+    if (quizFlag) {
+        return { error: 'invalid quiz ID' };
+    }
+
+    if (!currUser.userQuizzes.includes(quizId)) {
+        return { error: 'you do not own this quiz' };
+    }
+
+    let i = 0;
+    while (data.users[i].authUserId != authUserId) {
+        i++;
+    }
+    let j = 0;
+    while (data.users[i].userQuizzes[j] != quizId) {
+        j++;
+    }
+    data.users[i].userQuizzes.splice(i, 1);
+
+    i = 0;
+    while(data.quizzes[i].quizId != quizId) {
+        i++;
+    }
+    data.quizzes.splice(i, 1);
+    setData(data);
+
+    return {};
 }
 
 /**
