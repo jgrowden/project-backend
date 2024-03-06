@@ -220,6 +220,7 @@ export function adminUserDetailsUpdate(authUserId, email, nameFirst, nameLast) {
             user.email = email;
             user.nameFirst = nameFirst;
             user.nameLast = nameLast;
+            setData(data);
             return {};
         }
     }
