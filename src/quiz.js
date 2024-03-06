@@ -61,9 +61,62 @@ function adminQuizList(authUserId) {
  * @returns {quizId: 2} - object with a unique quiz identification number
 */
 function adminQuizCreate(authUserId, name, description) {
-    return {
-        quizId: 2
+    let data = getData();
+
+    let currUser;
+    let userExists = false;
+    for (const user of data.users) {
+        if (user.authUserId === authUserId) {
+            userExists = true;
+            currUser = user;
+            break;
+        }
     }
+
+    if (!userExists) {
+        return { 'error': 'invalid user ID' };
+    }
+
+    if (name.search(/[^A-Za-z0-9 ]/)) {
+        return { 'error': 'invalid quiz name characters' };
+    }
+
+    if (name.length < 3) {
+        return { 'error': 'invalid quiz name length: too short' };
+    } else if (name.length > 30) {
+        return { 'error': 'invalid quiz name length: too long' };
+    }
+
+    let duplicateQuizName = false;
+    for (const quiz of user.userQuizzes) {
+        if (data.quizzes[quiz].name === name) {
+            duplicateQuizName = true;
+        }
+    }
+    if (duplicateQuizName) {
+        return { 'error': 'Duplicate quiz name length' };
+    }
+
+    if (description.length > 100) {
+        return { 'error': 'Quiz description invalid length' };
+    }
+
+    const timestamp = require('unix-timestamp');
+
+    let unix_time = Date.now();
+
+    let index = 0;
+    while (data.quizzes[index].quizId) {
+        newQuizId++;
+    }
+
+    data.users[authUserId].userQuizzes.push(newQuizId);
+    data.quizzes.push()
+
+    if (name.length)
+        return {
+            quizId: 2
+        }
 }
 
 /**
