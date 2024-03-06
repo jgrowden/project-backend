@@ -1,3 +1,5 @@
+import { getData } from './dataStore.js'
+
 /**
  * Update the description of the relevant quiz.
  * 
@@ -60,20 +62,10 @@ function adminQuizList(authUserId) {
  * 
  * @returns {quizId: 2} - object with a unique quiz identification number
 */
-function adminQuizCreate(authUserId, name, description) {
+export function adminQuizCreate(authUserId, name, description) {
     let data = getData();
 
-    let currUser;
-    let userExists = false;
-    for (const user of data.users) {
-        if (user.authUserId === authUserId) {
-            userExists = true;
-            currUser = user;
-            break;
-        }
-    }
-
-    if (!userExists) {
+    if (!data.users.includes(authUserId)) {
         return { 'error': 'invalid user ID' };
     }
 
@@ -105,18 +97,26 @@ function adminQuizCreate(authUserId, name, description) {
 
     let unix_time = Date.now();
 
-    let index = 0;
-    while (data.quizzes[index].quizId) {
+    let newQuizId = 0;
+    let currQuizId = [];
+    for (const quiz in data.quizzes) {
+        currQuizId.push(quiz.quizId);
+    }
+    while (currQuizId.includes(newQuizId)) {
         newQuizId++;
     }
 
     data.users[authUserId].userQuizzes.push(newQuizId);
-    data.quizzes.push()
+    data.quizzes.push({
+        ownerId: authUserId,
+        quizId: newQuizId,
+        name: name,
+        description: description,
+        timeCreated: unix_time,
+        timeLastEdited: unix_time,
+    });
 
-    if (name.length)
-        return {
-            quizId: 2
-        }
+    return { quizId: newQuizId };
 }
 
 /**

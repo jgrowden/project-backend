@@ -56,6 +56,7 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
         nameFirst: nameFirst,
         nameLast: nameLast,
     })
+    setData(data);
     return {
         authUserId: data.users.length,
     }
