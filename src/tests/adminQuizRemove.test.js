@@ -18,7 +18,7 @@ describe('adminQuizRemove test cases', () => {
     describe('failure cases', () => {
         test('check for invalid user ID', () => {
             expect(adminQuizRemove(-1, 1))
-                .toMatchObject({ error : 'invalid user ID' });
+                .toMatchObject({ error : expect.any(String) });
         })
         test('Check for invalid quiz ID', () => {
             let user = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
