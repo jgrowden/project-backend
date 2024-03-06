@@ -1,4 +1,4 @@
-import { getData } from './dataStore.js'
+import { setData, getData } from './dataStore.js'
 
 /**
  * Update the description of the relevant quiz.
@@ -9,7 +9,7 @@ import { getData } from './dataStore.js'
  * 
  * @returns {} - an empty object
 */
-function adminQuizDescriptionUpdate(authUserId, quizId, description ) {
+function adminQuizDescriptionUpdate(authUserId, quizId, description) {
     return {}
 }
 
@@ -40,7 +40,7 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
 *    ]
 * }} - object with list of all quizzes by their unique ID number and name. 
 *
-*/ 
+*/
 function adminQuizList(authUserId) {
 
     return {
@@ -65,11 +65,21 @@ function adminQuizList(authUserId) {
 export function adminQuizCreate(authUserId, name, description) {
     let data = getData();
 
-    if (!data.users.includes(authUserId)) {
+    let flag = true;
+    let currUser;
+    for (const user of data.users) {
+        if (user.authUserId == authUserId) {
+            flag = false;
+            currUser = user;
+        }
+    }
+
+    if (flag) {
         return { 'error': 'invalid user ID' };
     }
 
-    if (name.search(/[^A-Za-z0-9 ]/)) {
+    const regex = /[^A-Za-z0-9 ]/;
+    if (regex.test(name)) {
         return { 'error': 'invalid quiz name characters' };
     }
 
@@ -80,7 +90,7 @@ export function adminQuizCreate(authUserId, name, description) {
     }
 
     let duplicateQuizName = false;
-    for (const quiz of user.userQuizzes) {
+    for (const quiz of currUser.userQuizzes) {
         if (data.quizzes[quiz].name === name) {
             duplicateQuizName = true;
         }
@@ -106,7 +116,7 @@ export function adminQuizCreate(authUserId, name, description) {
         newQuizId++;
     }
 
-    data.users[authUserId].userQuizzes.push(newQuizId);
+    currUser.userQuizzes.push(newQuizId);
     data.quizzes.push({
         ownerId: authUserId,
         quizId: newQuizId,
@@ -116,6 +126,7 @@ export function adminQuizCreate(authUserId, name, description) {
         timeLastEdited: unix_time,
     });
 
+    setData(data);
     return { quizId: newQuizId };
 }
 
@@ -129,7 +140,7 @@ export function adminQuizCreate(authUserId, name, description) {
  */
 function adminQuizRemove(authUserId, quizId) {
     return {}
-} 
+}
 
 /**
  * Get all of the relevant information about the current quiz.

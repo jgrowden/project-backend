@@ -1,6 +1,7 @@
 import { adminQuizCreate } from '../quiz.js'
 import { clear } from '../other.js'
-import {adminAuthRegister} from '../auth.js'
+import { adminAuthRegister } from '../auth.js'
+import { getData } from '../dataStore.js'
 
 clear();
 beforeEach(() => {
@@ -10,8 +11,8 @@ beforeEach(() => {
 describe('adminQuizCreate test cases', () => {
     describe('success cases', () => {
         test('correct return type', () => {
-            let userId = adminAuthRegister("john.smith@email.com", "JohnSmith1", "John", "Smith");
-            expect(adminQuizCreate(userId, 'Quiz Name', 'Quiz Description')).toBe(0);
+            let userId = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
+            expect(adminQuizCreate(userId.authUserId, 'Quiz Name', 'Quiz Description')).toMatchObject({ quizId : 0 });
         })
     })
     describe('failure cases', () => {
@@ -20,29 +21,29 @@ describe('adminQuizCreate test cases', () => {
                 .toMatchObject({ 'error': 'invalid user ID' });
         })
         test('Check for valid quiz name characters', () => {
-            let userId = adminAuthRegister("john.smith@email.com", "JohnSmith1", "John", "Smith");
-            expect(adminQuizCreate(userId, '!nvalid Name', 'Quiz Description'))
+            let userId = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
+            expect(adminQuizCreate(userId.authUserId, '!nvalid Name', 'Quiz Description'))
                 .toMatchObject({ 'error': 'invalid quiz name characters' });
         })
         test('Check for valid quiz name length', () => {
-            let userId = adminAuthRegister("john.smith@email.com", "JohnSmith1", "John", "Smith");
-            expect(adminQuizCreate(userId, 'iq', 'Quiz Description'))
+            let userId = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
+            expect(adminQuizCreate(userId.authUserId, 'iq', 'Quiz Description'))
                 .toMatchObject({ 'error': 'invalid quiz name length: too short' });
         })
         test('Check for valid quiz name length', () => {
-            let userId = adminAuthRegister("john.smith@email.com", "JohnSmith1", "John", "Smith");
-            expect(adminQuizCreate(userId, 'A very long quiz name, far too long', 'Quiz Description'))
+            let userId = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
+            expect(adminQuizCreate(userId.authUserId, 'A very long quiz name which is far too long', 'Quiz Description'))
                 .toMatchObject({ 'error': 'invalid quiz name length: too long' });
         })
         test('Check for duplicate quiz name', () => {
-            let userId = adminAuthRegister("john.smith@email.com", "JohnSmith1", "John", "Smith");
-            adminQuizCreate(userId, 'Duplicate Quiz Name', 'Quiz Description');
-            expect(adminQuizCreate(userId, 'Duplicate Quiz Name', 'Quiz Description'))
+            let userId = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
+            adminQuizCreate(userId.authUserId, 'Duplicate Quiz Name', 'Quiz Description');
+            expect(adminQuizCreate(userId.authUserId, 'Duplicate Quiz Name', 'Quiz Description'))
                 .toMatchObject({ 'error': 'Duplicate quiz name length' });
         })
         test('Check for valid quiz description length', () => {
-            let userId = adminAuthRegister("john.smith@email.com", "JohnSmith1", "John", "Smith");
-            expect(adminQuizCreate(userId, 'Quiz Name', 'A very, very, very, very, very, extraordinarily, tremendously, stupendously, ridiculously, anomolously, long description'))
+            let userId = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
+            expect(adminQuizCreate(userId.authUserId, 'Quiz Name', 'A very, very, very, very, very, extraordinarily, tremendously, stupendously, ridiculously, anomolously, long description'))
                 .toMatchObject({ 'error': 'Quiz description invalid length' });
         })
     })
