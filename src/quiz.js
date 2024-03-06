@@ -156,12 +156,44 @@ function adminQuizRemove(authUserId, quizId) {
  *      {string} description 
  * } - returns an object with details about the quiz queried for information.
  */
-function adminQuizInfo(authUserId, quizId) {
+export function adminQuizInfo(authUserId, quizId) {
+    let data = getData();
+
+    let userFlag = true;
+    let currUser;
+    for (const user of data.users) {
+        if (user.authUserId == authUserId) {
+            userFlag = false;
+            currUser = user;
+        }
+    }
+
+    let quizFlag = true;
+    let currQuiz;
+    for (const quiz of data.quizzes) {
+        if (quiz.quizId == quizId) {
+            quizFlag = false;
+            currQuiz = quiz;
+        }
+    }
+
+    if (userFlag) {
+        return { error : 'invalid user ID' };
+    }
+
+    if (quizFlag) {
+        return { error : 'invalid quiz ID' };
+    }
+
+    if (!currUser.userQuizzes.includes(quizId)) {
+        return { error : 'you do not own this quiz' };
+    }
+
     return {
-        quizId: 1,
-        name: 'My Quiz',
-        timeCreated: 1683125870,
-        timeLastEdited: 1683125871,
-        description: 'This is my quiz',
+        quizId: quizId,
+        name: currQuiz.name,
+        timeCreated: currQuiz.timeCreated,
+        timeLastEdited: currQuiz.timeLastEdited,
+        description: currQuiz.description,
     }
 }
