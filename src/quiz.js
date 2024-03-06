@@ -75,18 +75,18 @@ export function adminQuizCreate(authUserId, name, description) {
     }
 
     if (flag) {
-        return { 'error': 'invalid user ID' };
+        return { error : 'invalid user ID' };
     }
 
     const regex = /[^A-Za-z0-9 ]/;
     if (regex.test(name)) {
-        return { 'error': 'invalid quiz name characters' };
+        return { error : 'invalid quiz name characters' };
     }
 
     if (name.length < 3) {
-        return { 'error': 'invalid quiz name length: too short' };
+        return { error : 'invalid quiz name length: too short' };
     } else if (name.length > 30) {
-        return { 'error': 'invalid quiz name length: too long' };
+        return { error : 'invalid quiz name length: too long' };
     }
 
     let duplicateQuizName = false;
@@ -96,11 +96,11 @@ export function adminQuizCreate(authUserId, name, description) {
         }
     }
     if (duplicateQuizName) {
-        return { 'error': 'Duplicate quiz name length' };
+        return { error : 'Duplicate quiz name length' };
     }
 
     if (description.length > 100) {
-        return { 'error': 'Quiz description invalid length' };
+        return { error : 'Quiz description invalid length' };
     }
 
     const timestamp = require('unix-timestamp');

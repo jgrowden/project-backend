@@ -18,33 +18,33 @@ describe('adminQuizCreate test cases', () => {
     describe('failure cases', () => {
         test('check for invalid user type', () => {
             expect(adminQuizCreate(-1, 'Quiz Name', 'Quiz Description'))
-                .toMatchObject({ 'error': 'invalid user ID' });
+                .toMatchObject({ error : 'invalid user ID' });
         })
         test('Check for valid quiz name characters', () => {
             let userId = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
             expect(adminQuizCreate(userId.authUserId, '!nvalid Name', 'Quiz Description'))
-                .toMatchObject({ 'error': 'invalid quiz name characters' });
+                .toMatchObject({ error : 'invalid quiz name characters' });
         })
         test('Check for valid quiz name length', () => {
             let userId = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
             expect(adminQuizCreate(userId.authUserId, 'iq', 'Quiz Description'))
-                .toMatchObject({ 'error': 'invalid quiz name length: too short' });
+                .toMatchObject({ error : 'invalid quiz name length: too short' });
         })
         test('Check for valid quiz name length', () => {
             let userId = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
             expect(adminQuizCreate(userId.authUserId, 'A very long quiz name which is far too long', 'Quiz Description'))
-                .toMatchObject({ 'error': 'invalid quiz name length: too long' });
+                .toMatchObject({ error : 'invalid quiz name length: too long' });
         })
         test('Check for duplicate quiz name', () => {
             let userId = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
             adminQuizCreate(userId.authUserId, 'Duplicate Quiz Name', 'Quiz Description');
             expect(adminQuizCreate(userId.authUserId, 'Duplicate Quiz Name', 'Quiz Description'))
-                .toMatchObject({ 'error': 'Duplicate quiz name length' });
+                .toMatchObject({ error : 'Duplicate quiz name length' });
         })
         test('Check for valid quiz description length', () => {
             let userId = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
             expect(adminQuizCreate(userId.authUserId, 'Quiz Name', 'A very, very, very, very, very, extraordinarily, tremendously, stupendously, ridiculously, anomolously, long description'))
-                .toMatchObject({ 'error': 'Quiz description invalid length' });
+                .toMatchObject({ error : 'Quiz description invalid length' });
         })
     })
 })
