@@ -1,4 +1,4 @@
-import { getData } from './dataStore'
+import { setData, getData } from './dataStore.js'
 
 /**
  * Update the description of the relevant quiz.
@@ -63,9 +63,71 @@ function adminQuizList(authUserId) {
  * @returns {quizId: 2} - object with a unique quiz identification number
 */
 export function adminQuizCreate(authUserId, name, description) {
-    return {
-        quizId: 2
+    let data = getData();
+
+    let flag = true;
+    let currUser;
+    for (const user of data.users) {
+        if (user.authUserId == authUserId) {
+            flag = false;
+            currUser = user;
+        }
     }
+
+    if (flag) {
+        return { error : 'invalid user ID' };
+    }
+
+    const regex = /[^A-Za-z0-9 ]/;
+    if (regex.test(name)) {
+        return { error : 'invalid quiz name characters' };
+    }
+
+    if (name.length < 3) {
+        return { error : 'invalid quiz name length: too short' };
+    } else if (name.length > 30) {
+        return { error : 'invalid quiz name length: too long' };
+    }
+
+    let duplicateQuizName = false;
+    for (const quiz of currUser.userQuizzes) {
+        if (data.quizzes[quiz].name === name) {
+            duplicateQuizName = true;
+        }
+    }
+    if (duplicateQuizName) {
+        return { error : 'Duplicate quiz name length' };
+    }
+
+    if (description.length > 100) {
+        return { error : 'Quiz description invalid length' };
+    }
+
+    const timestamp = require('unix-timestamp');
+
+    let unix_time = Date.now();
+
+    let newQuizId = 0;
+    let currQuizId = [];
+    for (const quiz in data.quizzes) {
+        currQuizId.push(quiz.quizId);
+    }
+    while (currQuizId.includes(newQuizId)) {
+        newQuizId++;
+    }
+
+    currUser.userQuizzes.push(newQuizId);
+    data.quizzes.push({
+        ownerId: authUserId,
+        quizId: newQuizId,
+        name: name,
+        description: description,
+        timeCreated: unix_time,
+        timeLastEdited: unix_time,
+    });
+
+    setData(data);
+    return { quizId: newQuizId };
 }
 
 /**
