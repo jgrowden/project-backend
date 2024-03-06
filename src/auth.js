@@ -58,6 +58,7 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
         authUserId: data.users.length + 1,
         numSuccessfulLogins: 1,
         numFailedPasswordsSinceLastLogin: 0,
+        previousPasswords: [],
         userQuizzes: [],
     })
     setData(data);
@@ -65,6 +66,7 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
         authUserId: data.users.length,
     }
 }
+
 
 /**
  * Creates an array of chars containing only:
@@ -175,10 +177,60 @@ export function adminUserDetails(authUserId) {
  * 
  * @return {} - an empty object
 */
-function adminUserDetailsUpdate(authUserId, email, nameFirst, nameLast) {
+export function adminUserDetailsUpdate(authUserId, email, nameFirst, nameLast) {
 
-    return {};
+    if (typeof authUserId !== "number") {
+        return { error: 'Invalid ID' };
+    }
+    if (validator.isEmail(email) === false) {
+        return { error: 'Invalid email' };
+    }
+
+    // name length check
+    if (nameFirst.length < 2) {
+        return { error: 'Names should be 2 or more characters' }
+    }
+    if (nameFirst.length > 20) {
+        return { error: 'Names should be 20 or less characters' }
+    }
+    if (nameLast.length < 2) {
+        return { error: 'Names should be 2 or more characters' }
+    }
+    if (nameLast.length > 20) {
+        return { error: 'Names should be 20 or less characters' }
+    }
+
+    const validChars = createValidCharsArray();
+
+    // Check name validity
+    if (validator.isWhitelisted(nameFirst, validChars) == false) {
+        return { error: 'Invalid first name' };
+    }
+    if (validator.isWhitelisted(nameLast, validChars) == false) {
+        return { error: 'Invalid last name' };
+    }
+
+    const data = getData();
+
+    for (let user of data.users) {
+        if (user.email === email) {
+            return { error: 'Email already registered'};
+        }
+    }
+
+    for (let user of data.users) {
+        if (user.authUserId === authUserId) {
+            user.email = email;
+            user.nameFirst = nameFirst;
+            user.nameLast = nameLast;
+            return {};
+        }
+    }
+
+    return { error: 'User ID not found'};
 }
+
+
 
 /**
  * Given details relating to a password change, update the password of a logged in user.
@@ -190,7 +242,51 @@ function adminUserDetailsUpdate(authUserId, email, nameFirst, nameLast) {
  * @return {} - an empty object
 */    
 
-function adminUserPasswordUpdate(authUserId, oldPassword, newPassword) {
+export function adminUserPasswordUpdate(authUserId, oldPassword, newPassword) {
+    const data = getData();
+
+    //check for valid authUserId
+    let user;
+    let authUserIdValid = false;
+    for (user of data.users) {
+        if (user.authUserId === authUserId) {
+            authUserIdValid = true;
+            break;
+        }
+    }
+    if (authUserIdValid === false) {
+        return { 'error': 'Invalid authUserId' }
+    };
+
+    //check oldPassword is correct
+    if (oldPassword != user.password) {
+        return { 'error': 'Old password is not correct' }
+    }
+    //check oldPassword and newPassword match exactly
+    if (oldPassword === newPassword) {
+        return { 'error': 'New password is the same as old password' }
+    }
+
+    //check newPassword has not previously been used
+    for (let prev_password of user.previousPasswords) {
+        if (prev_password === newPassword) {
+            return { 'error': 'Password has been used before' }
+        }
+    }
+
+    //check newPassword is at least 8 characters
+    if (newPassword.length < 8) {
+        return { 'error': 'Password is less than 8 characters' }
+    }
+
+    //check newPassword is at least 1 letter and 1 number
+    if (!hasLetterAndNumber(newPassword)) {
+        return { 'error': 'Password must contain at least one letter and at least one number' };
+    }
+
+    //update password if no errors
+    user.password = newPassword;
+    user.previousPasswords.push(oldPassword);
 
     return {};
 }
