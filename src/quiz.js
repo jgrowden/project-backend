@@ -1,9 +1,4 @@
-<<<<<<< HEAD
 import { getData, setData } from './dataStore.js'
-=======
-import { setData, getData } from './dataStore.js'
->>>>>>> 4f6289656a7c280a8a04de06f6a7b4a21f603272
-
 /**
  * Update the description of the relevant quiz.
  * 
