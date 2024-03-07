@@ -84,7 +84,7 @@ describe('adminQuizDescriptionUpdate', () => {
             name: 'good quiz',
             timeCreated: expect.any(Number),
             timeLastEdited: expect.any(Number),
-            description: 'is good',
+            description: '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789',
         });
     });
 
