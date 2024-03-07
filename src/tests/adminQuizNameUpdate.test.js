@@ -1,4 +1,4 @@
-import { adminQuizCreate, adminQuizNameUpdate } from '../quiz.js'
+import { adminQuizCreate, adminQuizNameUpdate, adminQuizInfo } from '../quiz.js'
 import { getData } from '../dataStore.js'
 import { clear } from '../other.js'
 import { adminAuthRegister } from '../auth.js'
@@ -76,21 +76,39 @@ describe('adminQuizNameUpdate', () => {
         let user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
         let quiz1 = adminQuizCreate(user1.authUserId, 'good quiz', 'is good');
         expect(JSON.stringify(adminQuizNameUpdate(user1.authUserId, quiz1.quizId, 'great quiz'))).toBe('{}');
-        console.log(getData);
+        expect(adminQuizInfo(user1.authUserId, quiz1.quizId)).toMatchObject({
+            quizId: quiz1.quizId,
+            name: 'great quiz',
+            timeCreated: expect.any(Number),
+            timeLastEdited: expect.any(Number),
+            description: 'is good',
+        });
     });
 
     test('no errors 2, 3 character names', () => {
         let user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
         let quiz1 = adminQuizCreate(user1.authUserId, 'good quiz', 'is good');
         expect(JSON.stringify(adminQuizNameUpdate(user1.authUserId, quiz1.quizId, 'Abc'))).toBe('{}');
-        console.log(getData);
+        expect(adminQuizInfo(user1.authUserId, quiz1.quizId)).toMatchObject({
+            quizId: quiz1.quizId,
+            name: 'Abc',
+            timeCreated: expect.any(Number),
+            timeLastEdited: expect.any(Number),
+            description: 'is good',
+        });
     });
 
     test('no errors 3, 30 character names', () => {
         let user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
         let quiz1 = adminQuizCreate(user1.authUserId, 'good quiz', 'is good');
         expect(JSON.stringify(adminQuizNameUpdate(user1.authUserId, quiz1.quizId, 'ABCdefghijklmnopqrstuvwxyz1234'))).toBe('{}');
-        console.log(getData);
+        expect(adminQuizInfo(user1.authUserId, quiz1.quizId)).toMatchObject({
+            quizId: quiz1.quizId,
+            name: 'ABCdefghijklmnopqrstuvwxyz1234',
+            timeCreated: expect.any(Number),
+            timeLastEdited: expect.any(Number),
+            description: 'is good',
+        });
     });
 
 });
