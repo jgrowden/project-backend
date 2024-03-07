@@ -63,13 +63,31 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
         return { 'error': 'Quiz not owned by user' };
     }
 
-    
+    const regex = /[^A-Za-z0-9 ]/;
+    if (regex.test(name)) {
+        return { 'error': 'Invalid characters found in quiz name' };
+    }
+
+    if (name.length < 3) {
+        return { 'error': 'Quiz name should be more than 3 characters' };
+    }
+
+    if (name.length > 30) {
+        return { 'error': 'Quiz name should be less than 30 characters' };
+    }
+
+    for (const quiz of data.quizzes) {
+        if (quiz.ownerId === authUserId && quiz.name === name) {
+            return { 'error': 'Quiz name already taken' };
+        } 
+    }
 
     currQuiz.name = name;
 
     setData(data);
 
     return {}
+    
 }
 
 /**
