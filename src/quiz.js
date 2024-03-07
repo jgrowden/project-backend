@@ -8,8 +8,60 @@ import { getData, setData } from './dataStore.js'
  * 
  * @returns {} - an empty object
 */
-function adminQuizDescriptionUpdate(authUserId, quizId, description) {
+export function adminQuizDescriptionUpdate(authUserId, quizId, description) {
+
+    let data = getData();
+
+    let userFlag = true;
+    let currUser;
+    for (const user of data.users) {
+        if (user.authUserId === authUserId) {
+            userFlag = false;
+            currUser = user;
+        }
+    }
+
+    let quizFlag = true;
+    let currQuiz;
+    for (const quiz of data.quizzes) {
+        if (quiz.quizId === quizId) {
+            quizFlag = false;
+            currQuiz = quiz;
+        }
+    }
+
+    if (typeof authUserId !== 'number') {
+        return { 'error': 'Invalid user ID' }
+    };
+
+    if (userFlag) {
+        return { 'error': 'User ID not found' };
+    }
+    
+    if (typeof quizId !== 'number') {
+        return { 'error': 'Invalid quiz ID' }
+    };
+
+    if (quizFlag) {
+        return { 'error': 'Quiz ID not found' };
+    }
+
+    if (!currUser.userQuizzes.includes(quizId)) {
+        return { 'error': 'Quiz not owned by user' };
+    }
+
+    const maxNameLength = 100;
+
+    if (description.length > maxNameLength) {
+        return { 'error': 'Quiz description should be less than 100 characters' };
+    }
+
+    currQuiz.description = description;
+
+    setData(data);
+
     return {}
+
 }
 
 /** 
