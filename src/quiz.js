@@ -28,7 +28,7 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
     let userFlag = true;
     let currUser;
     for (const user of data.users) {
-        if (user.authUserId == authUserId) {
+        if (user.authUserId === authUserId) {
             userFlag = false;
             currUser = user;
         }
@@ -37,7 +37,7 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
     let quizFlag = true;
     let currQuiz;
     for (const quiz of data.quizzes) {
-        if (quiz.quizId == quizId) {
+        if (quiz.quizId === quizId) {
             quizFlag = false;
             currQuiz = quiz;
         }
