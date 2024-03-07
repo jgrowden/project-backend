@@ -1,3 +1,4 @@
+import { getData, setData } from './dataStore.js'
 /**
  * Update the description of the relevant quiz.
  * 
@@ -7,7 +8,7 @@
  * 
  * @returns {} - an empty object
 */
-function adminQuizDescriptionUpdate(authUserId, quizId, description ) {
+function adminQuizDescriptionUpdate(authUserId, quizId, description) {
     return {}
 }
 
@@ -38,17 +39,35 @@ function adminQuizNameUpdate(authUserId, quizId, name) {
 *    ]
 * }} - object with list of all quizzes by their unique ID number and name. 
 *
-*/ 
-function adminQuizList(authUserId) {
+*/
+export function adminQuizList(authUserId) {
+    let data = getData();
 
-    return {
-        quizzes: [
-            {
-                quizId: 1,
-                name: 'My Quiz',
-            }
-        ]
-    };
+    //check if authUserId is valid
+    let userFound = false;
+    for (const user of data.users) {
+        if (user.authUserId === authUserId) {
+            userFound = true;
+            break;
+        }
+    }
+    if (userFound === false) {
+        return (
+            { error: 'Invalid authUserId' }
+        )
+    }
+
+    //creating list of user's quizzes to return
+    let quizzes = [];
+    for (const quiz of data.quizzes) {
+        if (authUserId === quiz.ownerId) {
+            quizzes.push({
+                quizId: quiz.quizId,
+                name: quiz.name,
+            })
+        }
+    }
+    return { quizzes };
 }
 
 /**
@@ -60,10 +79,72 @@ function adminQuizList(authUserId) {
  * 
  * @returns {quizId: 2} - object with a unique quiz identification number
 */
-function adminQuizCreate(authUserId, name, description) {
-    return {
-        quizId: 2
+export function adminQuizCreate(authUserId, name, description) {
+    let data = getData();
+
+    let flag = true;
+    let currUser;
+    for (const user of data.users) {
+        if (user.authUserId == authUserId) {
+            flag = false;
+            currUser = user;
+        }
     }
+
+    if (flag) {
+        return { error : 'invalid user ID' };
+    }
+
+    const regex = /[^A-Za-z0-9 ]/;
+    if (regex.test(name)) {
+        return { error : 'invalid quiz name characters' };
+    }
+
+    if (name.length < 3) {
+        return { error : 'invalid quiz name length: too short' };
+    } else if (name.length > 30) {
+        return { error : 'invalid quiz name length: too long' };
+    }
+
+    let duplicateQuizName = false;
+    for (const quiz of currUser.userQuizzes) {
+        if (data.quizzes[quiz].name === name) {
+            duplicateQuizName = true;
+        }
+    }
+    if (duplicateQuizName) {
+        return { error : 'Duplicate quiz name length' };
+    }
+
+    if (description.length > 100) {
+        return { error : 'Quiz description invalid length' };
+    }
+
+    const timestamp = require('unix-timestamp');
+
+    let unix_time = Date.now();
+
+    let newQuizId = 0;
+    let currQuizId = [];
+    for (const quiz in data.quizzes) {
+        currQuizId.push(quiz.quizId);
+    }
+    while (currQuizId.includes(newQuizId)) {
+        newQuizId++;
+    }
+
+    currUser.userQuizzes.push(newQuizId);
+    data.quizzes.push({
+        ownerId: authUserId,
+        quizId: newQuizId,
+        name: name,
+        description: description,
+        timeCreated: unix_time,
+        timeLastEdited: unix_time,
+    });
+
+    setData(data);
+    return { quizId: newQuizId };
 }
 
 /**
@@ -74,9 +155,59 @@ function adminQuizCreate(authUserId, name, description) {
  * 
  * @returns {} - an empty object
  */
-function adminQuizRemove(authUserId, quizId) {
-    return {}
-} 
+export function adminQuizRemove(authUserId, quizId) {
+
+    let data = getData();
+
+    let userFlag = true;
+    let currUser;
+    for (const user of data.users) {
+        if (user.authUserId == authUserId) {
+            userFlag = false;
+            currUser = user;
+        }
+    }
+
+    let quizFlag = true;
+    let currQuiz;
+    for (const quiz of data.quizzes) {
+        if (quiz.quizId == quizId) {
+            quizFlag = false;
+            currQuiz = quiz;
+        }
+    }
+
+    if (userFlag) {
+        return { error: 'invalid user ID' };
+    }
+
+    if (quizFlag) {
+        return { error: 'invalid quiz ID' };
+    }
+
+    if (!currUser.userQuizzes.includes(quizId)) {
+        return { error: 'you do not own this quiz' };
+    }
+
+    let i = 0;
+    while (data.users[i].authUserId != authUserId) {
+        i++;
+    }
+    let j = 0;
+    while (data.users[i].userQuizzes[j] != quizId) {
+        j++;
+    }
+    data.users[i].userQuizzes.splice(i, 1);
+
+    i = 0;
+    while(data.quizzes[i].quizId != quizId) {
+        i++;
+    }
+    data.quizzes.splice(i, 1);
+    setData(data);
+
+    return {};
+}
 
 /**
  * Get all of the relevant information about the current quiz.
@@ -92,12 +223,44 @@ function adminQuizRemove(authUserId, quizId) {
  *      {string} description 
  * } - returns an object with details about the quiz queried for information.
  */
-function adminQuizInfo(authUserId, quizId) {
+export function adminQuizInfo(authUserId, quizId) {
+    let data = getData();
+
+    let userFlag = true;
+    let currUser;
+    for (const user of data.users) {
+        if (user.authUserId == authUserId) {
+            userFlag = false;
+            currUser = user;
+        }
+    }
+
+    let quizFlag = true;
+    let currQuiz;
+    for (const quiz of data.quizzes) {
+        if (quiz.quizId == quizId) {
+            quizFlag = false;
+            currQuiz = quiz;
+        }
+    }
+
+    if (userFlag) {
+        return { error : 'invalid user ID' };
+    }
+
+    if (quizFlag) {
+        return { error : 'invalid quiz ID' };
+    }
+
+    if (!currUser.userQuizzes.includes(quizId)) {
+        return { error : 'you do not own this quiz' };
+    }
+
     return {
-        quizId: 1,
-        name: 'My Quiz',
-        timeCreated: 1683125870,
-        timeLastEdited: 1683125871,
-        description: 'This is my quiz',
+        quizId: quizId,
+        name: currQuiz.name,
+        timeCreated: currQuiz.timeCreated,
+        timeLastEdited: currQuiz.timeLastEdited,
+        description: currQuiz.description,
     }
 }
