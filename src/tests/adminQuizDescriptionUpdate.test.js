@@ -1,5 +1,4 @@
 import { adminQuizCreate, adminQuizDescriptionUpdate, adminQuizInfo } from '../quiz.js'
-import { getData } from '../dataStore.js'
 import { clear } from '../other.js'
 import { adminAuthRegister } from '../auth.js'
 
