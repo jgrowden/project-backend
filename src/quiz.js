@@ -68,11 +68,14 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
         return { 'error': 'Invalid characters found in quiz name' };
     }
 
-    if (name.length < 3) {
+    const minNameLength = 3;
+    const maxNameLength = 30;
+
+    if (name.length < minNameLength) {
         return { 'error': 'Quiz name should be more than 3 characters' };
     }
 
-    if (name.length > 30) {
+    if (name.length > maxNameLength) {
         return { 'error': 'Quiz name should be less than 30 characters' };
     }
 
@@ -87,7 +90,7 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
     setData(data);
 
     return {}
-    
+
 }
 
 /**
