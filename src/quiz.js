@@ -87,16 +87,34 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
 * }} - object with list of all quizzes by their unique ID number and name. 
 *
 */
-function adminQuizList(authUserId) {
+export function adminQuizList(authUserId) {
+    let data = getData();
 
-    return {
-        quizzes: [
-            {
-                quizId: 1,
-                name: 'My Quiz',
-            }
-        ]
-    };
+    //check if authUserId is valid
+    let userFound = false;
+    for (const user of data.users) {
+        if (user.authUserId === authUserId) {
+            userFound = true;
+            break;
+        }
+    }
+    if (userFound === false) {
+        return (
+            { error: 'Invalid authUserId' }
+        )
+    }
+
+    //creating list of user's quizzes to return
+    let quizzes = [];
+    for (const quiz of data.quizzes) {
+        if (authUserId === quiz.ownerId) {
+            quizzes.push({
+                quizId: quiz.quizId,
+                name: quiz.name,
+            })
+        }
+    }
+    return { quizzes };
 }
 
 /**
