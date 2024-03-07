@@ -21,7 +21,54 @@ function adminQuizDescriptionUpdate(authUserId, quizId, description) {
  * 
  * @returns {} - an empty object
 */
-function adminQuizNameUpdate(authUserId, quizId, name) {
+export function adminQuizNameUpdate(authUserId, quizId, name) {
+
+    let data = getData();
+
+    let userFlag = true;
+    let currUser;
+    for (const user of data.users) {
+        if (user.authUserId == authUserId) {
+            userFlag = false;
+            currUser = user;
+        }
+    }
+
+    let quizFlag = true;
+    let currQuiz;
+    for (const quiz of data.quizzes) {
+        if (quiz.quizId == quizId) {
+            quizFlag = false;
+            currQuiz = quiz;
+        }
+    }
+
+    if (typeof authUserId !== 'number') {
+        return { 'error': 'Invalid user ID' }
+    };
+
+    if (userFlag) {
+        return { 'error': 'User ID not found' };
+    }
+    
+    if (typeof quizId !== 'number') {
+        return { 'error': 'Invalid quiz ID' }
+    };
+
+    if (quizFlag) {
+        return { 'error': 'Quiz ID not found' };
+    }
+
+    if (!currUser.userQuizzes.includes(quizId)) {
+        return { 'error': 'Quiz not owned by user' };
+    }
+
+    
+
+    currQuiz.name = name;
+
+    setData(data);
+
     return {}
 }
 
