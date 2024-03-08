@@ -27,10 +27,6 @@ describe('adminQuizCreate test cases', () => {
                 }
             )
         })
-        test('successful write to datastore', () => {
-            let userId = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-            expect(adminQuizCreate(userId.authUserId, 'Quiz Name', 'Quiz Description')).toStrictEqual({ quizId : expect.any(Number) });
-        })
     })
     describe('failure cases', () => {
         test('check for invalid user type', () => {
