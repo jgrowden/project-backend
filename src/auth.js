@@ -258,7 +258,7 @@ export function adminUserDetailsUpdate(authUserId, email, nameFirst, nameLast) {
 */    
 
 export function adminUserPasswordUpdate(authUserId, oldPassword, newPassword) {
-    const data = getData();
+    let data = getData();
 
     //check for valid authUserId
     let user;
@@ -274,7 +274,7 @@ export function adminUserPasswordUpdate(authUserId, oldPassword, newPassword) {
     };
 
     //check oldPassword is correct
-    if (oldPassword != user.password) {
+    if (oldPassword !== user.password) {
         return { error: 'Old password is not correct' }
     }
     //check oldPassword and newPassword match exactly
