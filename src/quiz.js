@@ -247,7 +247,7 @@ export function adminQuizCreate(authUserId, name, description) {
     
     let newQuizId = 0;
     let currQuizId = [];
-    for (const quiz in data.quizzes) {
+    for (const quiz of data.quizzes) {
         currQuizId.push(quiz.quizId);
     }
     while (currQuizId.includes(newQuizId)) {
