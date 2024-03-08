@@ -243,9 +243,7 @@ export function adminQuizCreate(authUserId, name, description) {
         return { error : 'Quiz description invalid length' };
     }
 
-    const timestamp = require('unix-timestamp');
-
-    let unix_time = Date.now();
+    let unix_time = Math.floor(Date.now()/1000);
 
     let newQuizId = 0;
     let currQuizId = [];
