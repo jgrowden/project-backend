@@ -244,7 +244,7 @@ export function adminQuizCreate(authUserId, name, description) {
     }
 
     let unix_time = Math.floor(Date.now()/1000);
-
+    
     let newQuizId = 0;
     let currQuizId = [];
     for (const quiz in data.quizzes) {
