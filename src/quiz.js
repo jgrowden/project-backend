@@ -31,29 +31,29 @@ export function adminQuizDescriptionUpdate(authUserId, quizId, description) {
     }
 
     if (typeof authUserId !== 'number') {
-        return { 'error': 'Invalid user ID' }
+        return { error : 'Invalid user ID' }
     };
 
     if (userFlag) {
-        return { 'error': 'User ID not found' };
+        return { error : 'User ID not found' };
     }
     
     if (typeof quizId !== 'number') {
-        return { 'error': 'Invalid quiz ID' }
+        return { error : 'Invalid quiz ID' }
     };
 
     if (quizFlag) {
-        return { 'error': 'Quiz ID not found' };
+        return { error : 'Quiz ID not found' };
     }
 
     if (!currUser.userQuizzes.includes(quizId)) {
-        return { 'error': 'Quiz not owned by user' };
+        return { error : 'Quiz not owned by user' };
     }
 
     const maxNameLength = 100;
 
     if (description.length > maxNameLength) {
-        return { 'error': 'Quiz description should be less than 100 characters' };
+        return { error : 'Quiz description should be less than 100 characters' };
     }
 
     currQuiz.description = description;
@@ -96,44 +96,44 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
     }
 
     if (typeof authUserId !== 'number') {
-        return { 'error': 'Invalid user ID' }
+        return { error : 'Invalid user ID' }
     };
 
     if (userFlag) {
-        return { 'error': 'User ID not found' };
+        return { error : 'User ID not found' };
     }
     
     if (typeof quizId !== 'number') {
-        return { 'error': 'Invalid quiz ID' }
+        return { error : 'Invalid quiz ID' }
     };
 
     if (quizFlag) {
-        return { 'error': 'Quiz ID not found' };
+        return { error : 'Quiz ID not found' };
     }
 
     if (!currUser.userQuizzes.includes(quizId)) {
-        return { 'error': 'Quiz not owned by user' };
+        return { error : 'Quiz not owned by user' };
     }
 
     const regex = /[^A-Za-z0-9 ]/;
     if (regex.test(name)) {
-        return { 'error': 'Invalid characters found in quiz name' };
+        return { error : 'Invalid characters found in quiz name' };
     }
 
     const minNameLength = 3;
     const maxNameLength = 30;
 
     if (name.length < minNameLength) {
-        return { 'error': 'Quiz name should be more than 3 characters' };
+        return { error : 'Quiz name should be more than 3 characters' };
     }
 
     if (name.length > maxNameLength) {
-        return { 'error': 'Quiz name should be less than 30 characters' };
+        return { error : 'Quiz name should be less than 30 characters' };
     }
 
     for (const quiz of data.quizzes) {
         if (quiz.ownerId === authUserId && quiz.name === name) {
-            return { 'error': 'Quiz name already taken' };
+            return { error : 'Quiz name already taken' };
         } 
     }
 
