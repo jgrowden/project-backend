@@ -156,7 +156,7 @@ export function adminAuthLogin(email, password) {
 export function adminUserDetails(authUserId) {
 
     if (typeof authUserId !== "number") {
-        return {error: "Invalid User ID Provided"};
+        return { error: 'Invalid User ID Provided' };
     }
 
     const data = getData();
@@ -175,7 +175,7 @@ export function adminUserDetails(authUserId) {
     }
 
     return {
-        error: "User ID not found",
+        error: 'User ID not found',
     };
 }
 
@@ -258,9 +258,14 @@ export function adminUserDetailsUpdate(authUserId, email, nameFirst, nameLast) {
 */    
 
 export function adminUserPasswordUpdate(authUserId, oldPassword, newPassword) {
-    const data = getData();
+    let data = getData();
 
     //check for valid authUserId
+    if (typeof authUserId !== "number") {
+        return { error: "Invalid ID" };
+    }
+
+    //check authUserId exists
     let user;
     let authUserIdValid = false;
     for (user of data.users) {
@@ -270,11 +275,11 @@ export function adminUserPasswordUpdate(authUserId, oldPassword, newPassword) {
         }
     }
     if (authUserIdValid === false) {
-        return { error: 'Invalid authUserId' }
+        return { error: 'User ID not found' }
     };
 
     //check oldPassword is correct
-    if (oldPassword != user.password) {
+    if (oldPassword !== user.password) {
         return { error: 'Old password is not correct' }
     }
     //check oldPassword and newPassword match exactly
