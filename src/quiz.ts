@@ -1,14 +1,14 @@
-import { string } from 'yaml/dist/schema/common/string';
-import { UserType, QuizType, DataType, getData, setData } from './dataStore';
+//import { string } from 'yaml/dist/schema/common/string';
+import { getData, setData } from './dataStore';
 
 interface ErrorObject {
   error: string
-};
+}
 
 interface AdminQuizListReturnElement {
   quizId: number;
   name: string;
-};
+}
 
 interface AdminQuizListReturn {
   quizzes: AdminQuizListReturnElement[];
@@ -172,7 +172,6 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
 *
 */
 
-
 export function adminQuizList(authUserId: number): AdminQuizListReturn | ErrorObject {
   const data = getData();
 
@@ -182,7 +181,7 @@ export function adminQuizList(authUserId: number): AdminQuizListReturn | ErrorOb
   }
 
   // check authUserId exists
-  let userFound: boolean = false;
+  let userFound = false;
   for (const user of data.users) {
     if (user.authUserId === authUserId) {
       userFound = true;

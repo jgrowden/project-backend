@@ -1,8 +1,5 @@
-import { UserType, QuizType, DataType, getData, setData } from './dataStore';
+import { UserType, getData, setData } from './dataStore';
 import validator from 'validator';
-
-
-
 
 /**
  * Register a user with an email, password, and names,
@@ -265,7 +262,7 @@ export function adminUserPasswordUpdate(authUserId: number, oldPassword: string,
 
   // check authUserId exists
   let user: UserType;
-  let authUserIdValid: boolean = false;
+  let authUserIdValid = false;
   for (user of data.users) {
     if (user.authUserId === authUserId) {
       authUserIdValid = true;
