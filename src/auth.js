@@ -9,7 +9,7 @@ import validator from 'validator';
  * @param {string} nameFirst - user's first name
  * @param {string} nameLast - user's last name
  *
- * @returns {number} authUserId - the user's unique identification number
+ * @returns {{authUserId: number}} authUserId - the user's unique identification number
  */
 export function adminAuthRegister(email, password, nameFirst, nameLast) {
   const data = getData();
@@ -112,7 +112,7 @@ function hasLetterAndNumber(str) {
  * @param {string} email - user's email
  * @param {string} password - user's password
  *
- * @returns {number} authUserId - the user's unique identification number
+ * @returns {{authUserId: number}} authUserId - the user's unique identification number
  */
 export function adminAuthLogin(email, password) {
   const data = getData();
