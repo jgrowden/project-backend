@@ -1,4 +1,4 @@
-//import { string } from 'yaml/dist/schema/common/string';
+// import { string } from 'yaml/dist/schema/common/string';
 import { getData, setData } from './dataStore';
 
 interface ErrorObject {
