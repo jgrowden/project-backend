@@ -1,12 +1,8 @@
 import { clear } from '../other';
 import { adminUserPasswordUpdate, adminAuthRegister, adminAuthLogin } from '../auth';
 
-interface userID {
-    authUserId: number;
-  }
-
 describe('adminUserPasswordUpdate', () => {
-  let userId: userID;
+  let userId;
   beforeEach(() => {
     clear();
     userId = adminAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');

@@ -1,6 +1,24 @@
 import { UserType, getData, setData } from './dataStore';
 import validator from 'validator';
 
+interface ErrorObject {
+  error: string
+}
+
+interface ReturnAuthUserId {
+  authUserId: number
+}
+
+interface AdminUserDetailsReturn {
+  user: {
+    userId: number;
+    name: string;
+    email: string;
+    numSuccessfulLogins: number;
+    numFailedPasswordsSinceLastLogin: number;
+  }
+}
+
 /**
  * Register a user with an email, password, and names,
  * then returns their authUserId value.
@@ -12,7 +30,9 @@ import validator from 'validator';
  *
  * @returns {{authUserId: number}} authUserId - the user's unique identification number
  */
-export function adminAuthRegister(email, password, nameFirst, nameLast) {
+
+export function adminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string):
+ ReturnAuthUserId | ErrorObject {
   const data = getData();
 
   // Check for duplicate email
@@ -79,8 +99,8 @@ export function adminAuthRegister(email, password, nameFirst, nameLast) {
  * @returns {Array<string>}
  */
 
-function createValidCharsArray() {
-  const validChars = [];
+function createValidCharsArray(): string[] {
+  const validChars: string[] = [];
 
   // add lowercase letters
   for (let i = 97; i <= 122; i++) {
@@ -102,7 +122,7 @@ function createValidCharsArray() {
  * @param {string}
  * @returns {boolean}
  */
-function hasLetterAndNumber(str) {
+function hasLetterAndNumber(str: string): boolean {
   return /[a-zA-Z]/.test(str) && /[0-9]/.test(str);
 }
 
@@ -115,7 +135,7 @@ function hasLetterAndNumber(str) {
  *
  * @returns {{authUserId: number}} authUserId - the user's unique identification number
  */
-export function adminAuthLogin(email, password) {
+export function adminAuthLogin(email: string, password: string): ReturnAuthUserId | ErrorObject {
   const data = getData();
   const userExists = data.users.find(user => user.email === email);
   if (!userExists) {
@@ -153,7 +173,8 @@ export function adminAuthLogin(email, password) {
  *      }
  *   }} - an object containing key information about the user queried.
 */
-export function adminUserDetails(authUserId) {
+
+export function adminUserDetails(authUserId: number): AdminUserDetailsReturn | ErrorObject {
   if (typeof authUserId !== 'number') {
     return { error: 'Invalid User ID Provided' };
   }
@@ -189,7 +210,7 @@ export function adminUserDetails(authUserId) {
  *
  * @return {} - an empty object
 */
-export function adminUserDetailsUpdate(authUserId, email, nameFirst, nameLast) {
+export function adminUserDetailsUpdate(authUserId: number, email: string, nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
   if (typeof authUserId !== 'number') {
     return { error: 'Invalid ID' };
   }
@@ -252,7 +273,7 @@ export function adminUserDetailsUpdate(authUserId, email, nameFirst, nameLast) {
  * @return {} - an empty object
 */
 
-export function adminUserPasswordUpdate(authUserId: number, oldPassword: string, newPassword: string) {
+export function adminUserPasswordUpdate(authUserId: number, oldPassword: string, newPassword: string): ErrorObject | Record<string, never> {
   const data = getData();
 
   // check for valid authUserId
