@@ -1,5 +1,9 @@
-import { getData, setData } from './dataStore.js';
+import { UserType, QuizType, DataType, getData, setData } from './dataStore';
 import validator from 'validator';
+
+
+
+
 /**
  * Register a user with an email, password, and names,
  * then returns their authUserId value.
@@ -251,7 +255,7 @@ export function adminUserDetailsUpdate(authUserId, email, nameFirst, nameLast) {
  * @return {} - an empty object
 */
 
-export function adminUserPasswordUpdate(authUserId, oldPassword, newPassword) {
+export function adminUserPasswordUpdate(authUserId: number, oldPassword: string, newPassword: string) {
   const data = getData();
 
   // check for valid authUserId
@@ -260,8 +264,8 @@ export function adminUserPasswordUpdate(authUserId, oldPassword, newPassword) {
   }
 
   // check authUserId exists
-  let user;
-  let authUserIdValid = false;
+  let user: UserType;
+  let authUserIdValid: boolean = false;
   for (user of data.users) {
     if (user.authUserId === authUserId) {
       authUserIdValid = true;

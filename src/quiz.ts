@@ -1,4 +1,19 @@
-import { getData, setData } from './dataStore.js';
+import { string } from 'yaml/dist/schema/common/string';
+import { UserType, QuizType, DataType, getData, setData } from './dataStore';
+
+interface ErrorObject {
+  error: string
+};
+
+interface AdminQuizListReturnElement {
+  quizId: number;
+  name: string;
+};
+
+interface AdminQuizListReturn {
+  quizzes: AdminQuizListReturnElement[];
+}
+
 /**
  * Update the description of the relevant quiz.
  *
@@ -156,7 +171,9 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
 * }} - object with list of all quizzes by their unique ID number and name.
 *
 */
-export function adminQuizList(authUserId) {
+
+
+export function adminQuizList(authUserId: number): AdminQuizListReturn | ErrorObject {
   const data = getData();
 
   // check for valid authUserId
@@ -165,7 +182,7 @@ export function adminQuizList(authUserId) {
   }
 
   // check authUserId exists
-  let userFound = false;
+  let userFound: boolean = false;
   for (const user of data.users) {
     if (user.authUserId === authUserId) {
       userFound = true;
@@ -177,7 +194,7 @@ export function adminQuizList(authUserId) {
   }
 
   // creating list of user's quizzes to return
-  const quizzes = [];
+  const quizzes: AdminQuizListReturnElement[] = [];
   for (const quiz of data.quizzes) {
     if (authUserId === quiz.ownerId) {
       quizzes.push({
@@ -186,7 +203,7 @@ export function adminQuizList(authUserId) {
       });
     }
   }
-  return { quizzes };
+  return { quizzes: quizzes };
 }
 
 /**
