@@ -1,5 +1,5 @@
-import { clear } from '../other.js';
-import { adminUserPasswordUpdate, adminAuthRegister, adminAuthLogin } from '../auth.js';
+import { clear } from '../other';
+import { adminUserPasswordUpdate, adminAuthRegister, adminAuthLogin } from '../auth';
 
 interface userID {
     authUserId: number;

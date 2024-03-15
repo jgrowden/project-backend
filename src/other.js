@@ -2,7 +2,7 @@
  * Reset the state of the application back to the start.
  */
 
-import { setData } from './dataStore.js';
+import { setData } from './dataStore';
 
 function clear() {
   setData({

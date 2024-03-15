@@ -1,6 +1,6 @@
-import { clear } from '../other.js';
-import { adminQuizList, adminQuizCreate } from '../quiz.js';
-import { adminAuthRegister } from '../auth.js';
+import { clear } from '../other';
+import { adminQuizList, adminQuizCreate } from '../quiz';
+import { adminAuthRegister } from '../auth';
 
 interface userID {
   authUserId: number;
