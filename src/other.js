@@ -2,13 +2,13 @@
  * Reset the state of the application back to the start.
  */
 
-import { getData, setData } from './dataStore.js';
+import { setData } from './dataStore.js';
 
 function clear() {
-    setData({
-        users: [],
-        quizzes: [],
-    });
+  setData({
+    users: [],
+    quizzes: [],
+  });
 }
 
-export { clear }
+export { clear };
