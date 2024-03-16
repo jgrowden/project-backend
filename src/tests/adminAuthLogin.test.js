@@ -1,5 +1,5 @@
-import { clear } from '../other.js';
-import { adminAuthRegister, adminAuthLogin } from '../auth.js';
+import { clear } from '../other';
+import { adminAuthRegister, adminAuthLogin } from '../auth';
 
 beforeEach(() => {
   clear();

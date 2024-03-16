@@ -1,4 +1,31 @@
-import { getData, setData } from './dataStore.js';
+// import { string } from 'yaml/dist/schema/common/string';
+import { UserType, QuizType, getData, setData } from './dataStore';
+
+interface ErrorObject {
+  error: string
+}
+
+interface AdminQuizListReturnElement {
+  quizId: number;
+  name: string;
+}
+
+interface AdminQuizListReturn {
+  quizzes: AdminQuizListReturnElement[];
+}
+
+interface AdminQuizCreateReturn {
+  quizId: number;
+}
+
+interface AdminQuizInfoReturn {
+  quizId: number;
+  name: string;
+  timeCreated: number;
+  timeLastEdited: number;
+  description: string;
+}
+
 /**
  * Update the description of the relevant quiz.
  *
@@ -8,11 +35,11 @@ import { getData, setData } from './dataStore.js';
  *
  * @returns {} - an empty object
 */
-export function adminQuizDescriptionUpdate(authUserId, quizId, description) {
+export function adminQuizDescriptionUpdate(authUserId: number, quizId: number, description: string): ErrorObject | Record<string, never> {
   const data = getData();
 
   let userFlag = true;
-  let currUser;
+  let currUser: UserType;
   for (const user of data.users) {
     if (user.authUserId === authUserId) {
       userFlag = false;
@@ -21,7 +48,7 @@ export function adminQuizDescriptionUpdate(authUserId, quizId, description) {
   }
 
   let quizFlag = true;
-  let currQuiz;
+  let currQuiz: QuizType;
   for (const quiz of data.quizzes) {
     if (quiz.quizId === quizId) {
       quizFlag = false;
@@ -71,11 +98,11 @@ export function adminQuizDescriptionUpdate(authUserId, quizId, description) {
  *
  * @returns {} - an empty object
 */
-export function adminQuizNameUpdate(authUserId, quizId, name) {
+export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): ErrorObject | Record<string, never> {
   const data = getData();
 
   let userFlag = true;
-  let currUser;
+  let currUser: UserType;
   for (const user of data.users) {
     if (user.authUserId === authUserId) {
       userFlag = false;
@@ -84,7 +111,7 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
   }
 
   let quizFlag = true;
-  let currQuiz;
+  let currQuiz: QuizType;
   for (const quiz of data.quizzes) {
     if (quiz.quizId === quizId) {
       quizFlag = false;
@@ -156,7 +183,8 @@ export function adminQuizNameUpdate(authUserId, quizId, name) {
 * }} - object with list of all quizzes by their unique ID number and name.
 *
 */
-export function adminQuizList(authUserId) {
+
+export function adminQuizList(authUserId: number): AdminQuizListReturn | ErrorObject {
   const data = getData();
 
   // check for valid authUserId
@@ -177,7 +205,7 @@ export function adminQuizList(authUserId) {
   }
 
   // creating list of user's quizzes to return
-  const quizzes = [];
+  const quizzes: AdminQuizListReturnElement[] = [];
   for (const quiz of data.quizzes) {
     if (authUserId === quiz.ownerId) {
       quizzes.push({
@@ -186,23 +214,23 @@ export function adminQuizList(authUserId) {
       });
     }
   }
-  return { quizzes };
+  return { quizzes: quizzes };
 }
 
 /**
  * Given basic details about a new quiz, create one for the logged in user.
  *
- * @param {int} authUserId - unique user identification number
+ * @param {number} authUserId - unique user identification number
  * @param {string} name - name of quiz created
  * @param {string} description - description of the quiz being created
  *
  * @returns {quizId: 2} - object with a unique quiz identification number
 */
-export function adminQuizCreate(authUserId, name, description) {
+export function adminQuizCreate(authUserId: number, name: string, description: string): AdminQuizCreateReturn | ErrorObject {
   const data = getData();
 
   let flag = true;
-  let currUser;
+  let currUser: UserType;
   for (const user of data.users) {
     if (user.authUserId === authUserId) {
       flag = false;
@@ -242,7 +270,7 @@ export function adminQuizCreate(authUserId, name, description) {
   const unixTime = Math.floor(Date.now() / 1000);
 
   let newQuizId = 0;
-  const currQuizId = [];
+  const currQuizId: number[] = [];
   for (const quiz of data.quizzes) {
     currQuizId.push(quiz.quizId);
   }
@@ -272,11 +300,11 @@ export function adminQuizCreate(authUserId, name, description) {
  *
  * @returns {} - an empty object
  */
-export function adminQuizRemove(authUserId, quizId) {
+export function adminQuizRemove(authUserId: number, quizId: number): ErrorObject | Record<string, never> {
   const data = getData();
 
   let userFlag = true;
-  let currUser;
+  let currUser: UserType;
   for (const user of data.users) {
     if (user.authUserId === authUserId) {
       userFlag = false;
@@ -330,18 +358,18 @@ export function adminQuizRemove(authUserId, quizId) {
  * @param {number} quizId - a quiz's unique identification number
  *
  * @returns {
- *      {number} quizId,
- *      {string} name,
- *      {number} timeCreated,
- *      {number} timeLastEdited,
- *      {string} description
+ *      quizId: number,
+ *      name: string,
+ *      timeCreated: number,
+ *      timeLastEdited: number,
+ *      description: string
  * } - returns an object with details about the quiz queried for information.
  */
-export function adminQuizInfo(authUserId, quizId) {
+export function adminQuizInfo(authUserId: number, quizId: number): AdminQuizInfoReturn | ErrorObject {
   const data = getData();
 
   let userFlag = true;
-  let currUser;
+  let currUser: UserType;
   for (const user of data.users) {
     if (user.authUserId === authUserId) {
       userFlag = false;
@@ -350,7 +378,7 @@ export function adminQuizInfo(authUserId, quizId) {
   }
 
   let quizFlag = true;
-  let currQuiz;
+  let currQuiz: QuizType;
   for (const quiz of data.quizzes) {
     if (quiz.quizId === quizId) {
       quizFlag = false;
