@@ -2,12 +2,12 @@ import { UserType, getData, setData } from './dataStore';
 import validator from 'validator';
 
 interface ErrorObject {
-  error: string
-}
+  error: string;
+};
 
 interface ReturnAuthUserId {
-  authUserId: number
-}
+  authUserId: number;
+};
 
 interface AdminUserDetailsReturn {
   user: {
@@ -17,6 +17,31 @@ interface AdminUserDetailsReturn {
     numSuccessfulLogins: number;
     numFailedPasswordsSinceLastLogin: number;
   }
+};
+
+const userNameMinLength = 2;
+const userNameMaxLength = 20;
+const userPasswordMinLength = 8;
+
+/**
+ * Returns true if the given string contains anything but letters, 
+ * hyphens, spaces, and apostrophes.
+ * @param {string}
+ * @returns {boolean}
+ */
+function validName(str: string): boolean {
+  return /[^a-zA-Z \-\']/.test(str);
+}
+
+
+/**
+ * Returns true if the given string contains at least one letter
+ * and at least one number. False otherwise.
+ * @param {string}
+ * @returns {boolean}
+ */
+function hasLetterAndNumber(str: string): boolean {
+  return /[a-zA-Z]/.test(str) && /[0-9]/.test(str);
 }
 
 /**
@@ -36,42 +61,47 @@ export function adminAuthRegister(email: string, password: string, nameFirst: st
   const data = getData();
 
   // Check for duplicate email
-  for (const user of data.users) {
-    if (user.email === email) {
-      return { error: 'User with given email already exists' };
-    }
+  let duplicateEmail = data.users.find(user => user.email === email);
+  if (duplicateEmail !== undefined) {
+    return { error: 'User with given email already exists' };
   }
+
   // Check for invalid email
   if (!validator.isEmail(email)) {
     return { error: 'invalid email' };
   }
-  const validChars = createValidCharsArray();
-  const minNameLength = 2;
-  const maxNameLength = 20;
-  const minPassLength = 8;
 
   // Check for invalid first name
-  if (!validator.isWhitelisted(nameFirst, validChars)) {
+  if (validName(nameFirst)) {
     return { error: 'Invalid first name' };
   }
-  if (nameFirst.length < minNameLength || nameFirst.length > maxNameLength) {
+
+  if (nameFirst.length < userNameMinLength || nameFirst.length > userNameMaxLength) {
     return { error: 'nameFirst does not satisfy length requirements' };
   }
 
   // Check for invalid last name
-  if (!validator.isWhitelisted(nameLast, validChars)) {
+  if (validName(nameLast)) {
     return { error: 'invalid last name' };
   }
-  if (nameLast.length < minNameLength || nameLast.length > maxNameLength) {
+
+  if (nameLast.length < userNameMinLength || nameLast.length > userNameMaxLength) {
     return { error: 'nameLast does not satisfy length requirements' };
   }
 
   // Check for invalid password
-  if (password.length < minPassLength) {
+  if (password.length < userPasswordMinLength) {
     return { error: 'password is less than 8 characters' };
   }
+
   if (!hasLetterAndNumber(password)) {
     return { error: 'password must contain at least one letter and at least one number' };
+  }
+
+  let newUserId = 0;
+  const userIds = data.users.map(user => user.authUserId);
+  while (userIds.includes(newUserId)) {
+    newUserId++;
   }
 
   data.users.push({
@@ -79,51 +109,14 @@ export function adminAuthRegister(email: string, password: string, nameFirst: st
     password: password,
     nameFirst: nameFirst,
     nameLast: nameLast,
-    authUserId: data.users.length + 1,
+    authUserId: newUserId,
     numSuccessfulLogins: 1,
     numFailedPasswordsSinceLastLogin: 0,
     previousPasswords: [],
-    userQuizzes: [],
+    userQuizzes: []
   });
-  setData(data);
-  return {
-    authUserId: data.users.length,
-  };
-}
 
-/**
- * Creates an array of chars containing only:
- *      - Lowercase letters
- *      - Uppercase letters
- *      - Space, hyphen and apostrophe
- * @returns {Array<string>}
- */
-
-function createValidCharsArray(): string[] {
-  const validChars: string[] = [];
-
-  // add lowercase letters
-  for (let i = 97; i <= 122; i++) {
-    validChars.push(String.fromCharCode(i));
-  }
-
-  // add uppercase letters
-  for (let i = 65; i <= 90; i++) {
-    validChars.push(String.fromCharCode(i));
-  }
-  validChars.push(' ', '-', '\'');
-
-  return validChars;
-}
-
-/**
- * Returns true if the given string contains at least one letter
- * and at least one number. False otherwise.
- * @param {string}
- * @returns {boolean}
- */
-function hasLetterAndNumber(str: string): boolean {
-  return /[a-zA-Z]/.test(str) && /[0-9]/.test(str);
+  return { authUserId: newUserId };
 }
 
 /**
@@ -137,6 +130,7 @@ function hasLetterAndNumber(str: string): boolean {
  */
 export function adminAuthLogin(email: string, password: string): ReturnAuthUserId | ErrorObject {
   const data = getData();
+
   const userExists = data.users.find(user => user.email === email);
   if (!userExists) {
     return { error: 'user doesn\'t exist' };
@@ -145,9 +139,10 @@ export function adminAuthLogin(email: string, password: string): ReturnAuthUserI
     userExists.numFailedPasswordsSinceLastLogin++;
     return { error: 'incorrect password' };
   }
+
   userExists.numFailedPasswordsSinceLastLogin = 0;
   userExists.numSuccessfulLogins++;
-  setData(data);
+
   return {
     authUserId: userExists.authUserId,
   };
@@ -175,29 +170,25 @@ export function adminAuthLogin(email: string, password: string): ReturnAuthUserI
 */
 
 export function adminUserDetails(authUserId: number): AdminUserDetailsReturn | ErrorObject {
-  if (typeof authUserId !== 'number') {
-    return { error: 'Invalid User ID Provided' };
-  }
-
   const data = getData();
-  for (const user of data.users) {
-    if (user.authUserId === authUserId) {
-      return {
-        user: {
-          userId: user.authUserId,
-          name: `${user.nameFirst} ${user.nameLast}`,
-          email: user.email,
-          numSuccessfulLogins: user.numSuccessfulLogins,
-          numFailedPasswordsSinceLastLogin: user.numFailedPasswordsSinceLastLogin,
-        },
-      };
-    }
+
+  const user = data.users.find(user => user.authUserId === authUserId);
+  if (!user) {
+    return { error: 'User ID not found' };
   }
 
   return {
-    error: 'User ID not found',
+    user: {
+      userId: user.authUserId,
+      name: `${user.nameFirst} ${user.nameLast}`,
+      email: user.email,
+      numSuccessfulLogins: user.numSuccessfulLogins,
+      numFailedPasswordsSinceLastLogin: user.numFailedPasswordsSinceLastLogin,
+    }
   };
 }
+
+
 
 /**
  * Given an admin user's authUserId and a set of properties,
@@ -211,56 +202,43 @@ export function adminUserDetails(authUserId: number): AdminUserDetailsReturn | E
  * @return {} - an empty object
 */
 export function adminUserDetailsUpdate(authUserId: number, email: string, nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
-  if (typeof authUserId !== 'number') {
-    return { error: 'Invalid ID' };
-  }
   if (validator.isEmail(email) === false) {
     return { error: 'Invalid email' };
   }
 
-  // name length check
-  if (nameFirst.length < 2) {
-    return { error: 'Names should be 2 or more characters' };
-  }
-  if (nameFirst.length > 20) {
-    return { error: 'Names should be 20 or less characters' };
-  }
-  if (nameLast.length < 2) {
-    return { error: 'Names should be 2 or more characters' };
-  }
-  if (nameLast.length > 20) {
-    return { error: 'Names should be 20 or less characters' };
-  }
-
-  const validChars = createValidCharsArray();
-
-  // Check name validity
-  if (validator.isWhitelisted(nameFirst, validChars) === false) {
+  // Check for invalid first name
+  if (validName(nameFirst)) {
     return { error: 'Invalid first name' };
   }
-  if (validator.isWhitelisted(nameLast, validChars) === false) {
-    return { error: 'Invalid last name' };
+  if (nameFirst.length < userNameMinLength || nameFirst.length > userNameMaxLength) {
+    return { error: 'nameFirst does not satisfy length requirements' };
+  }
+
+  // Check for invalid last name
+  if (validName(nameLast)) {
+    return { error: 'invalid last name' };
+  }
+  if (nameLast.length < userNameMinLength || nameLast.length > userNameMaxLength) {
+    return { error: 'nameLast does not satisfy length requirements' };
   }
 
   const data = getData();
 
-  for (const user of data.users) {
-    if (user.email === email) {
-      return { error: 'Email already registered' };
-    }
+  const duplicateEmail = data.users.find(user => user.email === email);
+  if (duplicateEmail !== undefined) {
+    return { error: 'Email already registered' };
   }
 
-  for (const user of data.users) {
-    if (user.authUserId === authUserId) {
-      user.email = email;
-      user.nameFirst = nameFirst;
-      user.nameLast = nameLast;
-      setData(data);
-      return {};
-    }
+  const user = data.users.find(user => user.authUserId === authUserId);
+  if (!user) {
+    return { error: 'User ID not found' };
   }
 
-  return { error: 'User ID not found' };
+  user.email = email;
+  user.nameFirst = nameFirst;
+  user.nameLast = nameLast;
+
+  return {};
 }
 
 /**
@@ -276,21 +254,9 @@ export function adminUserDetailsUpdate(authUserId: number, email: string, nameFi
 export function adminUserPasswordUpdate(authUserId: number, oldPassword: string, newPassword: string): ErrorObject | Record<string, never> {
   const data = getData();
 
-  // check for valid authUserId
-  if (typeof authUserId !== 'number') {
-    return { error: 'Invalid ID' };
-  }
-
   // check authUserId exists
-  let user: UserType;
-  let authUserIdValid = false;
-  for (user of data.users) {
-    if (user.authUserId === authUserId) {
-      authUserIdValid = true;
-      break;
-    }
-  }
-  if (authUserIdValid === false) {
+  const user = data.users.find(user => user.authUserId === authUserId);
+  if (!user) {
     return { error: 'User ID not found' };
   }
 
@@ -311,7 +277,7 @@ export function adminUserPasswordUpdate(authUserId: number, oldPassword: string,
   }
 
   // check newPassword is at least 8 characters
-  if (newPassword.length < 8) {
+  if (newPassword.length < userPasswordMinLength) {
     return { error: 'Password is less than 8 characters' };
   }
 
@@ -323,8 +289,6 @@ export function adminUserPasswordUpdate(authUserId: number, oldPassword: string,
   // update password if no errors
   user.password = newPassword;
   user.previousPasswords.push(oldPassword);
-
-  setData(data);
 
   return {};
 }
