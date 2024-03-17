@@ -11,10 +11,12 @@ import process from 'process';
 import { getData, setData } from './dataStore';
 import {
   adminAuthRegister, adminAuthLogin, adminUserDetails,
-  adminUserDetailsUpdate, adminUserPasswordUpdate } from './auth';
+  adminUserDetailsUpdate, adminUserPasswordUpdate
+} from './auth';
 import {
   adminQuizList, adminQuizCreate, adminQuizRemove,
-  adminQuizInfo, adminQuizNameUpdate, adminQuizDescriptionUpdate } from './quiz';
+  adminQuizInfo, adminQuizNameUpdate, adminQuizDescriptionUpdate
+} from './quiz';
 
 // Set up web app
 const app = express();
@@ -42,7 +44,7 @@ const load = () => {
 load();
 const save = () => {
   fs.writeFileSync('./tooHakData.json', JSON.stringify(getData()));
-}
+};
 
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
@@ -73,7 +75,7 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
   }
   save();
   res.json(result);
-})
+});
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================
