@@ -1,14 +1,16 @@
-import { clear } from '../other.js';
-import { adminQuizList, adminQuizCreate } from '../quiz.js';
-import { adminAuthRegister } from '../auth.js';
+import { clear } from '../other';
+import { adminQuizList, adminQuizCreate } from '../quiz';
+import { adminAuthRegister } from '../auth';
 
 describe('adminQuizList', () => {
-  test('returning list of quizzes', () => {
+  beforeEach(() => {
     clear();
+  });
+  test('returning list of quizzes', () => {
     const userId = adminAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
     const quizId1 = adminQuizCreate(userId.authUserId, 'quiz1', 'the first quiz');
     const quizId2 = adminQuizCreate(userId.authUserId, 'quiz2', 'the second quiz');
-    expect(adminQuizList(userId.authUserId)).toEqual({
+    expect(adminQuizList(userId.authUserId)).toStrictEqual({
       quizzes: [
         {
           quizId: quizId1.quizId,
@@ -22,13 +24,12 @@ describe('adminQuizList', () => {
     });
   });
   test('returning list of quizzes for multiple users', () => {
-    clear();
     const userId1 = adminAuthRegister('email1@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
     const userId2 = adminAuthRegister('email2@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
     const quizId1 = adminQuizCreate(userId1.authUserId, 'quiz1', 'the first quiz');
     const quizId2 = adminQuizCreate(userId2.authUserId, 'quiz2', 'the second quiz');
     const quizId3 = adminQuizCreate(userId1.authUserId, 'quiz3', 'the third quiz');
-    expect(adminQuizList(userId1.authUserId)).toEqual({
+    expect(adminQuizList(userId1.authUserId)).toStrictEqual({
       quizzes: [
         {
           quizId: quizId1.quizId,
@@ -40,7 +41,7 @@ describe('adminQuizList', () => {
         }
       ]
     });
-    expect(adminQuizList(userId2.authUserId)).toEqual({
+    expect(adminQuizList(userId2.authUserId)).toStrictEqual({
       quizzes: [
         {
           quizId: quizId2.quizId,
@@ -50,14 +51,12 @@ describe('adminQuizList', () => {
     });
   });
   test('returning empty list of quizzes', () => {
-    clear();
     const userId = adminAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
-    expect(adminQuizList(userId.authUserId)).toEqual({
+    expect(adminQuizList(userId.authUserId)).toStrictEqual({
       quizzes: []
     });
   });
   test('invalid authUserId', () => {
-    clear();
     expect(adminQuizList(1)).toMatchObject({ error: expect.any(String) });
   });
 });
