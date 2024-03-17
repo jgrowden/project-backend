@@ -9,14 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { getData, setData } from './dataStore';
-import {
-  adminAuthRegister, adminAuthLogin, adminUserDetails,
-  adminUserDetailsUpdate, adminUserPasswordUpdate
-} from './auth';
-import {
-  adminQuizList, adminQuizCreate, adminQuizRemove,
-  adminQuizInfo, adminQuizNameUpdate, adminQuizDescriptionUpdate
-} from './quiz';
+import { adminAuthRegister, adminAuthLogin } from './auth';
 import { clear } from './other';
 // Set up web app
 const app = express();
@@ -41,7 +34,6 @@ const load = () => {
     setData(JSON.parse(dataFile));
   }
 };
-load();
 const save = () => {
   fs.writeFileSync('./tooHakData.json', JSON.stringify(getData()));
 };
@@ -105,10 +97,12 @@ app.use((req: Request, res: Response) => {
 // start server
 const server = app.listen(PORT, HOST, () => {
   // DO NOT CHANGE THIS LINE
+  load();
   console.log(`⚡️ Server started on port ${PORT} at ${HOST}`);
 });
 
 // For coverage, handle Ctrl+C gracefully
 process.on('SIGINT', () => {
+  save();
   server.close(() => console.log('Shutting down server gracefully.'));
 });
