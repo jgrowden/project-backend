@@ -1,13 +1,13 @@
-import { UserType, getData, setData } from './dataStore';
+import { getData } from './dataStore';
 import validator from 'validator';
 
 interface ErrorObject {
   error: string;
-};
+}
 
 interface ReturnAuthUserId {
   authUserId: number;
-};
+}
 
 interface AdminUserDetailsReturn {
   user: {
@@ -17,22 +17,21 @@ interface AdminUserDetailsReturn {
     numSuccessfulLogins: number;
     numFailedPasswordsSinceLastLogin: number;
   }
-};
+}
 
 const userNameMinLength = 2;
 const userNameMaxLength = 20;
 const userPasswordMinLength = 8;
 
 /**
- * Returns true if the given string contains anything but letters, 
+ * Returns true if the given string contains anything but letters,
  * hyphens, spaces, and apostrophes.
  * @param {string}
  * @returns {boolean}
  */
 function validName(str: string): boolean {
-  return /[^a-zA-Z \-\']/.test(str);
+  return /[^a-zA-Z \'\-]/.test(str); // eslint-disable-line
 }
-
 
 /**
  * Returns true if the given string contains at least one letter
@@ -61,7 +60,7 @@ export function adminAuthRegister(email: string, password: string, nameFirst: st
   const data = getData();
 
   // Check for duplicate email
-  let duplicateEmail = data.users.find(user => user.email === email);
+  const duplicateEmail = data.users.find(user => user.email === email);
   if (duplicateEmail !== undefined) {
     return { error: 'User with given email already exists' };
   }
@@ -187,8 +186,6 @@ export function adminUserDetails(authUserId: number): AdminUserDetailsReturn | E
     }
   };
 }
-
-
 
 /**
  * Given an admin user's authUserId and a set of properties,

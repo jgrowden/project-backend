@@ -1,5 +1,5 @@
 // import { string } from 'yaml/dist/schema/common/string';
-import { UserType, QuizType, getData, setData } from './dataStore';
+import { getData } from './dataStore';
 
 interface ErrorObject {
   error: string
@@ -140,7 +140,7 @@ export function adminQuizList(authUserId: number): AdminQuizListReturn | ErrorOb
   }
 
   const filteredQuiz = data.quizzes.filter(quiz => quiz.ownerId === authUserId);
-  const quizzes = filteredQuiz.map(quiz => {return { quizId: quiz.quizId, name: quiz.name }});
+  const quizzes = filteredQuiz.map(quiz => { return { quizId: quiz.quizId, name: quiz.name }; });
 
   return { quizzes: quizzes };
 }
@@ -170,8 +170,8 @@ export function adminQuizCreate(authUserId: number, name: string, description: s
 
   if (name.length < quizNameMinLength) {
     return { error: 'invalid quiz name length: too short' };
-  } 
-  
+  }
+
   if (name.length > quizNameMaxLength) {
     return { error: 'invalid quiz name length: too long' };
   }
