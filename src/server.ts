@@ -8,6 +8,13 @@ import sui from 'swagger-ui-express';
 import fs from 'fs';
 import path from 'path';
 import process from 'process';
+import { getData, setData } from './dataStore';
+import {
+  adminAuthRegister, adminAuthLogin, adminUserDetails,
+  adminUserDetailsUpdate, adminUserPasswordUpdate } from './auth';
+import {
+  adminQuizList, adminQuizCreate, adminQuizRemove,
+  adminQuizInfo, adminQuizNameUpdate, adminQuizDescriptionUpdate } from './quiz';
 
 // Set up web app
 const app = express();
@@ -25,16 +32,48 @@ app.use('/docs', sui.serve, sui.setup(YAML.parse(file), { swaggerOptions: { docE
 const PORT: number = parseInt(process.env.PORT || config.port);
 const HOST: string = process.env.IP || 'localhost';
 
+// Load + Store functions for persistence
+const load = () => {
+  if (fs.existsSync('./toohakData.json')) {
+    const dataFile = fs.readfFileSync('./toohakData.json', { encoding: 'utf8' });
+    setData(JSON.parse(dataFile));
+  }
+};
+load();
+const save = () => {
+  fs.writeFileSync('./tooHakData.json', JSON.stringify(getData()));
+}
+
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
-
 // Example get request
 app.get('/echo', (req: Request, res: Response) => {
   const data = req.query.echo as string;
   return res.json(echo(data));
 });
 
+// adminAuthRegister Route
+app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
+  const { email, password, nameFirst, nameLast } = req.body;
+  const result = adminAuthRegister(email, password, nameFirst, nameLast);
+  if ('error' in result) {
+    return res.status(400).json(result);
+  }
+  save();
+  res.json(result);
+});
+
+// adminAuthLogin Route
+app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const result = adminAuthLogin(email, password);
+  if ('error' in result) {
+    return res.status(400).json(result);
+  }
+  save();
+  res.json(result);
+})
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================
