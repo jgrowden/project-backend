@@ -346,8 +346,7 @@ export function adminQuizRemove(authUserId: number, quizId: number): ErrorObject
     i++;
   }
 
-  let quizToDelete = data.quizzes[i];
-  data.deletedQuizzes.push(quizToDelete);
+  data.deletedQuizzes.push(data.quizzes[i]);
   data.quizzes.splice(i, 1);
   setData(data);
 
