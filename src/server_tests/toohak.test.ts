@@ -2,14 +2,14 @@ import request, { HttpVerb } from 'sync-request-curl';
 import { port, url } from './config.json';
 const SERVER_URL = `${url}:${port}`;
 
-// Return type of returnHelper() function. 
+// Return type of returnHelper() function.
 interface RequestHelperReturnType {
   statusCode: number;
   jsonBody?: Record<string, any>;
   error?: string;
 }
 
-// Function to streamline HTTP calls to the server 
+// Function to streamline HTTP calls to the server
 export const requestHelper = (
   method: HttpVerb,
   path: string,
