@@ -29,6 +29,7 @@ interface DataType {
 let data: DataType = {
   users: [],
   quizzes: [],
+  deletedQuizzes: []
 };
 
 // YOU SHOULD MODIFY THIS OBJECT ABOVE ONLY

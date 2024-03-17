@@ -345,6 +345,9 @@ export function adminQuizRemove(authUserId: number, quizId: number): ErrorObject
   while (data.quizzes[i].quizId !== quizId) {
     i++;
   }
+
+  let quizToDelete = data.quizzes[i];
+  data.deletedQuizzes.push(quizToDelete);
   data.quizzes.splice(i, 1);
   setData(data);
 
