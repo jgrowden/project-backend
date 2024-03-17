@@ -1,5 +1,6 @@
 import request from 'sync-request-curl';
-import { port, url } from '.../config.json';
+import { port, url } from '../config.json';
+import { UserType } from '../dataStore';
 
 const SERVER_URL = `${url}:${port}`;
 const requestAuthRegister = (email: string, password: string, nameFirst: string, nameLast: string) => {
@@ -37,7 +38,7 @@ beforeEach(() => {
 });
 
 describe('Testing adminAuthLogin', () => {
-  let user;
+  let user: UserType;
   beforeEach(() => {
     user = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
   });

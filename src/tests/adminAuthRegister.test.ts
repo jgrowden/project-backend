@@ -1,5 +1,5 @@
 import request from 'sync-request-curl';
-import { port, url } from '.../config.json';
+import { port, url } from '../config.json';
 
 const SERVER_URL = `${url}:${port}`;
 
@@ -26,9 +26,9 @@ beforeEach(() => {
 describe('Testing authRegister', () => {
   test('Test successful registration', () => {
     const authUserId1 = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    expect(authUserId1).toStrictEqual({ sessionId: expect.any(Number) });
+    expect(authUserId1).toStrictEqual({ authUserId: expect.any(Number) });
     const authUserId2 = requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo');
-    expect(authUserId2).toStrictEqual({ sessionId: expect.any(Number) });
+    expect(authUserId2).toStrictEqual({ authUserId: expect.any(Number) });
   });
 
   test('Check for duplicate email', () => {
