@@ -1,5 +1,6 @@
 import { getData } from './dataStore';
 import validator from 'validator';
+import { fetchUserFromUserId, userWithEmailExists, generateNewUserId } from './helper';
 
 interface ErrorObject {
   error: string;
@@ -60,7 +61,7 @@ export function adminAuthRegister(email: string, password: string, nameFirst: st
   const data = getData();
 
   // Check for duplicate email
-  const duplicateEmail = data.users.find(user => user.email === email);
+  const duplicateEmail = userWithEmailExists(email);
   if (duplicateEmail !== undefined) {
     return { error: 'User with given email already exists' };
   }
@@ -97,11 +98,7 @@ export function adminAuthRegister(email: string, password: string, nameFirst: st
     return { error: 'password must contain at least one letter and at least one number' };
   }
 
-  let newUserId = 0;
-  const userIds = data.users.map(user => user.authUserId);
-  while (userIds.includes(newUserId)) {
-    newUserId++;
-  }
+  const newUserId = generateNewUserId();
 
   data.users.push({
     email: email,
@@ -128,23 +125,19 @@ export function adminAuthRegister(email: string, password: string, nameFirst: st
  * @returns {{authUserId: number}} authUserId - the user's unique identification number
  */
 export function adminAuthLogin(email: string, password: string): ReturnAuthUserId | ErrorObject {
-  const data = getData();
-
-  const userExists = data.users.find(user => user.email === email);
-  if (!userExists) {
+  const user = userWithEmailExists(email);
+  if (!user) {
     return { error: 'user doesn\'t exist' };
   }
-  if (userExists.password !== password) {
-    userExists.numFailedPasswordsSinceLastLogin++;
+  if (user.password !== password) {
+    user.numFailedPasswordsSinceLastLogin++;
     return { error: 'incorrect password' };
   }
 
-  userExists.numFailedPasswordsSinceLastLogin = 0;
-  userExists.numSuccessfulLogins++;
+  user.numFailedPasswordsSinceLastLogin = 0;
+  user.numSuccessfulLogins++;
 
-  return {
-    authUserId: userExists.authUserId,
-  };
+  return { authUserId: user.authUserId };
 }
 
 /**
@@ -169,9 +162,7 @@ export function adminAuthLogin(email: string, password: string): ReturnAuthUserI
 */
 
 export function adminUserDetails(authUserId: number): AdminUserDetailsReturn | ErrorObject {
-  const data = getData();
-
-  const user = data.users.find(user => user.authUserId === authUserId);
+  const user = fetchUserFromUserId(authUserId);
   if (!user) {
     return { error: 'User ID not found' };
   }
@@ -219,14 +210,13 @@ export function adminUserDetailsUpdate(authUserId: number, email: string, nameFi
     return { error: 'nameLast does not satisfy length requirements' };
   }
 
-  const data = getData();
+  const duplicateEmail = userWithEmailExists(email);
 
-  const duplicateEmail = data.users.find(user => user.email === email);
   if (duplicateEmail !== undefined) {
     return { error: 'Email already registered' };
   }
 
-  const user = data.users.find(user => user.authUserId === authUserId);
+  const user = fetchUserFromUserId(authUserId);
   if (!user) {
     return { error: 'User ID not found' };
   }
@@ -249,10 +239,8 @@ export function adminUserDetailsUpdate(authUserId: number, email: string, nameFi
 */
 
 export function adminUserPasswordUpdate(authUserId: number, oldPassword: string, newPassword: string): ErrorObject | Record<string, never> {
-  const data = getData();
-
   // check authUserId exists
-  const user = data.users.find(user => user.authUserId === authUserId);
+  const user = fetchUserFromUserId(authUserId);
   if (!user) {
     return { error: 'User ID not found' };
   }

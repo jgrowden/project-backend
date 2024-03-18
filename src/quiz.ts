@@ -1,5 +1,6 @@
 // import { string } from 'yaml/dist/schema/common/string';
 import { getData } from './dataStore';
+import { fetchUserFromUserId, fetchQuizFromQuizId, generateNewQuizId, currentTime } from './helper';
 
 interface ErrorObject {
   error: string
@@ -41,10 +42,8 @@ const regex = /[^A-Za-z0-9 ]/;
  * @returns {} - an empty object
 */
 export function adminQuizDescriptionUpdate(authUserId: number, quizId: number, description: string): ErrorObject | Record<string, never> {
-  const data = getData();
-
-  const user = data.users.find(user => user.authUserId === authUserId);
-  const quiz = data.quizzes.find(quiz => quiz.quizId === quizId);
+  const user = fetchUserFromUserId(authUserId);
+  const quiz = fetchQuizFromQuizId(quizId);
 
   if (!user) {
     return { error: 'User ID not found' };
@@ -79,8 +78,8 @@ export function adminQuizDescriptionUpdate(authUserId: number, quizId: number, d
 export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): ErrorObject | Record<string, never> {
   const data = getData();
 
-  const user = data.users.find(user => user.authUserId === authUserId);
-  const quiz = data.quizzes.find(quiz => quiz.quizId === quizId);
+  const user = fetchUserFromUserId(authUserId);
+  const quiz = fetchQuizFromQuizId(quizId);
 
   if (!user) {
     return { error: 'User ID not found' };
@@ -99,11 +98,11 @@ export function adminQuizNameUpdate(authUserId: number, quizId: number, name: st
   }
 
   if (name.length < quizNameMinLength) {
-    return { error: 'Quiz name should be more than 3 characters' };
+    return { error: 'invalid quiz name length: too short' };
   }
 
   if (name.length > quizNameMaxLength) {
-    return { error: 'Quiz name should be less than 30 characters' };
+    return { error: 'invalid quiz name length: too long' };
   }
 
   if (data.quizzes.find(quiz => quiz.ownerId === authUserId && quiz.name === name)) {
@@ -133,7 +132,7 @@ export function adminQuizNameUpdate(authUserId: number, quizId: number, name: st
 export function adminQuizList(authUserId: number): AdminQuizListReturn | ErrorObject {
   const data = getData();
 
-  const user = data.users.find(user => user.authUserId === authUserId);
+  const user = fetchUserFromUserId(authUserId);
 
   if (!user) {
     return { error: 'User ID not found' };
@@ -158,7 +157,7 @@ export function adminQuizList(authUserId: number): AdminQuizListReturn | ErrorOb
 export function adminQuizCreate(authUserId: number, name: string, description: string): AdminQuizCreateReturn | ErrorObject {
   const data = getData();
 
-  const user = data.users.find(user => user.authUserId === authUserId);
+  const user = fetchUserFromUserId(authUserId);
 
   if (!user) {
     return { error: 'invalid user ID' };
@@ -176,7 +175,7 @@ export function adminQuizCreate(authUserId: number, name: string, description: s
     return { error: 'invalid quiz name length: too long' };
   }
 
-  const duplicateName = user.userQuizzes.find(quizId => data.quizzes.find(quiz => quiz.quizId === quizId).name === name);
+  const duplicateName = user.userQuizzes.find(quizId => fetchQuizFromQuizId(quizId).name === name);
 
   if (duplicateName !== undefined) {
     return { error: 'Duplicate quiz name' };
@@ -186,14 +185,10 @@ export function adminQuizCreate(authUserId: number, name: string, description: s
     return { error: 'Quiz description invalid length' };
   }
 
-  const unixTime = Math.floor(Date.now() / 1000);
+  const unixTime = currentTime();
 
   // fetches new quizId that is the lowest unused quizId number
-  let newQuizId = 0;
-  const quizIds = data.quizzes.map(quiz => quiz.quizId);
-  while (quizIds.includes(newQuizId)) {
-    newQuizId++;
-  }
+  const newQuizId = generateNewQuizId();
 
   user.userQuizzes.push(newQuizId);
   data.quizzes.push({
@@ -219,8 +214,8 @@ export function adminQuizCreate(authUserId: number, name: string, description: s
 export function adminQuizRemove(authUserId: number, quizId: number): ErrorObject | Record<string, never> {
   const data = getData();
 
-  const user = data.users.find(user => user.authUserId === authUserId);
-  const quiz = data.quizzes.find(quiz => quiz.quizId === quizId);
+  const user = fetchUserFromUserId(authUserId);
+  const quiz = fetchQuizFromQuizId(quizId);
 
   if (!user) {
     return { error: 'invalid user ID' };
@@ -255,10 +250,8 @@ export function adminQuizRemove(authUserId: number, quizId: number): ErrorObject
  * } - returns an object with details about the quiz queried for information.
  */
 export function adminQuizInfo(authUserId: number, quizId: number): AdminQuizInfoReturn | ErrorObject {
-  const data = getData();
-
-  const user = data.users.find(user => user.authUserId === authUserId);
-  const quiz = data.quizzes.find(quiz => quiz.quizId === quizId);
+  const user = fetchUserFromUserId(authUserId);
+  const quiz = fetchQuizFromQuizId(quizId);
 
   if (!user) {
     return { error: 'invalid user ID' };
