@@ -1,26 +1,45 @@
-import { clear } from '../other';
-import { adminAuthRegister } from '../auth';
+import request from 'sync-request-curl';
+import { port, url } from '../config.json';
 
+const SERVER_URL = `${url}:${port}`;
+
+const requestAuthRegister = (email: string, password: string, nameFirst: string, nameLast: string) => {
+  const res = request(
+    'POST',
+    SERVER_URL + '/v1/admin/auth/register',
+    {
+      json: {
+        email,
+        password,
+        nameFirst,
+        nameLast
+      }
+    }
+  );
+  return JSON.parse(res.body.toString());
+};
+
+const ERROR = { error: expect.any(String) };
 beforeEach(() => {
-  clear();
+  request('DELETE', SERVER_URL + '/v1/clear', { json: {} });
 });
-describe('Testing adminAuthRegister', () => {
+describe('Testing authRegister', () => {
   test('Test successful registration', () => {
-    const authUserId1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    expect(authUserId1.authUserId).toStrictEqual(expect.any(Number));
-    const authUserId2 = adminAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo');
-    expect(authUserId2.authUserId).toStrictEqual(expect.any(Number));
+    const authUserId1 = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
+    expect(authUserId1).toStrictEqual({ authUserId: expect.any(Number) });
+    const authUserId2 = requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo');
+    expect(authUserId2).toStrictEqual({ authUserId: expect.any(Number) });
   });
 
   test('Check for duplicate email', () => {
-    adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    expect(adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp'))
-      .toMatchObject({ error: expect.any(String) });
+    requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
+    expect(requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp'))
+      .toMatchObject(ERROR);
   });
 
   test('Check for valid email', () => {
-    expect(adminAuthRegister('notanEmail', 'P4ssword', 'No', 'Email'))
-      .toMatchObject({ error: expect.any(String) });
+    expect(requestAuthRegister('notanEmail', 'P4ssword', 'No', 'Email'))
+      .toMatchObject(ERROR);
   });
 
   test.each([
@@ -44,8 +63,8 @@ describe('Testing adminAuthRegister', () => {
     },
   ])('testing for invalid nameFirst, variation $#, with nameFirst: \'$nameFirst\'',
     ({ email, password, nameFirst, nameLast }) => {
-      expect(adminAuthRegister(email, password, nameFirst, nameLast))
-        .toStrictEqual({ error: expect.any(String) });
+      expect(requestAuthRegister(email, password, nameFirst, nameLast))
+        .toStrictEqual(ERROR);
     }
   );
 
@@ -70,8 +89,8 @@ describe('Testing adminAuthRegister', () => {
     },
   ])('testing for invalid nameLast, variation $#, with nameLast: \'$nameLast\'',
     ({ email, password, nameFirst, nameLast }) => {
-      expect(adminAuthRegister(email, password, nameFirst, nameLast))
-        .toStrictEqual({ error: expect.any(String) });
+      expect(requestAuthRegister(email, password, nameFirst, nameLast))
+        .toStrictEqual(ERROR);
     }
   );
 
@@ -98,12 +117,13 @@ describe('Testing adminAuthRegister', () => {
       email: 'nico.robin@gmail.com',
       password: '0hara',
       nameFirst: 'Nico',
+
       nameLast: 'Robin'
     }
-  ])('testing for invalid password, variation $#, with password: \'$nameLast\'',
+  ])('testing for invalid password, variation $#, with password: \'$password\'',
     ({ email, password, nameFirst, nameLast }) => {
-      expect(adminAuthRegister(email, password, nameFirst, nameLast))
-        .toStrictEqual({ error: expect.any(String) });
+      expect(requestAuthRegister(email, password, nameFirst, nameLast))
+        .toStrictEqual(ERROR);
     }
   );
 });

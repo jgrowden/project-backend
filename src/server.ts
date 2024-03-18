@@ -8,7 +8,9 @@ import sui from 'swagger-ui-express';
 import fs from 'fs';
 import path from 'path';
 import process from 'process';
-
+import { getData, setData } from './dataStore';
+import { adminAuthRegister, adminAuthLogin } from './auth';
+import { clear } from './other';
 // Set up web app
 const app = express();
 // Use middleware that allows us to access the JSON body of requests
@@ -25,16 +27,54 @@ app.use('/docs', sui.serve, sui.setup(YAML.parse(file), { swaggerOptions: { docE
 const PORT: number = parseInt(process.env.PORT || config.port);
 const HOST: string = process.env.IP || 'localhost';
 
+// Load + Store functions for persistence
+const load = () => {
+  if (fs.existsSync('./toohakData.json')) {
+    const dataFile = fs.readfFileSync('./toohakData.json', { encoding: 'utf8' });
+    setData(JSON.parse(dataFile));
+  }
+};
+const save = () => {
+  fs.writeFileSync('./tooHakData.json', JSON.stringify(getData()));
+};
+
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
-
 // Example get request
 app.get('/echo', (req: Request, res: Response) => {
   const data = req.query.echo as string;
   return res.json(echo(data));
 });
 
+// adminAuthRegister Route
+app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
+  const { email, password, nameFirst, nameLast } = req.body;
+  const result = adminAuthRegister(email, password, nameFirst, nameLast);
+  if ('error' in result) {
+    return res.status(400).json(result);
+  }
+  save();
+  res.json(result);
+});
+
+// adminAuthLogin Route
+app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
+  const { email, password } = req.body;
+  const result = adminAuthLogin(email, password);
+  if ('error' in result) {
+    return res.status(400).json(result);
+  }
+  save();
+  res.json(result);
+});
+
+// clear Route
+app.delete('/v1/clear', (req: Request, res: Response) => {
+  const result = clear();
+  save();
+  res.json(result);
+});
 // ====================================================================
 //  ================= WORK IS DONE ABOVE THIS LINE ===================
 // ====================================================================
@@ -57,10 +97,12 @@ app.use((req: Request, res: Response) => {
 // start server
 const server = app.listen(PORT, HOST, () => {
   // DO NOT CHANGE THIS LINE
+  load();
   console.log(`⚡️ Server started on port ${PORT} at ${HOST}`);
 });
 
 // For coverage, handle Ctrl+C gracefully
 process.on('SIGINT', () => {
+  save();
   server.close(() => console.log('Shutting down server gracefully.'));
 });
