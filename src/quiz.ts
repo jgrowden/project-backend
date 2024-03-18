@@ -229,6 +229,7 @@ export function adminQuizRemove(authUserId: number, quizId: number): ErrorObject
     return { error: 'you do not own this quiz' };
   }
 
+  data.deletedQuizzes.push(fetchQuizFromQuizId(quizId));
   user.userQuizzes.splice(user.userQuizzes.indexOf(quizId), 1);
   data.quizzes.splice(data.quizzes.indexOf(quiz), 1);
 

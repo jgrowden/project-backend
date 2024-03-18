@@ -24,11 +24,13 @@ interface QuizType {
 interface DataType {
   users: UserType[];
   quizzes: QuizType[];
+  deletedQuizzes: QuizType[];
 }
 
 let data: DataType = {
   users: [],
   quizzes: [],
+  deletedQuizzes: []
 };
 
 // YOU SHOULD MODIFY THIS OBJECT ABOVE ONLY
