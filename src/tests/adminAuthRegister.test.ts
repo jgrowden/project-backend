@@ -1,45 +1,30 @@
-import request from 'sync-request-curl';
-import { port, url } from '../config.json';
+import { requestAuthRegister, clear, ERROR } from './wrapper';
 
-const SERVER_URL = `${url}:${port}`;
-
-const requestAuthRegister = (email: string, password: string, nameFirst: string, nameLast: string) => {
-  const res = request(
-    'POST',
-    SERVER_URL + '/v1/admin/auth/register',
-    {
-      json: {
-        email,
-        password,
-        nameFirst,
-        nameLast
-      }
-    }
-  );
-  return JSON.parse(res.body.toString());
-};
-
-const ERROR = { error: expect.any(String) };
 beforeEach(() => {
-  request('DELETE', SERVER_URL + '/v1/clear', { json: {} });
+  clear();
 });
+
 describe('Testing authRegister', () => {
   test('Test successful registration', () => {
-    const authUserId1 = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    expect(authUserId1).toStrictEqual({ authUserId: expect.any(Number) });
-    const authUserId2 = requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo');
-    expect(authUserId2).toStrictEqual({ authUserId: expect.any(Number) });
+    expect(requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp')).toStrictEqual({
+      statusCode: 200,
+      jsonBody: { authUserId: expect.any(Number) }
+    });
+    expect(requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo')).toStrictEqual({
+      statusCode: 200,
+      jsonBody: { authUserId: expect.any(Number) }
+    });
   });
 
   test('Check for duplicate email', () => {
     requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
     expect(requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp'))
-      .toMatchObject(ERROR);
+      .toMatchObject({ statusCode: 400, jsonBody: ERROR });
   });
 
   test('Check for valid email', () => {
     expect(requestAuthRegister('notanEmail', 'P4ssword', 'No', 'Email'))
-      .toMatchObject(ERROR);
+      .toMatchObject({ statusCode: 400, jsonBody: ERROR });
   });
 
   test.each([
@@ -64,7 +49,7 @@ describe('Testing authRegister', () => {
   ])('testing for invalid nameFirst, variation $#, with nameFirst: \'$nameFirst\'',
     ({ email, password, nameFirst, nameLast }) => {
       expect(requestAuthRegister(email, password, nameFirst, nameLast))
-        .toStrictEqual(ERROR);
+        .toStrictEqual({ statusCode: 400, jsonBody: ERROR });
     }
   );
 
@@ -90,7 +75,7 @@ describe('Testing authRegister', () => {
   ])('testing for invalid nameLast, variation $#, with nameLast: \'$nameLast\'',
     ({ email, password, nameFirst, nameLast }) => {
       expect(requestAuthRegister(email, password, nameFirst, nameLast))
-        .toStrictEqual(ERROR);
+        .toStrictEqual({ statusCode: 400, jsonBody: ERROR });
     }
   );
 
@@ -123,7 +108,7 @@ describe('Testing authRegister', () => {
   ])('testing for invalid password, variation $#, with password: \'$password\'',
     ({ email, password, nameFirst, nameLast }) => {
       expect(requestAuthRegister(email, password, nameFirst, nameLast))
-        .toStrictEqual(ERROR);
+        .toStrictEqual({ statusCode: 400, jsonBody: ERROR });
     }
   );
 });
