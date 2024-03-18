@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { getData, setData } from './dataStore';
-import { adminAuthRegister, adminAuthLogin } from './auth';
+import { adminAuthRegister, adminAuthLogin, adminUserPasswordUpdate } from './auth';
 import { clear } from './other';
 // Set up web app
 const app = express();
@@ -30,7 +30,7 @@ const HOST: string = process.env.IP || 'localhost';
 // Load + Store functions for persistence
 const load = () => {
   if (fs.existsSync('./toohakData.json')) {
-    const dataFile = fs.readfFileSync('./toohakData.json', { encoding: 'utf8' });
+    const dataFile = fs.readFileSync('./toohakData.json', { encoding: 'utf8' });
     setData(JSON.parse(dataFile));
   }
 };
@@ -62,6 +62,17 @@ app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
 app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
   const { email, password } = req.body;
   const result = adminAuthLogin(email, password);
+  if ('error' in result) {
+    return res.status(400).json(result);
+  }
+  save();
+  res.json(result);
+});
+
+// adminUserPasswordUpdate Route
+app.put('v1/admin/user/password', (req: Request, res: Response) => {
+  const { token, oldPassword, newPassword } = req.body;
+  const result = adminUserPasswordUpdate(token, oldPassword, newPassword);
   if ('error' in result) {
     return res.status(400).json(result);
   }
