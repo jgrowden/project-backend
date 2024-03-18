@@ -9,22 +9,22 @@ describe('adminUserDetails testing', () => {
   test('empty database', () => {
     expect(adminUserDetails(123456789)).toStrictEqual({ error: expect.any(String) });
   });
-  test('no authUserId provided', () => {
+  test('no sessionId provided', () => {
     expect(adminUserDetails()).toStrictEqual({ error: expect.any(String) });
   });
   test('invalid user id provided', () => {
     expect(adminUserDetails('Nan')).toStrictEqual({ error: expect.any(String) });
   });
-  test('authUserId does not exist', () => {
+  test('sessionId does not exist', () => {
     const user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    expect(adminUserDetails(user1.authUserId + 1)).toStrictEqual({ error: expect.any(String) });
+    expect(adminUserDetails(user1.sessionId + '1')).toStrictEqual({ error: expect.any(String) });
   });
-  test('valid authUserId 1', () => {
+  test('valid sessionId 1', () => {
     const user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
     adminAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo');
-    expect(adminUserDetails(user1.authUserId)).toMatchObject({
+    expect(adminUserDetails(user1.sessionId)).toMatchObject({
       user: {
-        userId: user1.authUserId,
+        userId: expect.any(Number),
         name: 'God Usopp',
         email: 'go.d.usopp@gmail.com',
         numSuccessfulLogins: 1,
@@ -32,12 +32,12 @@ describe('adminUserDetails testing', () => {
       }
     });
   });
-  test('valid authUserId 2', () => {
+  test('valid sessionId 2', () => {
     adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
     const user2 = adminAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo');
-    expect(adminUserDetails(user2.authUserId)).toMatchObject({
+    expect(adminUserDetails(user2.sessionId)).toMatchObject({
       user: {
-        userId: user2.authUserId,
+        userId: expect.any(Number),
         name: 'Donquixote Doflamingo',
         email: 'doffy@gmail.com',
         numSuccessfulLogins: 1,

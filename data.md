@@ -17,6 +17,7 @@ let data = {
             numFailedPasswordsSinceLastLogin: 123
             previousPasswords:["oldpassword123", "anotheroldpassword123"]
             userQuizzes: [1, 2, 3]
+            sessions: []
         }
     ]
     quizzes: [

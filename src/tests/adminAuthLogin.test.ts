@@ -1,20 +1,17 @@
 import { requestAuthRegister, requestAuthLogin, clear, ERROR } from './wrapper';
-import { UserType } from '../dataStore';
 
 beforeEach(() => {
   clear();
 });
 
 describe('Testing adminAuthLogin', () => {
-  let user: UserType;
   beforeEach(() => {
-    const { jsonBody } = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
-    user = jsonBody as UserType;
+    requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
   });
   test('Test successful login', () => {
     expect(requestAuthLogin('gon.freecs@gmail.com', 'GonF1shing')).toStrictEqual({
       statusCode: 200,
-      jsonBody: { authUserId: user.authUserId }
+      jsonBody: { sessionId: expect.any(String) }
     });
   });
 
