@@ -17,9 +17,21 @@ let data = {
             numFailedPasswordsSinceLastLogin: 123
             previousPasswords:["oldpassword123", "anotheroldpassword123"]
             userQuizzes: [1, 2, 3]
+            sessions: []
         }
     ]
     quizzes: [
+        {
+            ownerId: 1
+            quizId: 1
+            name: "The John Smith Test"
+            description: "Tests general knowledge about John Smith."
+            timeCreated: 1
+            timeLastEdited: 1
+            // Actual quiz data to be added in later iterations
+        }
+    ]
+    deletedQuizzes: [
         {
             ownerId: 1
             quizId: 1

@@ -30,7 +30,7 @@ const HOST: string = process.env.IP || 'localhost';
 // Load + Store functions for persistence
 const load = () => {
   if (fs.existsSync('./toohakData.json')) {
-    const dataFile = fs.readfFileSync('./toohakData.json', { encoding: 'utf8' });
+    const dataFile = fs.readFileSync('./toohakData.json', { encoding: 'utf8' });
     setData(JSON.parse(dataFile));
   }
 };
