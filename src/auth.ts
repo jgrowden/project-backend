@@ -1,13 +1,14 @@
 import { getData } from './dataStore';
 import validator from 'validator';
-import { fetchUserFromUserId, userWithEmailExists, generateNewUserId } from './helper';
+import { nanoid } from 'nanoid';
+import { fetchUserFromSessionId, userWithEmailExists, generateNewUserId } from './helper';
 
 interface ErrorObject {
   error: string;
 }
 
-interface ReturnAuthUserId {
-  authUserId: number;
+interface ReturnSessionId {
+  sessionId: string;
 }
 
 interface AdminUserDetailsReturn {
@@ -31,7 +32,7 @@ const userPasswordMinLength = 8;
  * @returns {boolean}
  */
 function validName(str: string): boolean {
-  return /[^a-zA-Z \'\-]/.test(str); // eslint-disable-line
+  return /[^a-zA-Z '-]/.test(str);
 }
 
 /**
@@ -46,18 +47,18 @@ function hasLetterAndNumber(str: string): boolean {
 
 /**
  * Register a user with an email, password, and names,
- * then returns their authUserId value.
+ * then returns their sessionId value.
  *
  * @param {string} email - user's email
  * @param {string} password - user's password
  * @param {string} nameFirst - user's first name
  * @param {string} nameLast - user's last name
  *
- * @returns {{authUserId: number}} authUserId - the user's unique identification number
+ * @returns {{sessionId: number}} sessionId - the user's unique identification number
  */
 
 export function adminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string):
- ReturnAuthUserId | ErrorObject {
+ ReturnSessionId | ErrorObject {
   const data = getData();
 
   // Check for duplicate email
@@ -99,6 +100,8 @@ export function adminAuthRegister(email: string, password: string, nameFirst: st
   }
 
   const newUserId = generateNewUserId();
+  const sessionId: string = nanoid();
+  const sessions: string[] = [sessionId];
 
   data.users.push({
     email: email,
@@ -109,22 +112,23 @@ export function adminAuthRegister(email: string, password: string, nameFirst: st
     numSuccessfulLogins: 1,
     numFailedPasswordsSinceLastLogin: 0,
     previousPasswords: [],
-    userQuizzes: []
+    userQuizzes: [],
+    sessions: sessions
   });
 
-  return { authUserId: newUserId };
+  return { sessionId: sessionId };
 }
 
 /**
  * Given a registered user's email and password,
- * returns their authUserId value.
+ * returns their sessionId value.
  *
  * @param {string} email - user's email
  * @param {string} password - user's password
  *
- * @returns {{authUserId: number}} authUserId - the user's unique identification number
+ * @returns {{sessionId: string}} sessionId - the user's unique identification string
  */
-export function adminAuthLogin(email: string, password: string): ReturnAuthUserId | ErrorObject {
+export function adminAuthLogin(email: string, password: string): ReturnSessionId | ErrorObject {
   const user = userWithEmailExists(email);
   if (!user) {
     return { error: 'user doesn\'t exist' };
@@ -134,21 +138,23 @@ export function adminAuthLogin(email: string, password: string): ReturnAuthUserI
     return { error: 'incorrect password' };
   }
 
+  const sessionId: string = nanoid();
+  user.sessions.push(sessionId);
   user.numFailedPasswordsSinceLastLogin = 0;
   user.numSuccessfulLogins++;
 
-  return { authUserId: user.authUserId };
+  return { sessionId: sessionId };
 }
 
 /**
- * Given an admin user's authUserId, return details about the user.
+ * Given an admin user's sessionId, return details about the user.
  *
  * 'name' is the first and last name concatenated with a single space between them.
  *
- * Note: authUserId seems to be the input number, while the user object contains
+ * Note: sessionId seems to be the input number, while the user object contains
  * just 'userId'. They should be mean the same thing though.
  *
- * @param {number} authUserId - unique identifier for user
+ * @param {number} sessionId - unique identifier for user
  *
  * @return {{
  *      user: {
@@ -161,8 +167,8 @@ export function adminAuthLogin(email: string, password: string): ReturnAuthUserI
  *   }} - an object containing key information about the user queried.
 */
 
-export function adminUserDetails(authUserId: number): AdminUserDetailsReturn | ErrorObject {
-  const user = fetchUserFromUserId(authUserId);
+export function adminUserDetails(sessionId: string): AdminUserDetailsReturn | ErrorObject {
+  const user = fetchUserFromSessionId(sessionId);
   if (!user) {
     return { error: 'User ID not found' };
   }
@@ -179,17 +185,17 @@ export function adminUserDetails(authUserId: number): AdminUserDetailsReturn | E
 }
 
 /**
- * Given an admin user's authUserId and a set of properties,
+ * Given an admin user's sessionId and a set of properties,
  *  update the properties of this logged in admin user.
  *
- * @param {number} authUserId - unique identifier for user
+ * @param {number} sessionId - unique identifier for user
  * @param {string} email - user's email
  * @param {string} nameFirst - user's first name
  * @param {string} nameLast - user's last name
  *
  * @return {} - an empty object
 */
-export function adminUserDetailsUpdate(authUserId: number, email: string, nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
+export function adminUserDetailsUpdate(sessionId: string, email: string, nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
   if (validator.isEmail(email) === false) {
     return { error: 'Invalid email' };
   }
@@ -216,7 +222,7 @@ export function adminUserDetailsUpdate(authUserId: number, email: string, nameFi
     return { error: 'Email already registered' };
   }
 
-  const user = fetchUserFromUserId(authUserId);
+  const user = fetchUserFromSessionId(sessionId);
   if (!user) {
     return { error: 'User ID not found' };
   }
@@ -231,16 +237,16 @@ export function adminUserDetailsUpdate(authUserId: number, email: string, nameFi
 /**
  * Given details relating to a password change, update the password of a logged in user.
  *
- * @param {number} authUserId - unique identifier for user
+ * @param {number} sessionId - unique identifier for user
  * @param {string} oldPassword - user's old password
  * @param {string} newPassword - user's new password
  *
  * @return {} - an empty object
 */
 
-export function adminUserPasswordUpdate(authUserId: number, oldPassword: string, newPassword: string): ErrorObject | Record<string, never> {
-  // check authUserId exists
-  const user = fetchUserFromUserId(authUserId);
+export function adminUserPasswordUpdate(sessionId: string, oldPassword: string, newPassword: string): ErrorObject | Record<string, never> {
+  // check sessionId exists
+  const user = fetchUserFromSessionId(sessionId);
   if (!user) {
     return { error: 'User ID not found' };
   }

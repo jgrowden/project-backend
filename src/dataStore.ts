@@ -10,6 +10,7 @@ interface UserType {
   numFailedPasswordsSinceLastLogin: number;
   previousPasswords: string[];
   userQuizzes: number[];
+  sessions: string[];
 }
 
 interface AnswerType {

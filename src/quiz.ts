@@ -1,6 +1,6 @@
 // import { string } from 'yaml/dist/schema/common/string';
 import { getData } from './dataStore';
-import { fetchUserFromUserId, fetchQuizFromQuizId, generateNewQuizId, currentTime } from './helper';
+import { fetchUserFromSessionId, fetchQuizFromQuizId, generateNewQuizId, currentTime } from './helper';
 
 interface ErrorObject {
   error: string
@@ -35,14 +35,14 @@ const regex = /[^A-Za-z0-9 ]/;
 /**
  * Update the description of the relevant quiz.
  *
- * @param {number} authUserId - unique user identification number
+ * @param {string} sessionId - unique user identification number
  * @param {number} quizId - a quiz's unique identification number
  * @param {string} description - description of the quiz being created
  *
  * @returns {} - an empty object
 */
-export function adminQuizDescriptionUpdate(authUserId: number, quizId: number, description: string): ErrorObject | Record<string, never> {
-  const user = fetchUserFromUserId(authUserId);
+export function adminQuizDescriptionUpdate(sessionId: string, quizId: number, description: string): ErrorObject | Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
   const quiz = fetchQuizFromQuizId(quizId);
 
   if (!user) {
@@ -69,16 +69,16 @@ export function adminQuizDescriptionUpdate(authUserId: number, quizId: number, d
 /**
  * Update the name of the relevant quiz.
  *
- * @param {number} authUserId - unique user identification number
+ * @param {string} sessionId - unique user identification number
  * @param {number} quizId - a quiz's unique identification number
  * @param {string} name - name of quiz created
  *
  * @returns {} - an empty object
 */
-export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): ErrorObject | Record<string, never> {
+export function adminQuizNameUpdate(sessionId: string, quizId: number, name: string): ErrorObject | Record<string, never> {
   const data = getData();
 
-  const user = fetchUserFromUserId(authUserId);
+  const user = fetchUserFromSessionId(sessionId);
   const quiz = fetchQuizFromQuizId(quizId);
 
   if (!user) {
@@ -105,7 +105,7 @@ export function adminQuizNameUpdate(authUserId: number, quizId: number, name: st
     return { error: 'invalid quiz name length: too long' };
   }
 
-  if (data.quizzes.find(quiz => quiz.ownerId === authUserId && quiz.name === name)) {
+  if (data.quizzes.find(quiz => quiz.ownerId === user.authUserId && quiz.name === name)) {
     return { error: 'Quiz name already taken' };
   }
 
@@ -117,7 +117,7 @@ export function adminQuizNameUpdate(authUserId: number, quizId: number, name: st
 /**
  * Provide a list of all quizzes that are owned by the currently logged in user.
  *
- * @param {number} authUserId - unique identifier for user
+ * @param {string} sessionId - unique identifier for user
  *
  * @returns {{
 *    quizzes: [
@@ -129,16 +129,16 @@ export function adminQuizNameUpdate(authUserId: number, quizId: number, name: st
 * }} - object with list of all quizzes by their unique ID number and name.
 *
 */
-export function adminQuizList(authUserId: number): AdminQuizListReturn | ErrorObject {
+export function adminQuizList(sessionId: string): AdminQuizListReturn | ErrorObject {
   const data = getData();
 
-  const user = fetchUserFromUserId(authUserId);
+  const user = fetchUserFromSessionId(sessionId);
 
   if (!user) {
     return { error: 'User ID not found' };
   }
 
-  const filteredQuiz = data.quizzes.filter(quiz => quiz.ownerId === authUserId);
+  const filteredQuiz = data.quizzes.filter(quiz => quiz.ownerId === user.authUserId);
   const quizzes = filteredQuiz.map(quiz => { return { quizId: quiz.quizId, name: quiz.name }; });
 
   return { quizzes: quizzes };
@@ -147,17 +147,17 @@ export function adminQuizList(authUserId: number): AdminQuizListReturn | ErrorOb
 /**
  * Given basic details about a new quiz, create one for the logged in user.
  *
- * @param {number} authUserId - unique user identification number
+ * @param {string} sessionId - unique user identification number
  * @param {string} name - name of quiz created
  * @param {string} description - description of the quiz being created
  *
  * @returns {quizId: 2} - object with a unique quiz identification number
 */
 
-export function adminQuizCreate(authUserId: number, name: string, description: string): AdminQuizCreateReturn | ErrorObject {
+export function adminQuizCreate(sessionId: string, name: string, description: string): AdminQuizCreateReturn | ErrorObject {
   const data = getData();
 
-  const user = fetchUserFromUserId(authUserId);
+  const user = fetchUserFromSessionId(sessionId);
 
   if (!user) {
     return { error: 'invalid user ID' };
@@ -192,7 +192,7 @@ export function adminQuizCreate(authUserId: number, name: string, description: s
 
   user.userQuizzes.push(newQuizId);
   data.quizzes.push({
-    ownerId: authUserId,
+    ownerId: user.authUserId,
     quizId: newQuizId,
     name: name,
     description: description,
@@ -206,15 +206,15 @@ export function adminQuizCreate(authUserId: number, name: string, description: s
 /**
  * Given a particular quiz, permanently remove the quiz.
  *
- * @param {number} authUserId - a user's unique identification number
+ * @param {string} sessionId - a user's unique identification number
  * @param {number} quizId - a quiz's unique identification number
  *
  * @returns {} - an empty object
  */
-export function adminQuizRemove(authUserId: number, quizId: number): ErrorObject | Record<string, never> {
+export function adminQuizRemove(sessionId: string, quizId: number): ErrorObject | Record<string, never> {
   const data = getData();
 
-  const user = fetchUserFromUserId(authUserId);
+  const user = fetchUserFromSessionId(sessionId);
   const quiz = fetchQuizFromQuizId(quizId);
 
   if (!user) {
@@ -239,7 +239,7 @@ export function adminQuizRemove(authUserId: number, quizId: number): ErrorObject
 /**
  * Get all of the relevant information about the current quiz.
  *
- * @param {number} authUserId - a user's unique identification number
+ * @param {string} sessionId - a user's unique identification number
  * @param {number} quizId - a quiz's unique identification number
  *
  * @returns {
@@ -250,8 +250,8 @@ export function adminQuizRemove(authUserId: number, quizId: number): ErrorObject
  *      description: string
  * } - returns an object with details about the quiz queried for information.
  */
-export function adminQuizInfo(authUserId: number, quizId: number): AdminQuizInfoReturn | ErrorObject {
-  const user = fetchUserFromUserId(authUserId);
+export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoReturn | ErrorObject {
+  const user = fetchUserFromSessionId(sessionId);
   const quiz = fetchQuizFromQuizId(quizId);
 
   if (!user) {
