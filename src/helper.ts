@@ -39,5 +39,3 @@ export const generateNewQuizId = (): number => {
 export const currentTime = (): number => {
   return Math.floor(Date.now() / 1000);
 };
-
-// export { fetchUserFromUserId, fetchQuizFromQuizId, userWithEmailExists, generateNewUserId, generateNewQuizId, currentTime };
