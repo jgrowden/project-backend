@@ -1,5 +1,6 @@
 // import { string } from 'yaml/dist/schema/common/string';
-import { UserType, QuizType, getData, setData } from './dataStore';
+import { getData } from './dataStore';
+import { fetchUserFromUserId, fetchQuizFromQuizId, generateNewQuizId, currentTime } from './helper';
 
 interface ErrorObject {
   error: string
@@ -26,6 +27,11 @@ interface AdminQuizInfoReturn {
   description: string;
 }
 
+const quizDescriptionMaxLength = 100;
+const quizNameMinLength = 3;
+const quizNameMaxLength = 30;
+const regex = /[^A-Za-z0-9 ]/;
+
 /**
  * Update the description of the relevant quiz.
  *
@@ -36,55 +42,26 @@ interface AdminQuizInfoReturn {
  * @returns {} - an empty object
 */
 export function adminQuizDescriptionUpdate(authUserId: number, quizId: number, description: string): ErrorObject | Record<string, never> {
-  const data = getData();
+  const user = fetchUserFromUserId(authUserId);
+  const quiz = fetchQuizFromQuizId(quizId);
 
-  let userFlag = true;
-  let currUser: UserType;
-  for (const user of data.users) {
-    if (user.authUserId === authUserId) {
-      userFlag = false;
-      currUser = user;
-    }
-  }
-
-  let quizFlag = true;
-  let currQuiz: QuizType;
-  for (const quiz of data.quizzes) {
-    if (quiz.quizId === quizId) {
-      quizFlag = false;
-      currQuiz = quiz;
-    }
-  }
-
-  if (typeof authUserId !== 'number') {
-    return { error: 'Invalid user ID' };
-  }
-
-  if (userFlag) {
+  if (!user) {
     return { error: 'User ID not found' };
   }
 
-  if (typeof quizId !== 'number') {
-    return { error: 'Invalid quiz ID' };
-  }
-
-  if (quizFlag) {
+  if (!quiz) {
     return { error: 'Quiz ID not found' };
   }
 
-  if (!currUser.userQuizzes.includes(quizId)) {
+  if (!user.userQuizzes.includes(quizId)) {
     return { error: 'Quiz not owned by user' };
   }
 
-  const maxNameLength = 100;
-
-  if (description.length > maxNameLength) {
+  if (description.length > quizDescriptionMaxLength) {
     return { error: 'Quiz description should be less than 100 characters' };
   }
 
-  currQuiz.description = description;
-
-  setData(data);
+  quiz.description = description;
 
   return {};
 }
@@ -101,69 +78,38 @@ export function adminQuizDescriptionUpdate(authUserId: number, quizId: number, d
 export function adminQuizNameUpdate(authUserId: number, quizId: number, name: string): ErrorObject | Record<string, never> {
   const data = getData();
 
-  let userFlag = true;
-  let currUser: UserType;
-  for (const user of data.users) {
-    if (user.authUserId === authUserId) {
-      userFlag = false;
-      currUser = user;
-    }
-  }
+  const user = fetchUserFromUserId(authUserId);
+  const quiz = fetchQuizFromQuizId(quizId);
 
-  let quizFlag = true;
-  let currQuiz: QuizType;
-  for (const quiz of data.quizzes) {
-    if (quiz.quizId === quizId) {
-      quizFlag = false;
-      currQuiz = quiz;
-    }
-  }
-
-  if (typeof authUserId !== 'number') {
-    return { error: 'Invalid user ID' };
-  }
-
-  if (userFlag) {
+  if (!user) {
     return { error: 'User ID not found' };
   }
 
-  if (typeof quizId !== 'number') {
-    return { error: 'Invalid quiz ID' };
-  }
-
-  if (quizFlag) {
+  if (!quiz) {
     return { error: 'Quiz ID not found' };
   }
 
-  if (!currUser.userQuizzes.includes(quizId)) {
+  if (!user.userQuizzes.includes(quizId)) {
     return { error: 'Quiz not owned by user' };
   }
 
-  const regex = /[^A-Za-z0-9 ]/;
   if (regex.test(name)) {
     return { error: 'Invalid characters found in quiz name' };
   }
 
-  const minNameLength = 3;
-  const maxNameLength = 30;
-
-  if (name.length < minNameLength) {
-    return { error: 'Quiz name should be more than 3 characters' };
+  if (name.length < quizNameMinLength) {
+    return { error: 'invalid quiz name length: too short' };
   }
 
-  if (name.length > maxNameLength) {
-    return { error: 'Quiz name should be less than 30 characters' };
+  if (name.length > quizNameMaxLength) {
+    return { error: 'invalid quiz name length: too long' };
   }
 
-  for (const quiz of data.quizzes) {
-    if (quiz.ownerId === authUserId && quiz.name === name) {
-      return { error: 'Quiz name already taken' };
-    }
+  if (data.quizzes.find(quiz => quiz.ownerId === authUserId && quiz.name === name)) {
+    return { error: 'Quiz name already taken' };
   }
 
-  currQuiz.name = name;
-
-  setData(data);
+  quiz.name = name;
 
   return {};
 }
@@ -183,37 +129,18 @@ export function adminQuizNameUpdate(authUserId: number, quizId: number, name: st
 * }} - object with list of all quizzes by their unique ID number and name.
 *
 */
-
 export function adminQuizList(authUserId: number): AdminQuizListReturn | ErrorObject {
   const data = getData();
 
-  // check for valid authUserId
-  if (typeof authUserId !== 'number') {
-    return { error: 'Invalid ID' };
-  }
+  const user = fetchUserFromUserId(authUserId);
 
-  // check authUserId exists
-  let userFound = false;
-  for (const user of data.users) {
-    if (user.authUserId === authUserId) {
-      userFound = true;
-      break;
-    }
-  }
-  if (userFound === false) {
+  if (!user) {
     return { error: 'User ID not found' };
   }
 
-  // creating list of user's quizzes to return
-  const quizzes: AdminQuizListReturnElement[] = [];
-  for (const quiz of data.quizzes) {
-    if (authUserId === quiz.ownerId) {
-      quizzes.push({
-        quizId: quiz.quizId,
-        name: quiz.name,
-      });
-    }
-  }
+  const filteredQuiz = data.quizzes.filter(quiz => quiz.ownerId === authUserId);
+  const quizzes = filteredQuiz.map(quiz => { return { quizId: quiz.quizId, name: quiz.name }; });
+
   return { quizzes: quizzes };
 }
 
@@ -226,59 +153,44 @@ export function adminQuizList(authUserId: number): AdminQuizListReturn | ErrorOb
  *
  * @returns {quizId: 2} - object with a unique quiz identification number
 */
+
 export function adminQuizCreate(authUserId: number, name: string, description: string): AdminQuizCreateReturn | ErrorObject {
   const data = getData();
 
-  let flag = true;
-  let currUser: UserType;
-  for (const user of data.users) {
-    if (user.authUserId === authUserId) {
-      flag = false;
-      currUser = user;
-    }
-  }
+  const user = fetchUserFromUserId(authUserId);
 
-  if (flag) {
+  if (!user) {
     return { error: 'invalid user ID' };
   }
 
-  const regex = /[^A-Za-z0-9 ]/;
   if (regex.test(name)) {
     return { error: 'invalid quiz name characters' };
   }
 
-  if (name.length < 3) {
+  if (name.length < quizNameMinLength) {
     return { error: 'invalid quiz name length: too short' };
-  } else if (name.length > 30) {
+  }
+
+  if (name.length > quizNameMaxLength) {
     return { error: 'invalid quiz name length: too long' };
   }
 
-  let duplicateQuizName = false;
-  for (const quiz of currUser.userQuizzes) {
-    if (data.quizzes[quiz].name === name) {
-      duplicateQuizName = true;
-    }
-  }
-  if (duplicateQuizName) {
-    return { error: 'Duplicate quiz name length' };
+  const duplicateName = user.userQuizzes.find(quizId => fetchQuizFromQuizId(quizId).name === name);
+
+  if (duplicateName !== undefined) {
+    return { error: 'Duplicate quiz name' };
   }
 
-  if (description.length > 100) {
+  if (description.length > quizDescriptionMaxLength) {
     return { error: 'Quiz description invalid length' };
   }
 
-  const unixTime = Math.floor(Date.now() / 1000);
+  const unixTime = currentTime();
 
-  let newQuizId = 0;
-  const currQuizId: number[] = [];
-  for (const quiz of data.quizzes) {
-    currQuizId.push(quiz.quizId);
-  }
-  while (currQuizId.includes(newQuizId)) {
-    newQuizId++;
-  }
+  // fetches new quizId that is the lowest unused quizId number
+  const newQuizId = generateNewQuizId();
 
-  currUser.userQuizzes.push(newQuizId);
+  user.userQuizzes.push(newQuizId);
   data.quizzes.push({
     ownerId: authUserId,
     quizId: newQuizId,
@@ -288,7 +200,6 @@ export function adminQuizCreate(authUserId: number, name: string, description: s
     timeLastEdited: unixTime,
   });
 
-  setData(data);
   return { quizId: newQuizId };
 }
 
@@ -303,50 +214,23 @@ export function adminQuizCreate(authUserId: number, name: string, description: s
 export function adminQuizRemove(authUserId: number, quizId: number): ErrorObject | Record<string, never> {
   const data = getData();
 
-  let userFlag = true;
-  let currUser: UserType;
-  for (const user of data.users) {
-    if (user.authUserId === authUserId) {
-      userFlag = false;
-      currUser = user;
-    }
-  }
+  const user = fetchUserFromUserId(authUserId);
+  const quiz = fetchQuizFromQuizId(quizId);
 
-  let quizFlag = true;
-  for (const quiz of data.quizzes) {
-    if (quiz.quizId === quizId) {
-      quizFlag = false;
-    }
-  }
-
-  if (userFlag) {
+  if (!user) {
     return { error: 'invalid user ID' };
   }
 
-  if (quizFlag) {
+  if (!quiz) {
     return { error: 'invalid quiz ID' };
   }
 
-  if (!currUser.userQuizzes.includes(quizId)) {
+  if (!user.userQuizzes.includes(quizId)) {
     return { error: 'you do not own this quiz' };
   }
 
-  let i = 0;
-  while (data.users[i].authUserId !== authUserId) {
-    i++;
-  }
-  let j = 0;
-  while (data.users[i].userQuizzes[j] !== quizId) {
-    j++;
-  }
-  data.users[i].userQuizzes.splice(i, 1);
-
-  i = 0;
-  while (data.quizzes[i].quizId !== quizId) {
-    i++;
-  }
-  data.quizzes.splice(i, 1);
-  setData(data);
+  user.userQuizzes.splice(user.userQuizzes.indexOf(quizId), 1);
+  data.quizzes.splice(data.quizzes.indexOf(quiz), 1);
 
   return {};
 }
@@ -366,43 +250,26 @@ export function adminQuizRemove(authUserId: number, quizId: number): ErrorObject
  * } - returns an object with details about the quiz queried for information.
  */
 export function adminQuizInfo(authUserId: number, quizId: number): AdminQuizInfoReturn | ErrorObject {
-  const data = getData();
+  const user = fetchUserFromUserId(authUserId);
+  const quiz = fetchQuizFromQuizId(quizId);
 
-  let userFlag = true;
-  let currUser: UserType;
-  for (const user of data.users) {
-    if (user.authUserId === authUserId) {
-      userFlag = false;
-      currUser = user;
-    }
-  }
-
-  let quizFlag = true;
-  let currQuiz: QuizType;
-  for (const quiz of data.quizzes) {
-    if (quiz.quizId === quizId) {
-      quizFlag = false;
-      currQuiz = quiz;
-    }
-  }
-
-  if (userFlag) {
+  if (!user) {
     return { error: 'invalid user ID' };
   }
 
-  if (quizFlag) {
+  if (!quiz) {
     return { error: 'invalid quiz ID' };
   }
 
-  if (!currUser.userQuizzes.includes(quizId)) {
+  if (!user.userQuizzes.includes(quizId)) {
     return { error: 'you do not own this quiz' };
   }
 
   return {
     quizId: quizId,
-    name: currQuiz.name,
-    timeCreated: currQuiz.timeCreated,
-    timeLastEdited: currQuiz.timeLastEdited,
-    description: currQuiz.description,
+    name: quiz.name,
+    timeCreated: quiz.timeCreated,
+    timeLastEdited: quiz.timeLastEdited,
+    description: quiz.description,
   };
 }
