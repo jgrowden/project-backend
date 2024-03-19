@@ -11,8 +11,8 @@ describe('adminQuizRemove test cases', () => {
   describe('success cases', () => {
     test('correct return type', () => {
       const user = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-      const quiz = adminQuizCreate(user.sessionId, 'quiz name', 'quiz description');
-      expect(adminQuizRemove(user.sessionId, quiz.quizId)).toMatchObject({ });
+      const quiz = adminQuizCreate(user.token, 'quiz name', 'quiz description');
+      expect(adminQuizRemove(user.token, quiz.quizId)).toMatchObject({ });
     });
   });
   describe('failure cases', () => {
@@ -22,14 +22,14 @@ describe('adminQuizRemove test cases', () => {
     });
     test('Check for invalid quiz ID', () => {
       const user = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-      expect(adminQuizRemove(user.sessionId, -1))
+      expect(adminQuizRemove(user.token, -1))
         .toMatchObject({ error: expect.any(String) });
     });
     test('Check for valid quiz ownership', () => {
       const user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
       const user2 = adminAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo');
-      const user2quiz = adminQuizCreate(user2.sessionId, 'quiz name', 'quiz description');
-      expect(adminQuizRemove(user1.sessionId, user2quiz.quizId))
+      const user2quiz = adminQuizCreate(user2.token, 'quiz name', 'quiz description');
+      expect(adminQuizRemove(user1.token, user2quiz.quizId))
         .toMatchObject({ error: expect.any(String) });
     });
   });

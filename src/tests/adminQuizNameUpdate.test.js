@@ -21,60 +21,60 @@ describe('adminQuizNameUpdate', () => {
 
   test('invalid quiz ID', () => {
     const user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    adminQuizCreate(user1.sessionId, 'good quiz', 'is good');
-    expect(adminQuizNameUpdate(user1.sessionId, 'quizId', 'great quiz'))
+    adminQuizCreate(user1.token, 'good quiz', 'is good');
+    expect(adminQuizNameUpdate(user1.token, 'quizId', 'great quiz'))
       .toStrictEqual({ error: expect.any(String) });
   });
 
   test('quiz ID not found', () => {
     clear();
     const user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    expect(adminQuizNameUpdate(user1.sessionId, 1, 'great quiz'))
+    expect(adminQuizNameUpdate(user1.token, 1, 'great quiz'))
       .toStrictEqual({ error: expect.any(String) });
   });
 
   test('quiz not owned by user', () => {
     const user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    const quiz1 = adminQuizCreate(user1.sessionId, 'good quiz', 'is good');
+    const quiz1 = adminQuizCreate(user1.token, 'good quiz', 'is good');
     const user2 = adminAuthRegister('fancypants@gmail.com', 'f4ncyP4nts', 'Fancy', 'Pants');
-    expect(adminQuizNameUpdate(user2.sessionId, quiz1.quizId, 'great quiz'))
+    expect(adminQuizNameUpdate(user2.token, quiz1.quizId, 'great quiz'))
       .toStrictEqual({ error: expect.any(String) });
   });
 
   test('invalid characters in quiz name', () => {
     const user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    const quiz1 = adminQuizCreate(user1.sessionId, 'good quiz', 'is good');
-    expect(adminQuizNameUpdate(user1.sessionId, quiz1.quizId, '/!greatQUIZ>>'))
+    const quiz1 = adminQuizCreate(user1.token, 'good quiz', 'is good');
+    expect(adminQuizNameUpdate(user1.token, quiz1.quizId, '/!greatQUIZ>>'))
       .toStrictEqual({ error: expect.any(String) });
   });
 
   test('quiz name less than 3 characters long', () => {
     const user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    const quiz1 = adminQuizCreate(user1.sessionId, 'good quiz', 'is good');
-    expect(adminQuizNameUpdate(user1.sessionId, quiz1.quizId, 'ab'))
+    const quiz1 = adminQuizCreate(user1.token, 'good quiz', 'is good');
+    expect(adminQuizNameUpdate(user1.token, quiz1.quizId, 'ab'))
       .toStrictEqual({ error: expect.any(String) });
   });
 
   test('quiz name more than 30 characters long', () => {
     const user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    const quiz1 = adminQuizCreate(user1.sessionId, 'good quiz', 'is good');
-    expect(adminQuizNameUpdate(user1.sessionId, quiz1.quizId, 'abcedfghijklmnopqrstuvwxyz123456789'))
+    const quiz1 = adminQuizCreate(user1.token, 'good quiz', 'is good');
+    expect(adminQuizNameUpdate(user1.token, quiz1.quizId, 'abcedfghijklmnopqrstuvwxyz123456789'))
       .toStrictEqual({ error: expect.any(String) });
   });
 
   test('quiz name already used on another quiz by logged in user', () => {
     const user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    const quiz1 = adminQuizCreate(user1.sessionId, 'good quiz', 'is good');
-    adminQuizCreate(user1.sessionId, 'great quiz', 'is good');
-    expect(adminQuizNameUpdate(user1.sessionId, quiz1.quizId, 'great quiz'))
+    const quiz1 = adminQuizCreate(user1.token, 'good quiz', 'is good');
+    adminQuizCreate(user1.token, 'great quiz', 'is good');
+    expect(adminQuizNameUpdate(user1.token, quiz1.quizId, 'great quiz'))
       .toStrictEqual({ error: expect.any(String) });
   });
 
   test('no errors 1', () => {
     const user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    const quiz1 = adminQuizCreate(user1.sessionId, 'good quiz', 'is good');
-    expect(JSON.stringify(adminQuizNameUpdate(user1.sessionId, quiz1.quizId, 'great quiz'))).toBe('{}');
-    expect(adminQuizInfo(user1.sessionId, quiz1.quizId)).toMatchObject({
+    const quiz1 = adminQuizCreate(user1.token, 'good quiz', 'is good');
+    expect(JSON.stringify(adminQuizNameUpdate(user1.token, quiz1.quizId, 'great quiz'))).toBe('{}');
+    expect(adminQuizInfo(user1.token, quiz1.quizId)).toMatchObject({
       quizId: quiz1.quizId,
       name: 'great quiz',
       timeCreated: expect.any(Number),
@@ -85,9 +85,9 @@ describe('adminQuizNameUpdate', () => {
 
   test('no errors 2, 3 character names', () => {
     const user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    const quiz1 = adminQuizCreate(user1.sessionId, 'good quiz', 'is good');
-    expect(JSON.stringify(adminQuizNameUpdate(user1.sessionId, quiz1.quizId, 'Abc'))).toBe('{}');
-    expect(adminQuizInfo(user1.sessionId, quiz1.quizId)).toMatchObject({
+    const quiz1 = adminQuizCreate(user1.token, 'good quiz', 'is good');
+    expect(JSON.stringify(adminQuizNameUpdate(user1.token, quiz1.quizId, 'Abc'))).toBe('{}');
+    expect(adminQuizInfo(user1.token, quiz1.quizId)).toMatchObject({
       quizId: quiz1.quizId,
       name: 'Abc',
       timeCreated: expect.any(Number),
@@ -98,9 +98,9 @@ describe('adminQuizNameUpdate', () => {
 
   test('no errors 3, 30 character names', () => {
     const user1 = adminAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    const quiz1 = adminQuizCreate(user1.sessionId, 'good quiz', 'is good');
-    expect(JSON.stringify(adminQuizNameUpdate(user1.sessionId, quiz1.quizId, 'ABCdefghijklmnopqrstuvwxyz1234'))).toBe('{}');
-    expect(adminQuizInfo(user1.sessionId, quiz1.quizId)).toMatchObject({
+    const quiz1 = adminQuizCreate(user1.token, 'good quiz', 'is good');
+    expect(JSON.stringify(adminQuizNameUpdate(user1.token, quiz1.quizId, 'ABCdefghijklmnopqrstuvwxyz1234'))).toBe('{}');
+    expect(adminQuizInfo(user1.token, quiz1.quizId)).toMatchObject({
       quizId: quiz1.quizId,
       name: 'ABCdefghijklmnopqrstuvwxyz1234',
       timeCreated: expect.any(Number),

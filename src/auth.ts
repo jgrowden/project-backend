@@ -8,7 +8,7 @@ interface ErrorObject {
 }
 
 interface ReturnSessionId {
-  sessionId: string;
+  token: string;
 }
 
 interface AdminUserDetailsReturn {
@@ -116,7 +116,7 @@ export function adminAuthRegister(email: string, password: string, nameFirst: st
     sessions: sessions
   });
 
-  return { sessionId: sessionId };
+  return { token: sessionId };
 }
 
 /**
@@ -143,7 +143,7 @@ export function adminAuthLogin(email: string, password: string): ReturnSessionId
   user.numFailedPasswordsSinceLastLogin = 0;
   user.numSuccessfulLogins++;
 
-  return { sessionId: sessionId };
+  return { token: sessionId };
 }
 
 /**
