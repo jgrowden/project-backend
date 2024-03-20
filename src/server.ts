@@ -70,7 +70,7 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
   res.json(result);
 });
 
-app.post('/v1/quiz/create', (req: Request, res: Response) => {
+app.post('/v1/admin/quiz/create', (req: Request, res: Response) => {
   const { token, name, description } = req.body;
   const result = adminQuizCreate(token, name, description);
   if ('error' in result) {
@@ -79,6 +79,8 @@ app.post('/v1/quiz/create', (req: Request, res: Response) => {
   save();
   res.json(result);
 });
+
+app.delete('')
 
 // clear Route
 app.delete('/v1/clear', (req: Request, res: Response) => {
