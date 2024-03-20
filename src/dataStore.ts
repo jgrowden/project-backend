@@ -14,11 +14,13 @@ interface UserType {
 }
 
 interface AnswerType {
+  answerId: number;
   answer: string;
   correct: boolean;
 }
 
 interface QuestionType {
+  questionId: number;
   question: string;
   duration: number;
   points: number;
@@ -32,6 +34,7 @@ interface QuizType {
   description: string;
   timeCreated: number;
   timeLastEdited: number;
+  numQuestions: number;
   questions: QuestionType[];
 }
 

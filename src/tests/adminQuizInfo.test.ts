@@ -22,6 +22,8 @@ describe('Testing /v1/admin/quiz/{quizid}:', () => {
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),
         description: 'Quiz Description',
+        numQuestions: 0,
+        questions: []
       }
     });
   });
