@@ -19,12 +19,31 @@ interface AdminQuizCreateReturn {
   quizId: number;
 }
 
+interface AdminQuizQuestionCreateReturn {
+  quizId: number;
+}
+
 interface AdminQuizInfoReturn {
   quizId: number;
   name: string;
   timeCreated: number;
   timeLastEdited: number;
   description: string;
+}
+
+interface AnswersType {
+  answer: string;
+  correct: boolean;
+}
+
+interface adminQuizQuestionCreateArgument {
+  token: string;
+  questionBody: {
+    question: string;
+    duration: number;
+    points: number;
+    answers: AnswersType[];
+  }
 }
 
 const quizDescriptionMaxLength = 100;
@@ -198,6 +217,7 @@ export function adminQuizCreate(sessionId: string, name: string, description: st
     description: description,
     timeCreated: unixTime,
     timeLastEdited: unixTime,
+    numQuestions: 0,
     questions: []
   });
 
@@ -275,3 +295,56 @@ export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoR
     description: quiz.description,
   };
 }
+
+export function adminQuizQuestionCreate(
+  sessionId: string, 
+  quizId: number, 
+  question: adminQuizQuestionCreateArgument
+): AdminQuizQuestionCreateReturn {
+  const user = fetchUserFromSessionId(sessionId);
+  let quiz = fetchQuizFromQuizId(quizId);
+  if (question.questionBody.question.length < 5 || 
+    question.questionBody.question.length > 50 ||
+    question.questionBody.question.answers.length < 2 ||
+    question.questionBody.question.answers.length > 6 ||
+    question.questionBody.duration < 1 ||
+    quiz.questions.reduce((pSum, question) => pSum + question.duration, 0) + question.questionBody.duration > 180 ||
+    question.questionBody.points < 1 ||
+    question.questionBody.points > 10 ||
+    question.questionBody.answers.find(answer => answer.length < 1 || answer.length > 30) !== undefined ||
+    question.questionBody.answers.filter((answer, index) => question.questionBody.answers.indexOf(answer) !== index) !== [] || 
+    question.questionBody.answers.find(answer => answer.correct === true) === undefined
+  ) {
+    return { error: 'something is wrong...' };
+  } 
+  
+  if (!user) {
+    return { error: 'invalid user ID' };
+  }
+
+  if (!user.userQuizzes.includes(quizId)) {
+    return { error: 'you do not own this quiz' };
+  }
+
+  let newQuestionId = generateNewQuestionId();
+
+  quiz.questions.push({
+    questionId: newQuestionId,
+    question: question.questionBody.question,
+    duration: question.questionBody.duration,
+    points: question.questionBody.points,
+    answers: question.questionBody.answers
+  })
+  quiz.numQuestions++;
+  quiz.timeLastEdited = Math.floor(Date.now() / 1000);
+}
+
+export const generateNewQuestionId = (): number => {
+  const data = getData();
+  let newQuizId = 0;
+  const quizIds = data.quizzes.map(quiz => quiz.quizId);
+  while (quizIds.includes(newQuizId)) {
+    newQuizId++;
+  }
+  return newQuizId;
+};

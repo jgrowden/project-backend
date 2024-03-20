@@ -17,7 +17,7 @@ beforeEach(() => {
         question: "Question?",
         duration: 3,
         points: 4,
-        answers: [{ answer: "Answer!", correct: true }]
+        answers: [{ answer: "Answer!", correct: true }, { answer: "Another Answer!", correct: true }]
         }
     }
 });
@@ -54,6 +54,13 @@ describe('Testing /v1/admin/quiz/{quizid}:', () => {
   });
   test('Failed test: question is too long.', () => {
     question.questionBody.question = 'A monoid is a monad in the category of endofunctors. What are the consequences for Haskell?';
+    expect(requestQuizQuestionCreate(quizId, question)).toStrictEqual({
+        statusCode: 400,
+        jsonBody: ERROR
+    });
+  });
+  test('Failed test: there must be between 2 and 6 answers.', () => {
+    question.questionBody.question;
     expect(requestQuizQuestionCreate(quizId, question)).toStrictEqual({
         statusCode: 400,
         jsonBody: ERROR
