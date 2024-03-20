@@ -9,9 +9,8 @@ const requestAuthLogin = (email: string, password: string) =>
 const requestQuizCreate = (token: string, name: string, description: string) =>
   requestHelper('POST', '/v1/admin/quiz/create', { token, name, description });
 
-const requestQuizDelete = (token: string, quizId: number) => {
-  requestHelper('DELETE', '/v1/admin/quiz/delete', { token, quizId });
-}
+const requestQuizDelete = (token: string, quizId: number) =>
+  requestHelper('DELETE', `/v1/admin/quiz/${quizId}`, { token, quizId });
 
 const clear = () => requestHelper('DELETE', '/v1/clear');
 
