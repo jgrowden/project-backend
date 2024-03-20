@@ -10,6 +10,7 @@ import path from 'path';
 import process from 'process';
 import { getData, setData } from './dataStore';
 import { adminAuthRegister, adminAuthLogin } from './auth';
+import { adminQuizQuestionUpdate } from './quiz';
 import { clear } from './other';
 // Set up web app
 const app = express();
@@ -65,6 +66,18 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
   if ('error' in result) {
     return res.status(400).json(result);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizQuestionUpdate Route
+app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const { token, questionBody } = req.body;
+  const result = adminQuizQuestionUpdate(token, quizId, questionId, questionBody);
+  // if ('error' in result) {
+  // }
   save();
   res.json(result);
 });
