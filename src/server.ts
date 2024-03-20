@@ -10,7 +10,7 @@ import path from 'path';
 import process from 'process';
 import { getData, setData } from './dataStore';
 import { adminAuthRegister, adminAuthLogin } from './auth';
-import { adminQuizCreate, adminQuizRemove } from './quiz';
+import { adminQuizCreate, adminQuizRemove, adminQuizInfo } from './quiz';
 import { clear } from './other';
 // Set up web app
 const app = express();
@@ -84,6 +84,17 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const token = req.query.token as string;
   const quizId = parseInt(req.params.quizid);
   const result = adminQuizRemove(token, quizId);
+  if ('error' in result) {
+    return res.status(400).json(result);
+  }
+  save();
+  res.json(result);
+});
+
+app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = req.query.token as string;
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizInfo(token, quizId);
   if ('error' in result) {
     return res.status(400).json(result);
   }

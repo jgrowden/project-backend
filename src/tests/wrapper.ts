@@ -20,3 +20,4 @@ const clear = () => requestHelper('DELETE', '/v1/clear');
 const ERROR = { error: expect.any(String) };
 
 export { requestAuthRegister, requestAuthLogin, requestQuizCreate, requestQuizDelete, clear, ERROR };
+export { requestQuizInfo };

@@ -13,15 +13,16 @@ beforeEach(() => {
 
 describe('Testing /v1/admin/quiz/{quizid}:', () => {
   test('Successful test.', () => {
-    let time = Math.floor(Date.now() / 1000);
-    let requestedInfo = requestQuizInfo(token, quizId);
+    const requestedInfo = requestQuizInfo(token, quizId);
     expect(requestedInfo).toStrictEqual({
+      statusCode: 200,
+      jsonBody: {
         quizId: quizId,
         name: 'Quiz Name',
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),
         description: 'Quiz Description',
-        questions: []
+      }
     });
   });
   test('Failed test: user does not exist.', () => {

@@ -198,6 +198,7 @@ export function adminQuizCreate(sessionId: string, name: string, description: st
     description: description,
     timeCreated: unixTime,
     timeLastEdited: unixTime,
+    questions: []
   });
 
   return { quizId: newQuizId };
