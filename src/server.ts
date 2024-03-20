@@ -88,7 +88,7 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
     return res.status(400).json(result);
   }
   save();
-  res.json(result);  
+  res.json(result);
 });
 
 // clear Route
