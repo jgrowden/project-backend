@@ -1,4 +1,6 @@
 import { requestHelper } from './requestHelper';
+import { AdminQuizQuestionBody } from '../quiz';
+const ERROR = { error: expect.any(String) };
 
 const requestAuthRegister = (email: string, password: string, nameFirst: string, nameLast: string) =>
   requestHelper('POST', '/v1/admin/auth/register', { email, password, nameFirst, nameLast });
@@ -8,6 +10,7 @@ const requestAuthLogin = (email: string, password: string) =>
 
 const clear = () => requestHelper('DELETE', '/v1/clear');
 
-const ERROR = { error: expect.any(String) };
+const requestQuestionUpdate = (sessionId: string, quizId: number, questionId: number, questionBody: AdminQuizQuestionBody) =>
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { sessionId, questionBody });
 
-export { requestAuthRegister, requestAuthLogin, clear, ERROR };
+export { requestAuthRegister, requestAuthLogin, clear, requestQuestionUpdate, ERROR };

@@ -25,6 +25,24 @@ interface AdminQuizInfoReturn {
   timeCreated: number;
   timeLastEdited: number;
   description: string;
+  numQuestions?: number;
+  questions?: AdminQuizQuestionBody[];
+  duration?: number;
+}
+
+export interface AdminQuizQuestionBody {
+  questionId: number,
+  question: string;
+  duration: number;
+  points: number;
+  answers: AdminQuizAnswerBody[];
+}
+
+interface AdminQuizAnswerBody {
+  answerId: number;
+  answer: string;
+  colour: string,
+  correct: boolean;
 }
 
 const quizDescriptionMaxLength = 100;
@@ -273,4 +291,18 @@ export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoR
     timeLastEdited: quiz.timeLastEdited,
     description: quiz.description,
   };
+}
+
+/**
+ * Update the relevant details of a particular question within a quiz.
+ * When this route is called, the last edited time is updated,
+ * and the colours of all answers of that question are randomly generated.
+ * @param {string} sessionId
+ * @param {number} quizId
+ * @param {number} questionId
+ * @param {AdminQuizQuestionBody} questionBody
+ * @returns {} - empty object
+ */
+export function adminQuizQuestionUpdate(sessionId: string, quizId: number, questionId: number, questionBody: AdminQuizQuestionBody): ErrorObject | Record<string, never> {
+  return {};
 }
