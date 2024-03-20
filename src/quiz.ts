@@ -1,4 +1,3 @@
-// import { string } from 'yaml/dist/schema/common/string';
 import { getData } from './dataStore';
 import { fetchUserFromSessionId, fetchQuizFromQuizId, generateNewQuizId, currentTime } from './helper';
 
