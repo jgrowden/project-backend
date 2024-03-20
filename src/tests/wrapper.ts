@@ -12,6 +12,9 @@ const requestQuizCreate = (token: string, name: string, description: string) =>
 const requestQuizDelete = (token: string, quizId: number) =>
   requestHelper('DELETE', `/v1/admin/quiz/${quizId}`, { token, quizId });
 
+const requestQuizInfo = (token: string, quizId: number) =>
+  requestHelper('GET', `/v1/admin/quiz/${quizId}`, { token, quizId });
+
 const clear = () => requestHelper('DELETE', '/v1/clear');
 
 const ERROR = { error: expect.any(String) };

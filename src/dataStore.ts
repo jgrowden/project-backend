@@ -13,6 +13,18 @@ interface UserType {
   sessions: string[];
 }
 
+interface AnswerType {
+  answer: string;
+  correct: boolean;
+}
+
+interface QuestionType {
+  question: string;
+  duration: number;
+  points: number;
+  answers: AnswerType[];
+}
+
 interface QuizType {
   ownerId: number;
   quizId: number;
@@ -20,6 +32,7 @@ interface QuizType {
   description: string;
   timeCreated: number;
   timeLastEdited: number;
+  questions: QuestionType[];
 }
 
 interface DataType {
