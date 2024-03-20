@@ -17,40 +17,40 @@ describe('Testing adminQuizCreate:', () => {
     });
     test('Failed test: user does not exist', () => {
         expect(requestQuizCreate(token + 'a', 'Quiz Name', 'Quiz Description')).toStrictEqual({
-            statusCode: 200,
-            jsonBody: { quizId: expect.any(String) }
+            statusCode: 400,
+            jsonBody: { error: expect.any(String) }
         });
     });
     test('Failed test: invalid quiz name characters', () => {
         expect(requestQuizCreate(token, '!nvalid Name', 'Quiz Description')).toStrictEqual({
-            statusCode: 200,
-            jsonBody: { quizId: expect.any(String) }
+            statusCode: 400,
+            jsonBody: { error: expect.any(String) }
         });
     });
     test('Failed test: quiz name is too short', () => {
         expect(requestQuizCreate(token, 'iq', 'Quiz Description')).toStrictEqual({
-            statusCode: 200,
-            jsonBody: { quizId: expect.any(String) }
+            statusCode: 400,
+            jsonBody: { error: expect.any(String) }
         });
     });
     test('Failed test: quiz name is too long', () => {
         expect(requestQuizCreate(token, 'A very long quiz name which is far too long', 'Quiz Description')).toStrictEqual({
-            statusCode: 200,
-            jsonBody: { quizId: expect.any(String) }
+            statusCode: 400,
+            jsonBody: { error: expect.any(String) }
         });
     });
     test('Failed test: duplicate quiz name', () => {
         requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
         expect(requestQuizCreate(token, 'Quiz Name', 'Quiz Description')).toStrictEqual({
-            statusCode: 200,
-            jsonBody: { quizId: expect.any(String) }
+            statusCode: 400,
+            jsonBody: { error: expect.any(String) }
         });
     });
     test('Failed test: quiz description is too long', () => {
         requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
         expect(requestQuizCreate(token, 'Quiz Name', 'A very, very, very, very, very, extraordinarily, tremendously, stupendously, ridiculously, anomolously, long description')).toStrictEqual({
-            statusCode: 200,
-            jsonBody: { quizId: expect.any(String) }
+            statusCode: 400,
+            jsonBody: { error: expect.any(String) }
         });
     });
 });
