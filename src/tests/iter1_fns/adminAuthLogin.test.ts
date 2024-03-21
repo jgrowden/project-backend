@@ -11,7 +11,7 @@ describe('Testing adminAuthLogin', () => {
   test('Test successful login', () => {
     expect(requestAuthLogin('gon.freecs@gmail.com', 'GonF1shing')).toStrictEqual({
       statusCode: 200,
-      jsonBody: { sessionId: expect.any(String) }
+      jsonBody: { token: expect.any(String) }
     });
   });
 
