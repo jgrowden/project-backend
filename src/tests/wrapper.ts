@@ -17,3 +17,9 @@ const requestQuestionUpdate = (sessionId: string, quizId: number, questionId: nu
 const clear = () => requestHelper('DELETE', '/v1/clear');
 
 export { requestAuthRegister, requestAuthLogin, requestUserDetails, requestQuestionUpdate, clear, ERROR };
+
+const clear = () => requestHelper('DELETE', '/v1/clear');
+
+const ERROR = { error: expect.any(String) };
+
+export { requestAuthRegister, requestAuthLogin, requestUserDetails, clear, ERROR };
