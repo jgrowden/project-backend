@@ -9,8 +9,13 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { getData, setData } from './dataStore';
+<<<<<<< HEAD
 import { adminAuthRegister, adminAuthLogin } from './auth';
 import { adminQuizCreate, adminQuizRemove } from './quiz';
+=======
+import { adminQuizCreate } from './quiz';
+import { adminAuthRegister, adminAuthLogin, adminUserDetails, adminUserPasswordUpdate } from './auth';
+>>>>>>> e4aec6486a1a9daa026ebc08209645ec60c25b73
 import { clear } from './other';
 // Set up web app
 const app = express();
@@ -70,11 +75,38 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
   res.json(result);
 });
 
+<<<<<<< HEAD
 app.post('/v1/admin/quiz/create', (req: Request, res: Response) => {
+=======
+// adminQuizCreate route
+app.post('/v1/quiz/create', (req: Request, res: Response) => {
+>>>>>>> e4aec6486a1a9daa026ebc08209645ec60c25b73
   const { token, name, description } = req.body;
   const result = adminQuizCreate(token, name, description);
+  if ('errorCode' in result) {
+    return res.status(result.errorCode).json(result.errorObject);
+  }
+  save();
+  res.json(result);
+});
+
+// adminUserDetails Route
+app.get('/v1/admin/user/details', (req: Request, res: Response) => {
+  const token = req.query.token as string;
+  const result = adminUserDetails(token);
   if ('error' in result) {
-    return res.status(400).json(result);
+    return res.status(401).json(result);
+  }
+  save();
+  res.json(result);
+});
+
+// adminUserPasswordUpdate Route
+app.put('/v1/admin/user/password', (req: Request, res: Response) => {
+  const { token, oldPassword, newPassword } = req.body;
+  const result = adminUserPasswordUpdate(token.token, oldPassword, newPassword);
+  if ('error' in result) {
+    return res.status(result.statusCode).json(result);
   }
   save();
   res.json(result);
