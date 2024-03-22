@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizDelete, clear, ERROR } from './wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizDelete, errorCode, clear } from './wrapper';
 
 let token: string;
 let quizId: number;
@@ -19,23 +19,14 @@ describe('Testing /v1/admin/quiz/{quizid}:', () => {
     });
   });
   test('Failed test: user does not exist.', () => {
-    expect(requestQuizDelete(token + 'a', quizId)).toStrictEqual({
-      statusCode: 400,
-      jsonBody: ERROR
-    });
+    expect(requestQuizDelete(token + 'a', quizId)).toStrictEqual(errorCode(401));
   });
   test('Failed test: quiz does not exist.', () => {
-    expect(requestQuizDelete(token, quizId + 1)).toStrictEqual({
-      statusCode: 400,
-      jsonBody: ERROR
-    });
+    expect(requestQuizDelete(token, quizId + 1)).toStrictEqual(errorCode(403));
   });
   test('Failed test: user provided does not own quiz.', () => {
     const { jsonBody } = requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo');
     const otherToken = jsonBody.token as string;
-    expect(requestQuizDelete(otherToken, quizId)).toStrictEqual({
-      statusCode: 400,
-      jsonBody: ERROR
-    });
+    expect(requestQuizDelete(otherToken, quizId)).toStrictEqual(errorCode(403));
   });
 });

@@ -25,6 +25,10 @@ interface QuestionType {
   answers: AnswerType[];
 }
 
+interface TokenType {
+  token: string;
+}
+
 interface QuizType {
   ownerId: number;
   quizId: number;
@@ -75,4 +79,4 @@ function setData(newData: DataType) {
   data = newData;
 }
 
-export { UserType, QuizType, DataType, getData, setData };
+export { UserType, AnswerType, QuestionType, TokenType, QuizType, DataType, getData, setData };

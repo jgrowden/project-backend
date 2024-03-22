@@ -1,4 +1,5 @@
 import { getData, UserType, QuizType } from './dataStore';
+import { ErrorObject, ErrorObjectWithCode } from './quiz';
 
 export const fetchUserFromUserId = (authUserId: number): UserType | undefined => {
   return getData().users.find(user => user.authUserId === authUserId);
@@ -38,4 +39,12 @@ export const generateNewQuizId = (): number => {
 
 export const currentTime = (): number => {
   return Math.floor(Date.now() / 1000);
+};
+
+export const returnError = (errorString: string, errorCode: number): ErrorObjectWithCode => {
+  const err: ErrorObject = { error: errorString };
+  return {
+    errorObject: err,
+    errorCode: errorCode
+  };
 };
