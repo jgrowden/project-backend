@@ -1,10 +1,5 @@
-import { getData } from './dataStore';
-import { fetchUserFromSessionId, fetchQuizFromQuizId, generateNewQuizId, currentTime } from './helper';
-
-interface ErrorObject {
-  error: string;
-  statusCode?: number;
-}
+import { getData, QuestionType, ErrorObject } from './dataStore';
+import { fetchUserFromSessionId, fetchQuizFromQuizId, fetchQuestionFromQuestionId, generateNewQuizId, currentTime } from './helper';
 
 interface AdminQuizListReturnElement {
   quizId: number;
@@ -26,26 +21,8 @@ interface AdminQuizInfoReturn {
   timeLastEdited: number;
   description: string;
   numQuestions?: number;
-  questions?: AdminQuizQuestionBody[];
+  questions?: QuestionType;
   duration?: number;
-}
-
-// exported for testing
-export interface AdminQuizQuestionBody {
-  // questionId must be returned in quizInfo,
-  // however is given separately when q's are passed into functions
-  questionId?: number,
-  question: string;
-  duration: number;
-  points: number;
-  answers: AdminQuizAnswerBody[];
-}
-// similarly, answerId & colour's are returned, but not passed
-export interface AdminQuizAnswerBody {
-  answerId?: number;
-  answer: string;
-  colour?: string,
-  correct: boolean;
 }
 
 const quizDescriptionMaxLength = 100;
@@ -306,6 +283,131 @@ export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoR
  * @param {AdminQuizQuestionBody} questionBody
  * @returns {} - empty object
  */
-export function adminQuizQuestionUpdate(sessionId: string, quizId: number, questionId: number, questionBody: AdminQuizQuestionBody): ErrorObject | Record<string, never> {
+export function adminQuizQuestionUpdate(sessionId: string, quizId: number, questionId: number, newQuestionBody: QuestionType): ErrorObject | Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    return {
+      error: 'Invalid token',
+      statusCode: 401,
+    };
+  }
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    return {
+      error: 'Invalid quizId',
+      statusCode: 403,
+    };
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    return {
+      error: 'Invalid quiz ownership',
+      statusCode: 403,
+    };
+  }
+
+  const question = fetchQuestionFromQuestionId(quiz, questionId);
+  if (!question) {
+    return {
+      error: 'Invalid questionId',
+      statusCode: 400,
+    };
+  }
+
+  const questionLength = newQuestionBody.question.length;
+  if (questionLength < 5 || questionLength > 50) {
+    return {
+      error: 'Invalid question string',
+      statusCode: 400,
+    };
+  }
+
+  const answersArrayLength = newQuestionBody.answers.length;
+  if (answersArrayLength < 2 || answersArrayLength > 6) {
+    return {
+      error: 'Invalid amount of answers',
+      statusCode: 400,
+    };
+  }
+
+  if (newQuestionBody.duration < 1) {
+    return {
+      error: 'Duration must be positive',
+      statusCode: 400,
+    };
+  }
+
+  const quizDuration = quiz.duration - question.duration;
+  if (quizDuration + newQuestionBody.duration > 180) {
+    return {
+      error: 'Quiz duration must not exceed 3 mins',
+      statusCode: 400,
+    };
+  }
+
+  if (newQuestionBody.points < 1 || newQuestionBody.points > 10) {
+    return {
+      error: 'Question points must be between 1 and 10 (inclusive)',
+      statusCode: 400,
+    };
+  }
+
+  let noCorrectAnswers = true;
+  let noDuplicateAnswers = true;
+  let nextIndex = 1;
+  for (const answerBody of newQuestionBody.answers) {
+    const answerLength = answerBody.answer.length;
+    if (answerLength < 1 || answerLength > 30) {
+      return {
+        error: 'Invalid answer string length',
+        statusCode: 400,
+      };
+    }
+    if (answerBody.correct === true) {
+      noCorrectAnswers = false;
+    }
+    for (let i = nextIndex; i < newQuestionBody.answers.length; i++) {
+      if (answerBody.answer === newQuestionBody.answers[i].answer) {
+        noDuplicateAnswers = false;
+      }
+    }
+    nextIndex++;
+  }
+
+  if (noCorrectAnswers) {
+    return {
+      error: 'Question must contain at least one correct answer',
+      statusCode: 400,
+    };
+  }
+
+  if (!noDuplicateAnswers) {
+    return {
+      error: 'Answer strings must be unique',
+      statusCode: 400,
+    };
+  }
+
+  // No errors, update question
+  quiz.duration = quizDuration + newQuestionBody.duration;
+  question.question = newQuestionBody.question;
+  question.duration = newQuestionBody.duration;
+  question.points = newQuestionBody.points;
+  const newAnswerBodies = newQuestionBody.answers.map(answer => {
+    answer.colour = setRandomColour();
+    return answer;
+  });
+  question.answers = newAnswerBodies;
+  quiz.timeLastEdited = ~~(Date.now() / 1000);
+
   return {};
+}
+
+/**
+ * Function returns random colour out of 6 colours
+ * @returns string
+ */
+function setRandomColour (): string {
+  const colours = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
+  return colours[~~(Math.random() * colours.length)];
 }

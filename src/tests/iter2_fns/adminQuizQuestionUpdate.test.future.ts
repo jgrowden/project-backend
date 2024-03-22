@@ -1,11 +1,11 @@
 /* eslint-disable */
 import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuestionCreate, requestQuestionUpdate, clear, ERROR } from '../wrapper';
-import { AdminQuizQuestionBody, AdminQuizAnswerBody } from '../../quiz';
+import { QuestionType } from '../../dataStore';
 
 let token: string;
 let quizId: number;
 let questionId: number;
-const questionBody: AdminQuizQuestionBody = {
+const questionBody: QuestionType = {
   question: 'Who\'s the strongest?',
   duration: 5,
   points: 6,
@@ -120,7 +120,7 @@ describe('Testing Question Update', () => {
         jsonBody: ERROR
       });
     });
-    test('Error 400: duration < 0 || totalDuration > 3 mins', () => { 
+    test('Error 400: duration < 1 || totalDuration > 3 mins', () => { 
       newQuestionBody.answers = questionBody.answers;
       newQuestionBody.duration = -1;
       expect(requestQuestionUpdate(token, quizId, questionId, newQuestionBody))
@@ -186,7 +186,7 @@ describe('Testing Question Update', () => {
   });
 
   describe('Testing success case', () => {
-    const newQuestionBody: AdminQuizQuestionBody = {
+    const newQuestionBody: QuestionType = {
       question: 'Who has the longest nose?',
       duration: 5,
       points: 9,
@@ -234,19 +234,27 @@ describe('Testing Question Update', () => {
               points: 9,
               answers: [
                 {
+                  answerId: expect.any(Number),
                   answer: 'Luffy',
+                  colour: expect.any(String),
                   correct: false,
                 },
                 {
+                  answerId: expect.any(Number),
                   answer: 'Shanks',
+                  colour: expect.any(String),
                   correct: false,
                 },
                 {
+                  answerId: expect.any(Number),
                   answer: 'Blackbeard',
+                  colour: expect.any(String),
                   correct: false,
                 },
                 {
+                  answerId: expect.any(Number),
                   answer: 'God Usopp',
+                  colour: expect.any(String),
                   correct: true,
                 },
               ],
@@ -255,6 +263,8 @@ describe('Testing Question Update', () => {
           duration: 5,
         }
       });
+      expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.timeLastEdited);
+      expect(timeEdited).toBeLessThanOrEqual(quizInfo.timeLastEdited + 1);
     });
   });
 

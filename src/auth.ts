@@ -1,16 +1,7 @@
-import { getData } from './dataStore';
+import { getData, TokenType, ErrorObject } from './dataStore';
 import validator from 'validator';
 import { nanoid } from 'nanoid';
 import { fetchUserFromSessionId, userWithEmailExists, generateNewUserId } from './helper';
-
-interface ErrorObject {
-  error: string;
-  statusCode?: number;
-}
-
-interface ReturnSessionId {
-  token: string;
-}
 
 interface AdminUserDetailsReturn {
   user: {
@@ -59,7 +50,7 @@ function hasLetterAndNumber(str: string): boolean {
  */
 
 export function adminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string):
- ReturnSessionId | ErrorObject {
+ TokenType | ErrorObject {
   const data = getData();
 
   // Check for duplicate email
@@ -129,7 +120,7 @@ export function adminAuthRegister(email: string, password: string, nameFirst: st
  *
  * @returns {{sessionId: string}} sessionId - the user's unique identification string
  */
-export function adminAuthLogin(email: string, password: string): ReturnSessionId | ErrorObject {
+export function adminAuthLogin(email: string, password: string): TokenType | ErrorObject {
   const user = userWithEmailExists(email);
   if (!user) {
     return { error: 'user doesn\'t exist' };

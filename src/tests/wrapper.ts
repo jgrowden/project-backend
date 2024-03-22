@@ -1,5 +1,5 @@
 import { requestHelper } from './requestHelper';
-import { AdminQuizQuestionBody } from '../quiz';
+import { QuestionType } from '../dataStore';
 const ERROR = { error: expect.any(String) };
 
 const requestAuthRegister = (email: string, password: string, nameFirst: string, nameLast: string) =>
@@ -10,7 +10,7 @@ const requestAuthLogin = (email: string, password: string) =>
 
 const clear = () => requestHelper('DELETE', '/v1/clear');
 
-const requestQuestionUpdate = (sessionId: string, quizId: number, questionId: number, questionBody: AdminQuizQuestionBody) =>
+const requestQuestionUpdate = (sessionId: string, quizId: number, questionId: number, questionBody: QuestionType) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { sessionId, questionBody });
 
 export { requestAuthRegister, requestAuthLogin, clear, requestQuestionUpdate, ERROR };

@@ -44,7 +44,8 @@ let data = {
                         }
                     ]
                 }
-            ]
+            ],
+            duration: 60
         }
     ],
     deletedQuizzes: [
