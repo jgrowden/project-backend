@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { getData, setData } from './dataStore';
-import { adminAuthRegister, adminAuthLogin } from './auth';
+import { adminAuthRegister, adminAuthLogin, adminUserDetailsUpdate } from './auth';
 import { clear } from './other';
 // Set up web app
 const app = express();
@@ -64,6 +64,21 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
   const result = adminAuthLogin(email, password);
   if ('error' in result) {
     return res.status(400).json(result);
+  }
+  save();
+  res.json(result);
+});
+
+// adminUserDetailsUpdate Route
+app.put('/v1/admin/user/details', (req: Request, res: Response) => {
+  const { token, email, nameFirst, nameLast} = req.body;
+  const result = adminUserDetailsUpdate(token, email, nameFirst, nameLast);
+  if ('error' in result) {
+    if (result.error === 'User ID not found') {
+      return res.status(401).json(result);
+    } else {
+      return res.status(400).json(result);
+    }
   }
   save();
   res.json(result);

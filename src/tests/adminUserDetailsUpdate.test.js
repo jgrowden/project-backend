@@ -1,4 +1,4 @@
-import { clear } from './wrapper';
+import { clear, requestUserDetailsUpdate } from './wrapper';
 import { requestAuthRegister } from './wrapper';
 import { ERROR } from './wrapper';
 
@@ -104,7 +104,7 @@ describe('adminUserDetailsUpdate http testing', () => {
 
   // tests ensure that data has actually been written to the database
   test('no errors 1', () => {
-    expect(JSON.stringify(requestUserDetailsUpdate(user2Token, 'test@email.com', 'John', 'Smith')))
+    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'John', 'Smith'))
       .toStrictEqual({
         statusCode: 200,
         jsonBody: {}
@@ -112,23 +112,21 @@ describe('adminUserDetailsUpdate http testing', () => {
     expect(requestUserDetails(user2Token)).toMatchObject(
       {
         statusCode: 200,
-        jsonBody:
-            {
-              user:
-                {
-                  userId: expect.any(Number),
-                  name: 'John Smith',
-                  email: 'test@email.com',
-                  numSuccessfulLogins: 1,
-                  numFailedPasswordsSinceLastLogin: 0
-                },
-            }
+        jsonBody: {
+          user: {
+            userId: expect.any(Number),
+            name: 'John Smith',
+            email: 'test@email.com',
+            numSuccessfulLogins: 1,
+            numFailedPasswordsSinceLastLogin: 0
+          },
+        }
       }
     );
   });
 
   test('no errors 2', () => {
-    expect(JSON.stringify(requestUserDetailsUpdate(user1Token, 'test2@email.com', 'Johnny', 'Smitho')))
+    expect(requestUserDetailsUpdate(user1Token, 'test2@email.com', 'Johnny', 'Smitho'))
       .toStrictEqual({
         statusCode: 200,
         jsonBody: {}
@@ -136,23 +134,21 @@ describe('adminUserDetailsUpdate http testing', () => {
     expect(requestUserDetails(user1Token)).toMatchObject(
       {
         statusCode: 200,
-        jsonBody:
-            {
-              user:
-                {
-                  userId: expect.any(Number),
-                  name: 'Johnny Smitho',
-                  email: 'test2@email.com',
-                  numSuccessfulLogins: 1,
-                  numFailedPasswordsSinceLastLogin: 0
-                },
-            }
+        jsonBody: {
+          user: {
+            userId: expect.any(Number),
+            name: 'Johnny Smitho',
+            email: 'test2@email.com',
+            numSuccessfulLogins: 1,
+            numFailedPasswordsSinceLastLogin: 0
+          },
+        }
       }
     );
   });
 
   test('no errors 3, 20 character names', () => {
-    expect(JSON.stringify(requestUserDetailsUpdate(user1Token, 'test3@email.com', 'abcdefghijklmnopqrst', 'tsrqponmlkjihgfedcab')))
+    expect(requestUserDetailsUpdate(user1Token, 'test3@email.com', 'abcdefghijklmnopqrst', 'tsrqponmlkjihgfedcab'))
       .toStrictEqual({
         statusCode: 200,
         jsonBody: {}
@@ -160,23 +156,21 @@ describe('adminUserDetailsUpdate http testing', () => {
     expect(requestUserDetails(user1Token)).toMatchObject(
       {
         statusCode: 200,
-        jsonBody:
-            {
-              user:
-                {
-                  userId: expect.any(Number),
-                  name: 'abcdefghijklmnopqrst tsrqponmlkjihgfedcab',
-                  email: 'test3@email.com',
-                  numSuccessfulLogins: 1,
-                  numFailedPasswordsSinceLastLogin: 0
-                },
-            }
+        jsonBody: {
+          user: {
+            userId: expect.any(Number),
+            name: 'abcdefghijklmnopqrst tsrqponmlkjihgfedcab',
+            email: 'test3@email.com',
+            numSuccessfulLogins: 1,
+            numFailedPasswordsSinceLastLogin: 0
+          },
+        }
       }
     );
   });
 
   test('no errors 4, 2 character names', () => {
-    expect(JSON.stringify(requestUserDetailsUpdate(user1Token, 'test4@email.com', 'ab', 'ba')))
+    expect(requestUserDetailsUpdate(user1Token, 'test4@email.com', 'ab', 'ba'))
       .toStrictEqual({
         statusCode: 200,
         jsonBody: {}
@@ -184,23 +178,21 @@ describe('adminUserDetailsUpdate http testing', () => {
     expect(requestUserDetails(user1Token)).toMatchObject(
       {
         statusCode: 200,
-        jsonBody:
-            {
-              user:
-                {
-                  userId: expect.any(Number),
-                  name: 'ab ba',
-                  email: 'test4@email.com',
-                  numSuccessfulLogins: 1,
-                  numFailedPasswordsSinceLastLogin: 0
-                },
-            }
+        jsonBody: {
+          user: {
+            userId: expect.any(Number),
+            name: 'ab ba',
+            email: 'test4@email.com',
+            numSuccessfulLogins: 1,
+            numFailedPasswordsSinceLastLogin: 0
+          },
+        }
       }
     );
   });
 
   test('no errors 5, only update names', () => {
-    expect(JSON.stringify(requestUserDetailsUpdate(user1Token, 'go.d.usopp@gmail.com', 'ab', 'ba')))
+    expect(requestUserDetailsUpdate(user1Token, 'go.d.usopp@gmail.com', 'ab', 'ba'))
       .toStrictEqual({
         statusCode: 200,
         jsonBody: {}
@@ -208,17 +200,15 @@ describe('adminUserDetailsUpdate http testing', () => {
     expect(requestUserDetails(user1Token)).toMatchObject(
       {
         statusCode: 200,
-        jsonBody:
-            {
-              user:
-                {
-                  userId: expect.any(Number),
-                  name: 'ab ba',
-                  email: 'go.d.usopp@gmail.com',
-                  numSuccessfulLogins: 1,
-                  numFailedPasswordsSinceLastLogin: 0
-                },
-            }
+        jsonBody: {
+          user: {
+            userId: expect.any(Number),
+            name: 'ab ba',
+            email: 'go.d.usopp@gmail.com',
+            numSuccessfulLogins: 1,
+            numFailedPasswordsSinceLastLogin: 0
+          },
+        }
       }
     );
   });
