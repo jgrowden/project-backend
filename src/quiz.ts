@@ -2,11 +2,11 @@
 import { getData } from './dataStore';
 import { fetchUserFromSessionId, fetchQuizFromQuizId, generateNewQuizId, currentTime, returnError } from './helper';
 
-interface ErrorObject {
+export interface ErrorObject {
   error: string
 }
 
-interface ErrorObjectWithCode {
+export interface ErrorObjectWithCode {
   errorObject: ErrorObject;
   errorCode: number;
 }
