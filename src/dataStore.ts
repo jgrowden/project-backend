@@ -26,7 +26,7 @@ interface QuestionType {
 }
 
 interface TokenType {
-  sessionId: number;
+  token: string;
 }
 
 interface QuizType {
@@ -36,7 +36,6 @@ interface QuizType {
   description: string;
   timeCreated: number;
   timeLastEdited: number;
-  questions: QuestionType[];
 }
 
 interface DataType {

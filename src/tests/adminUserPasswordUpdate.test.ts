@@ -45,7 +45,7 @@ describe('requestUserPasswordUpdate test cases', () => {
     expect(requestAuthLogin('email@gmail.com', 'valid_p@ssw0rd'))
       .toStrictEqual({
         statusCode: 200,
-        jsonBody: { sessionId: expect.any(String) }
+        jsonBody: { token: expect.any(String) }
       });
   });
 });

@@ -72,7 +72,7 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
 // adminUserPasswordUpdate Route
 app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   const { token, oldPassword, newPassword } = req.body;
-  const result = adminUserPasswordUpdate(token.sessionId, oldPassword, newPassword);
+  const result = adminUserPasswordUpdate(token.token, oldPassword, newPassword);
   if ('error' in result) {
     return res.status(400).json(result);
   }
