@@ -7,6 +7,9 @@ const requestAuthRegister = (email: string, password: string, nameFirst: string,
 const requestAuthLogin = (email: string, password: string) =>
   requestHelper('POST', '/v1/admin/auth/login', { email, password });
 
+const requestUserDetails = (token: string) =>
+  requestHelper('GET', '/v1/admin/user/details', { token });
+
 const requestUserPasswordUpdate = (token: TokenType, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v1/admin/user/password', { token, oldPassword, newPassword });
 
@@ -19,5 +22,4 @@ const ERRORANDSTATUS = {
   statusCode: expect.any(Number)
 };
 
-
-export { requestAuthRegister, requestAuthLogin, requestUserPasswordUpdate, clear, ERROR, ERRORANDSTATUS };
+export { requestAuthRegister, requestAuthLogin, requestUserDetails, requestUserPasswordUpdate clear, ERROR, ERRORANDSTATUS };
