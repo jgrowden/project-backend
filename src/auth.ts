@@ -216,20 +216,25 @@ export function adminUserDetailsUpdate(sessionId: string, email: string, nameFir
     return { error: 'nameLast does not satisfy length requirements' };
   }
 
-  const duplicateEmail = userWithEmailExists(email);
+  // get userId from sessionId
+  // loop through datastore userIds. if a user has the same email and a different userId, email already registered
 
-  if (duplicateEmail !== undefined) {
-    return { error: 'Email already registered' };
-  }
+  const userToEdit = fetchUserFromSessionId(sessionId);
 
-  const user = fetchUserFromSessionId(sessionId);
-  if (!user) {
+  if (!userToEdit) {
     return { error: 'User ID not found' };
   }
 
-  user.email = email;
-  user.nameFirst = nameFirst;
-  user.nameLast = nameLast;
+  const data = getData();
+  for (const user of data.users) {
+    if (user.email === email && user.authUserId !== userToEdit.authUserId) {
+      return { error: 'Email already registered' };
+    }
+  }
+
+  userToEdit.email = email;
+  userToEdit.nameFirst = nameFirst;
+  userToEdit.nameLast = nameLast;
 
   return {};
 }
