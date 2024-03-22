@@ -10,14 +10,11 @@ const requestAuthLogin = (email: string, password: string) =>
 const requestQuizCreate = (token: string, name: string, description: string) =>
   requestHelper('POST', '/v1/admin/quiz/create', { token, name, description });
 
-  const requestQuizDelete = (token: string, quizId: number) =>
+const requestQuizDelete = (token: string, quizId: number) =>
   requestHelper('DELETE', `/v1/admin/quiz/${quizId}`, { token, quizId });
 
 const requestUserDetails = (token: string) =>
   requestHelper('GET', '/v1/admin/user/details', { token });
-
-const requestQuizCreate = (token: string, name: string, description: string) =>
-  requestHelper('POST', '/v1/quiz/create', { token, name, description });
 
 const requestUserPasswordUpdate = (token: TokenType, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v1/admin/user/password', { token, oldPassword, newPassword });

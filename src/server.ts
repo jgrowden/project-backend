@@ -106,8 +106,8 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const token = req.query.token as string;
   const quizId = parseInt(req.params.quizid);
   const result = adminQuizRemove(token, quizId);
-  if ('error' in result) {
-    return res.status(400).json(result);
+  if ('errorCode' in result) {
+    return res.status(result.errorCode).json(result.errorObject);
   }
   save();
   res.json(result);
