@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { getData, setData } from './dataStore';
-import { adminAuthRegister, adminAuthLogin } from './auth';
+import { adminAuthRegister, adminAuthLogin, adminUserDetails } from './auth';
 import { clear } from './other';
 // Set up web app
 const app = express();
@@ -66,6 +66,16 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
     return res.status(400).json(result);
   }
   save();
+  res.json(result);
+});
+
+// adminUserDetails Route
+app.get('/v1/admin/user/details', (req: Request, res: Response) => {
+  const token = req.query.token as string;
+  const result = adminUserDetails(token);
+  if ('error' in result) {
+    return res.status(401).json(result);
+  }
   res.json(result);
 });
 
