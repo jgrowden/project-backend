@@ -13,11 +13,6 @@ interface AdminUserDetailsReturn {
   }
 }
 
-interface ReturnErrorStruct {
-  error: string;
-  statusCode: number;
-}
-
 const userNameMinLength = 2;
 const userNameMaxLength = 20;
 const userPasswordMinLength = 8;
@@ -241,7 +236,7 @@ export function adminUserDetailsUpdate(sessionId: string, email: string, nameFir
  * @return {} - an empty object
 */
 
-export function adminUserPasswordUpdate(sessionId: string, oldPassword: string, newPassword: string): ReturnErrorStruct | Record<string, never> {
+export function adminUserPasswordUpdate(sessionId: string, oldPassword: string, newPassword: string): ErrorObject | Record<string, never> {
   // check sessionId exists
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
