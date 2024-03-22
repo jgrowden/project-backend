@@ -8,11 +8,11 @@ describe('Testing authRegister', () => {
   test('Test successful registration', () => {
     expect(requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp')).toStrictEqual({
       statusCode: 200,
-      jsonBody: { sessionId: expect.any(String) }
+      jsonBody: { token: expect.any(String) }
     });
     expect(requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo')).toStrictEqual({
       statusCode: 200,
-      jsonBody: { sessionId: expect.any(String) }
+      jsonBody: { token: expect.any(String) }
     });
   });
 
