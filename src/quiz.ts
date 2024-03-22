@@ -1,5 +1,10 @@
 import { getData, QuestionType, ErrorObject } from './dataStore';
-import { fetchUserFromSessionId, fetchQuizFromQuizId, fetchQuestionFromQuestionId, generateNewQuizId, currentTime } from './helper';
+import { fetchUserFromSessionId, fetchQuizFromQuizId, fetchQuestionFromQuestionId, generateNewQuizId, currentTime, returnError } from './helper';
+
+export interface ErrorObjectWithCode {
+  errorObject: ErrorObject;
+  errorCode: number;
+}
 
 interface AdminQuizListReturnElement {
   quizId: number;
@@ -152,35 +157,31 @@ export function adminQuizList(sessionId: string): AdminQuizListReturn | ErrorObj
  * @returns {quizId: 2} - object with a unique quiz identification number
 */
 
-export function adminQuizCreate(sessionId: string, name: string, description: string): AdminQuizCreateReturn | ErrorObject {
+export function adminQuizCreate(sessionId: string, name: string, description: string): AdminQuizCreateReturn | ErrorObjectWithCode {
   const data = getData();
 
   const user = fetchUserFromSessionId(sessionId);
 
   if (!user) {
-    return { error: 'invalid user ID' };
+    return returnError('invalid user ID', 401);
   }
 
   if (regex.test(name)) {
-    return { error: 'invalid quiz name characters' };
+    return returnError('invalid quiz name characters', 400);
   }
 
-  if (name.length < quizNameMinLength) {
-    return { error: 'invalid quiz name length: too short' };
-  }
-
-  if (name.length > quizNameMaxLength) {
-    return { error: 'invalid quiz name length: too long' };
+  if (name.length < quizNameMinLength || name.length > quizNameMaxLength) {
+    return returnError('invalid quiz name length', 400);
   }
 
   const duplicateName = user.userQuizzes.find(quizId => fetchQuizFromQuizId(quizId).name === name);
 
   if (duplicateName !== undefined) {
-    return { error: 'Duplicate quiz name' };
+    return returnError('Duplicate quiz name', 400);
   }
 
   if (description.length > quizDescriptionMaxLength) {
-    return { error: 'Quiz description invalid length' };
+    return returnError('Quiz description invalid length', 400);
   }
 
   const unixTime = currentTime();
@@ -196,6 +197,7 @@ export function adminQuizCreate(sessionId: string, name: string, description: st
     description: description,
     timeCreated: unixTime,
     timeLastEdited: unixTime,
+    questions: []
   });
 
   return { quizId: newQuizId };
@@ -209,22 +211,22 @@ export function adminQuizCreate(sessionId: string, name: string, description: st
  *
  * @returns {} - an empty object
  */
-export function adminQuizRemove(sessionId: string, quizId: number): ErrorObject | Record<string, never> {
+export function adminQuizRemove(sessionId: string, quizId: number): ErrorObjectWithCode | Record<string, never> {
   const data = getData();
 
   const user = fetchUserFromSessionId(sessionId);
   const quiz = fetchQuizFromQuizId(quizId);
 
   if (!user) {
-    return { error: 'invalid user ID' };
+    return returnError('invalid user ID', 401);
   }
 
   if (!quiz) {
-    return { error: 'invalid quiz ID' };
+    return returnError('invalid quiz ID', 403);
   }
 
   if (!user.userQuizzes.includes(quizId)) {
-    return { error: 'you do not own this quiz' };
+    return returnError('you do not own this quiz', 403);
   }
 
   data.deletedQuizzes.push(fetchQuizFromQuizId(quizId));
@@ -248,20 +250,20 @@ export function adminQuizRemove(sessionId: string, quizId: number): ErrorObject 
  *      description: string
  * } - returns an object with details about the quiz queried for information.
  */
-export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoReturn | ErrorObject {
+export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoReturn | ErrorObjectWithCode {
   const user = fetchUserFromSessionId(sessionId);
   const quiz = fetchQuizFromQuizId(quizId);
 
   if (!user) {
-    return { error: 'invalid user ID' };
+    return returnError('invalid user ID', 401);
   }
 
   if (!quiz) {
-    return { error: 'invalid quiz ID' };
+    return returnError('invalid quiz ID', 403);
   }
 
   if (!user.userQuizzes.includes(quizId)) {
-    return { error: 'you do not own this quiz' };
+    return returnError('you do not own this quiz', 403);
   }
 
   return {
