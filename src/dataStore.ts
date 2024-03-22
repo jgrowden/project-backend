@@ -36,6 +36,7 @@ interface QuizType {
   description: string;
   timeCreated: number;
   timeLastEdited: number;
+  questions: QuestionType[];
 }
 
 interface DataType {

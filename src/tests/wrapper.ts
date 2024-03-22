@@ -13,6 +13,9 @@ const requestQuizCreate = (token: string, name: string, description: string) =>
 const requestQuizDelete = (token: string, quizId: number) =>
   requestHelper('DELETE', `/v1/admin/quiz/${quizId}`, { token, quizId });
 
+const requestQuizInfo = (token: string, quizId: number) =>
+  requestHelper('GET', `/v1/admin/quiz/${quizId}`, { token, quizId });
+
 const requestUserDetails = (token: string) =>
   requestHelper('GET', '/v1/admin/user/details', { token });
 
@@ -32,4 +35,4 @@ const errorCode = (statusCode: number) => {
   return { statusCode: statusCode, jsonBody: ERROR };
 };
 
-export { requestAuthRegister, requestAuthLogin, requestUserDetails, requestQuizDelete, requestQuizCreate, requestUserPasswordUpdate, errorCode, clear, ERROR, ERRORANDSTATUS };
+export { requestAuthRegister, requestAuthLogin, requestUserDetails, requestQuizDelete, requestQuizCreate, requestQuizInfo, requestUserPasswordUpdate, errorCode, clear, ERROR, ERRORANDSTATUS };

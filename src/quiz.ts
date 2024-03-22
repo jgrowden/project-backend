@@ -199,6 +199,7 @@ export function adminQuizCreate(sessionId: string, name: string, description: st
     description: description,
     timeCreated: unixTime,
     timeLastEdited: unixTime,
+    questions: []
   });
 
   return { quizId: newQuizId };
@@ -251,20 +252,20 @@ export function adminQuizRemove(sessionId: string, quizId: number): ErrorObjectW
  *      description: string
  * } - returns an object with details about the quiz queried for information.
  */
-export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoReturn | ErrorObject {
+export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoReturn | ErrorObjectWithCode {
   const user = fetchUserFromSessionId(sessionId);
   const quiz = fetchQuizFromQuizId(quizId);
 
   if (!user) {
-    return { error: 'invalid user ID' };
+    return returnError('invalid user ID', 401);
   }
 
   if (!quiz) {
-    return { error: 'invalid quiz ID' };
+    return returnError('invalid quiz ID', 403);
   }
 
   if (!user.userQuizzes.includes(quizId)) {
-    return { error: 'you do not own this quiz' };
+    return returnError('you do not own this quiz', 403);
   }
 
   return {
