@@ -13,6 +13,22 @@ interface UserType {
   sessions: string[];
 }
 
+interface AnswerType {
+  answer: string;
+  correct: boolean;
+}
+
+interface QuestionType {
+  question: string;
+  duration: number;
+  points: number;
+  answers: AnswerType[];
+}
+
+interface TokenType {
+  token: string;
+}
+
 interface QuizType {
   ownerId: number;
   quizId: number;
@@ -62,4 +78,4 @@ function setData(newData: DataType) {
   data = newData;
 }
 
-export { UserType, QuizType, DataType, getData, setData };
+export { UserType, AnswerType, QuestionType, TokenType, QuizType, DataType, getData, setData };
