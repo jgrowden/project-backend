@@ -10,6 +10,9 @@ const requestAuthLogin = (email: string, password: string) =>
 const requestUserDetails = (token: string) =>
   requestHelper('GET', '/v1/admin/user/details', { token });
 
+const requestQuizCreate = (token: string, name: string, description: string) =>
+  requestHelper('POST', '/v1/quiz/create', { token, name, description });
+
 const requestUserPasswordUpdate = (token: TokenType, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v1/admin/user/password', { token, oldPassword, newPassword });
 
@@ -22,4 +25,8 @@ const ERRORANDSTATUS = {
   statusCode: expect.any(Number)
 };
 
-export { requestAuthRegister, requestAuthLogin, requestUserDetails, requestUserPasswordUpdate, clear, ERROR, ERRORANDSTATUS };
+const errorCode = (statusCode: number) => {
+  return { statusCode: statusCode, jsonBody: ERROR };
+};
+
+export { requestAuthRegister, requestAuthLogin, requestUserDetails, requestQuizCreate, requestUserPasswordUpdate, errorCode, clear, ERROR, ERRORANDSTATUS };

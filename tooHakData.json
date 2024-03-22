@@ -1,1 +1,1 @@
-{"users":[],"quizzes":[],"deletedQuizzes":[]}
+{"users":[{"email":"go.d.usopp@gmail.com","password":"S0geking","nameFirst":"God","nameLast":"Usopp","authUserId":0,"numSuccessfulLogins":1,"numFailedPasswordsSinceLastLogin":0,"previousPasswords":[],"userQuizzes":[0],"sessions":["ZSK7Xd7oTz-RfCCMk9mko"]}],"quizzes":[{"ownerId":0,"quizId":0,"name":"Quiz Name","description":"Quiz Description","timeCreated":1711117700,"timeLastEdited":1711117700}],"deletedQuizzes":[]}

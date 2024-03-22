@@ -9,6 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { getData, setData } from './dataStore';
+import { adminQuizCreate } from './quiz';
 import { adminAuthRegister, adminAuthLogin, adminUserDetails, adminUserPasswordUpdate } from './auth';
 import { clear } from './other';
 // Set up web app
@@ -64,6 +65,17 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
   const result = adminAuthLogin(email, password);
   if ('error' in result) {
     return res.status(400).json(result);
+  }
+  save();
+  res.json(result);
+});
+
+// adminQuizCreate route
+app.post('/v1/quiz/create', (req: Request, res: Response) => {
+  const { token, name, description } = req.body;
+  const result = adminQuizCreate(token, name, description);
+  if ('errorCode' in result) {
+    return res.status(result.errorCode).json(result.errorObject);
   }
   save();
   res.json(result);
