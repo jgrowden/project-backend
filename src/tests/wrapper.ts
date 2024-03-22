@@ -1,6 +1,5 @@
 import { requestHelper } from './requestHelper';
 import { QuestionType } from '../dataStore';
-const ERROR = { error: expect.any(String) };
 
 const requestAuthRegister = (email: string, password: string, nameFirst: string, nameLast: string) =>
   requestHelper('POST', '/v1/admin/auth/register', { email, password, nameFirst, nameLast });
@@ -18,4 +17,4 @@ const clear = () => requestHelper('DELETE', '/v1/clear');
 
 const ERROR = { error: expect.any(String) };
 
-export { requestAuthRegister, requestAuthLogin, requestUserDetails, clear, ERROR };
+export { requestAuthRegister, requestAuthLogin, requestUserDetails, requestQuestionUpdate, clear, ERROR };
