@@ -1,9 +1,14 @@
 // import { string } from 'yaml/dist/schema/common/string';
 import { getData } from './dataStore';
-import { fetchUserFromSessionId, fetchQuizFromQuizId, generateNewQuizId, currentTime } from './helper';
+import { fetchUserFromSessionId, fetchQuizFromQuizId, generateNewQuizId, currentTime, returnError } from './helper';
 
 interface ErrorObject {
   error: string
+}
+
+interface ErrorObjectWithCode {
+  errorObject: ErrorObject;
+  errorCode: number;
 }
 
 interface AdminQuizListReturnElement {
@@ -153,19 +158,6 @@ export function adminQuizList(sessionId: string): AdminQuizListReturn | ErrorObj
  *
  * @returns {quizId: 2} - object with a unique quiz identification number
 */
-
-interface ErrorObjectWithCode {
-  errorObject: ErrorObject;
-  errorCode: number;
-}
-
-const returnError = (errorString: string, errorCode: number): ErrorObjectWithCode => {
-  const err: ErrorObject = { error: errorString };
-  return {
-    errorObject: err,
-    errorCode: errorCode
-  };
-};
 
 export function adminQuizCreate(sessionId: string, name: string, description: string): AdminQuizCreateReturn | ErrorObjectWithCode {
   const data = getData();
