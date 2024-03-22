@@ -8,9 +8,12 @@ const requestAuthRegister = (email: string, password: string, nameFirst: string,
 const requestAuthLogin = (email: string, password: string) =>
   requestHelper('POST', '/v1/admin/auth/login', { email, password });
 
-const clear = () => requestHelper('DELETE', '/v1/clear');
+const requestUserDetails = (token: string) =>
+  requestHelper('GET', '/v1/admin/user/details', { token });
 
 const requestQuestionUpdate = (sessionId: string, quizId: number, questionId: number, questionBody: QuestionType) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { sessionId, questionBody });
 
-export { requestAuthRegister, requestAuthLogin, clear, requestQuestionUpdate, ERROR };
+const clear = () => requestHelper('DELETE', '/v1/clear');
+
+export { requestAuthRegister, requestAuthLogin, requestUserDetails, requestQuestionUpdate, clear, ERROR };
