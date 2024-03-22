@@ -74,7 +74,7 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   const { token, oldPassword, newPassword } = req.body;
   const result = adminUserPasswordUpdate(token.token, oldPassword, newPassword);
   if ('error' in result) {
-    return res.status(400).json(result);
+    return res.status(result.statusCode).json(result);
   }
   save();
   res.json(result);

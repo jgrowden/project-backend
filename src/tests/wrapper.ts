@@ -14,4 +14,10 @@ const clear = () => requestHelper('DELETE', '/v1/clear');
 
 const ERROR = { error: expect.any(String) };
 
-export { requestAuthRegister, requestAuthLogin, requestUserPasswordUpdate, clear, ERROR };
+const ERRORANDSTATUS = { 
+  error: expect.any(String),
+  statusCode: expect.any(Number)
+};
+
+
+export { requestAuthRegister, requestAuthLogin, requestUserPasswordUpdate, clear, ERROR, ERRORANDSTATUS };
