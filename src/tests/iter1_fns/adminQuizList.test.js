@@ -1,6 +1,6 @@
-import { clear } from '../other';
-import { adminQuizList, adminQuizCreate } from '../quiz';
-import { adminAuthRegister } from '../auth';
+import { clear } from '../../other';
+import { adminQuizList, adminQuizCreate } from '../../quiz';
+import { adminAuthRegister } from '../../auth';
 
 describe('adminQuizList', () => {
   beforeEach(() => {

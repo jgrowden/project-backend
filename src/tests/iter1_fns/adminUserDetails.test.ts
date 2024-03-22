@@ -1,4 +1,4 @@
-import { clear, requestUserDetails, requestAuthRegister, ERROR } from './wrapper';
+import { clear, requestUserDetails, requestAuthRegister, ERROR } from '../wrapper';
 
 beforeEach(() => {
   clear();

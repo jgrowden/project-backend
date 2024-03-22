@@ -1,5 +1,5 @@
-import { requestAuthRegister, requestAuthLogin, requestUserPasswordUpdate, clear, ERROR, ERRORANDSTATUS } from './wrapper';
-import { TokenType } from '../dataStore';
+import { requestAuthRegister, requestAuthLogin, requestUserPasswordUpdate, clear, ERROR, ERRORANDSTATUS } from '../wrapper';
+import { TokenType } from '../../dataStore';
 
 describe('requestUserPasswordUpdate test cases', () => {
   let user: TokenType;

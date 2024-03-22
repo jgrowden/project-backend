@@ -1,15 +1,7 @@
-import { getData } from './dataStore';
+import { getData, ErrorObject, TokenType } from './dataStore';
 import validator from 'validator';
 import { nanoid } from 'nanoid';
 import { fetchUserFromSessionId, userWithEmailExists, generateNewUserId } from './helper';
-
-interface ErrorObject {
-  error: string;
-}
-
-interface ReturnSessionId {
-  token: string;
-}
 
 interface AdminUserDetailsReturn {
   user: {
@@ -19,11 +11,6 @@ interface AdminUserDetailsReturn {
     numSuccessfulLogins: number;
     numFailedPasswordsSinceLastLogin: number;
   }
-}
-
-interface ReturnErrorStruct {
-  error: string;
-  statusCode: number;
 }
 
 const userNameMinLength = 2;
@@ -63,7 +50,7 @@ function hasLetterAndNumber(str: string): boolean {
  */
 
 export function adminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string):
- ReturnSessionId | ErrorObject {
+ TokenType | ErrorObject {
   const data = getData();
 
   // Check for duplicate email
@@ -133,7 +120,7 @@ export function adminAuthRegister(email: string, password: string, nameFirst: st
  *
  * @returns {{sessionId: string}} sessionId - the user's unique identification string
  */
-export function adminAuthLogin(email: string, password: string): ReturnSessionId | ErrorObject {
+export function adminAuthLogin(email: string, password: string): TokenType | ErrorObject {
   const user = userWithEmailExists(email);
   if (!user) {
     return { error: 'user doesn\'t exist' };
@@ -249,7 +236,7 @@ export function adminUserDetailsUpdate(sessionId: string, email: string, nameFir
  * @return {} - an empty object
 */
 
-export function adminUserPasswordUpdate(sessionId: string, oldPassword: string, newPassword: string): ReturnErrorStruct | Record<string, never> {
+export function adminUserPasswordUpdate(sessionId: string, oldPassword: string, newPassword: string): ErrorObject | Record<string, never> {
   // check sessionId exists
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {

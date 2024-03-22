@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { getData, setData } from './dataStore';
-import { adminQuizCreate, adminQuizRemove, adminQuizInfo } from './quiz';
+import { adminQuizCreate, adminQuizRemove, adminQuizInfo, adminQuizQuestionUpdate } from './quiz';
 import { adminAuthRegister, adminAuthLogin, adminUserDetails, adminUserPasswordUpdate } from './auth';
 import { clear } from './other';
 // Set up web app
@@ -70,6 +70,7 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizCreate route
 app.post('/v1/admin/quiz/create', (req: Request, res: Response) => {
   const { token, name, description } = req.body;
   const result = adminQuizCreate(token, name, description);
@@ -119,6 +120,19 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const result = adminQuizInfo(token, quizId);
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
+  }
+  save();
+  res.json(result);
+});
+
+// adminQuizQuestionUpdate Route
+app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const { token, questionBody } = req.body;
+  const result = adminQuizQuestionUpdate(token, quizId, questionId, questionBody);
+  if ('error' in result) {
+    return res.status(result.statusCode).json(result);
   }
   save();
   res.json(result);
