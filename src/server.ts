@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { getData, setData } from './dataStore';
-import { adminAuthRegister, adminAuthLogin, , adminUserDetails, adminUserPasswordUpdate } from './auth';
+import { adminAuthRegister, adminAuthLogin, adminUserDetails, adminUserPasswordUpdate } from './auth';
 import { clear } from './other';
 // Set up web app
 const app = express();
@@ -89,8 +89,7 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   }
   save();
   res.json(result);
-
-
+});
 
 // clear Route
 app.delete('/v1/clear', (req: Request, res: Response) => {

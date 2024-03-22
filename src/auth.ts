@@ -253,7 +253,7 @@ export function adminUserPasswordUpdate(sessionId: string, oldPassword: string, 
   // check sessionId exists
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
-    return { 
+    return {
       error: 'User ID not found',
       statusCode: 401
     };
@@ -261,23 +261,23 @@ export function adminUserPasswordUpdate(sessionId: string, oldPassword: string, 
 
   // check oldPassword is correct
   if (oldPassword !== user.password) {
-    return { 
+    return {
       error: 'Old password is not correct',
       statusCode: 400
     };
   }
   // check oldPassword and newPassword match exactly
   if (oldPassword === newPassword) {
-    return { 
+    return {
       error: 'New password is the same as old password',
-      statusCode: 400 
+      statusCode: 400
     };
   }
 
   // check newPassword has not previously been used
   for (const prevPassword of user.previousPasswords) {
     if (prevPassword === newPassword) {
-      return { 
+      return {
         error: 'Password has been used before',
         statusCode: 400
       };
@@ -286,7 +286,7 @@ export function adminUserPasswordUpdate(sessionId: string, oldPassword: string, 
 
   // check newPassword is at least 8 characters
   if (newPassword.length < userPasswordMinLength) {
-    return { 
+    return {
       error: 'Password is less than 8 characters',
       statusCode: 400
     };
@@ -294,7 +294,7 @@ export function adminUserPasswordUpdate(sessionId: string, oldPassword: string, 
 
   // check newPassword is at least 1 letter and 1 number
   if (!hasLetterAndNumber(newPassword)) {
-    return { 
+    return {
       error: 'Password must contain at least one letter and at least one number',
       statusCode: 400
     };
