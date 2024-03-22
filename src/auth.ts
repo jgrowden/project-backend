@@ -1,4 +1,4 @@
-import { getData, TokenType, ErrorObject } from './dataStore';
+import { getData, ErrorObject, TokenType } from './dataStore';
 import validator from 'validator';
 import { nanoid } from 'nanoid';
 import { fetchUserFromSessionId, userWithEmailExists, generateNewUserId } from './helper';
@@ -240,33 +240,51 @@ export function adminUserPasswordUpdate(sessionId: string, oldPassword: string, 
   // check sessionId exists
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
-    return { error: 'User ID not found' };
+    return {
+      error: 'User ID not found',
+      statusCode: 401
+    };
   }
 
   // check oldPassword is correct
   if (oldPassword !== user.password) {
-    return { error: 'Old password is not correct' };
+    return {
+      error: 'Old password is not correct',
+      statusCode: 400
+    };
   }
   // check oldPassword and newPassword match exactly
   if (oldPassword === newPassword) {
-    return { error: 'New password is the same as old password' };
+    return {
+      error: 'New password is the same as old password',
+      statusCode: 400
+    };
   }
 
   // check newPassword has not previously been used
   for (const prevPassword of user.previousPasswords) {
     if (prevPassword === newPassword) {
-      return { error: 'Password has been used before' };
+      return {
+        error: 'Password has been used before',
+        statusCode: 400
+      };
     }
   }
 
   // check newPassword is at least 8 characters
   if (newPassword.length < userPasswordMinLength) {
-    return { error: 'Password is less than 8 characters' };
+    return {
+      error: 'Password is less than 8 characters',
+      statusCode: 400
+    };
   }
 
   // check newPassword is at least 1 letter and 1 number
   if (!hasLetterAndNumber(newPassword)) {
-    return { error: 'Password must contain at least one letter and at least one number' };
+    return {
+      error: 'Password must contain at least one letter and at least one number',
+      statusCode: 400
+    };
   }
 
   // update password if no errors
