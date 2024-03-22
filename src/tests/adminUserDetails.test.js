@@ -8,14 +8,14 @@ describe('adminUserDetails testing', () => {
   test('empty database', () => {
     expect(requestUserDetails(123456789)).toStrictEqual(
       {
-        statusCode: 400,
+        statusCode: 401,
         jsonBody: ERROR
       });
   });
   test('no token provided', () => {
     expect(requestUserDetails(123456789)).toStrictEqual(
       {
-        statusCode: 400,
+        statusCode: 401,
         jsonBody: ERROR
       });
   });
@@ -23,7 +23,7 @@ describe('adminUserDetails testing', () => {
     const user1Token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token;
     expect(requestUserDetails(user1Token + '1')).toStrictEqual(
       {
-        statusCode: 400,
+        statusCode: 401,
         jsonBody: ERROR
       });
   });
