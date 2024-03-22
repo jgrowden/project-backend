@@ -43,6 +43,6 @@ describe('adminUserPasswordUpdate', () => {
       .toMatchObject({ error: expect.any(String) });
     const user = adminAuthLogin('email@gmail.com', 'valid_p@ssw0rd');
     expect(user)
-      .toMatchObject({ sessionId: user.sessionId });
+      .toMatchObject({ sessionId: expect.any(String) });
   });
 });
