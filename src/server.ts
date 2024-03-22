@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { getData, setData } from './dataStore';
-import { adminQuizCreate } from './quiz';
+import { adminQuizCreate, adminQuizRemove } from './quiz';
 import { adminAuthRegister, adminAuthLogin, adminUserDetails, adminUserPasswordUpdate } from './auth';
 import { clear } from './other';
 // Set up web app
@@ -70,8 +70,7 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
   res.json(result);
 });
 
-// adminQuizCreate route
-app.post('/v1/quiz/create', (req: Request, res: Response) => {
+app.post('/v1/admin/quiz/create', (req: Request, res: Response) => {
   const { token, name, description } = req.body;
   const result = adminQuizCreate(token, name, description);
   if ('errorCode' in result) {
@@ -98,6 +97,17 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   const result = adminUserPasswordUpdate(token.token, oldPassword, newPassword);
   if ('error' in result) {
     return res.status(result.statusCode).json(result);
+  }
+  save();
+  res.json(result);
+});
+
+app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = req.query.token as string;
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizRemove(token, quizId);
+  if ('errorCode' in result) {
+    return res.status(result.errorCode).json(result.errorObject);
   }
   save();
   res.json(result);
