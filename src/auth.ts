@@ -5,6 +5,7 @@ import { fetchUserFromSessionId, userWithEmailExists, generateNewUserId } from '
 
 interface ErrorObject {
   error: string;
+  statusCode?: number;
 }
 
 interface ReturnSessionId {

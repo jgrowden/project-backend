@@ -2,7 +2,8 @@ import { getData } from './dataStore';
 import { fetchUserFromSessionId, fetchQuizFromQuizId, generateNewQuizId, currentTime } from './helper';
 
 interface ErrorObject {
-  error: string
+  error: string;
+  statusCode?: number;
 }
 
 interface AdminQuizListReturnElement {
@@ -29,18 +30,21 @@ interface AdminQuizInfoReturn {
   duration?: number;
 }
 
+// exported for testing
 export interface AdminQuizQuestionBody {
-  questionId: number,
+  // questionId must be returned in quizInfo,
+  // however is given separately when q's are passed into functions
+  questionId?: number,
   question: string;
   duration: number;
   points: number;
   answers: AdminQuizAnswerBody[];
 }
-
-interface AdminQuizAnswerBody {
-  answerId: number;
+// similarly, answerId & colour's are returned, but not passed
+export interface AdminQuizAnswerBody {
+  answerId?: number;
   answer: string;
-  colour: string,
+  colour?: string,
   correct: boolean;
 }
 

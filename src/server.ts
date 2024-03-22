@@ -76,8 +76,9 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Respo
   const questionId = parseInt(req.params.questionid);
   const { token, questionBody } = req.body;
   const result = adminQuizQuestionUpdate(token, quizId, questionId, questionBody);
-  // if ('error' in result) {
-  // }
+  if ('error' in result) {
+    return res.status(result.statusCode).json(result);
+  }
   save();
   res.json(result);
 });
