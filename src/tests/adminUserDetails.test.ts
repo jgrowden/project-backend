@@ -6,21 +6,14 @@ beforeEach(() => {
 
 describe('adminUserDetails testing', () => {
   test('empty database', () => {
-    expect(requestUserDetails(123456789)).toStrictEqual(
-      {
-        statusCode: 401,
-        jsonBody: ERROR
-      });
-  });
-  test('no token provided', () => {
-    expect(requestUserDetails(123456789)).toStrictEqual(
+    expect(requestUserDetails('123456789')).toStrictEqual(
       {
         statusCode: 401,
         jsonBody: ERROR
       });
   });
   test('token does not exist', () => {
-    const user1Token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token;
+    const user1Token: string = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token;
     expect(requestUserDetails(user1Token + '1')).toStrictEqual(
       {
         statusCode: 401,
@@ -28,7 +21,7 @@ describe('adminUserDetails testing', () => {
       });
   });
   test('valid token 1', () => {
-    const user1Token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token;
+    const user1Token: string = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token;
     requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo');
     expect(requestUserDetails(user1Token)).toMatchObject(
       {
@@ -47,7 +40,7 @@ describe('adminUserDetails testing', () => {
   });
   test('valid token 2', () => {
     requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    const user2Token = requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo').jsonBody.token;
+    const user2Token: string = requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo').jsonBody.token;
     expect(requestUserDetails(user2Token)).toMatchObject(
       {
         statusCode: 200,
