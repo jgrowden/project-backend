@@ -9,8 +9,15 @@ const requestAuthLogin = (email: string, password: string) =>
 const requestQuizCreate = (token: string, name: string, description: string) =>
   requestHelper('POST', '/v1/quiz/create', { token, name, description });
 
+const requestUserDetails = (token: string) =>
+  requestHelper('GET', '/v1/admin/user/details', { token });
+
 const clear = () => requestHelper('DELETE', '/v1/clear');
 
 const ERROR = { error: expect.any(String) };
 
-export { requestAuthRegister, requestAuthLogin, requestQuizCreate, clear, ERROR };
+const errorCode = (statusCode: number) => {
+  return { statusCode: statusCode, jsonBody: ERROR };
+};
+
+export { requestAuthRegister, requestAuthLogin, requestUserDetails, requestQuizCreate, errorCode, clear, ERROR };

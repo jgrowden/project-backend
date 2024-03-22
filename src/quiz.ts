@@ -154,35 +154,44 @@ export function adminQuizList(sessionId: string): AdminQuizListReturn | ErrorObj
  * @returns {quizId: 2} - object with a unique quiz identification number
 */
 
-export function adminQuizCreate(sessionId: string, name: string, description: string): AdminQuizCreateReturn | ErrorObject {
+interface ErrorObjectWithCode {
+  errorObject: ErrorObject;
+  errorCode: number;
+}
+
+const returnError = (errorString: string, errorCode: number): ErrorObjectWithCode => {
+  const err: ErrorObject = { error: errorString };
+  return {
+    errorObject: err,
+    errorCode: errorCode
+  };
+};
+
+export function adminQuizCreate(sessionId: string, name: string, description: string): AdminQuizCreateReturn | ErrorObjectWithCode {
   const data = getData();
 
   const user = fetchUserFromSessionId(sessionId);
 
   if (!user) {
-    return { error: 'invalid user ID' };
+    return returnError('invalid user ID', 401);
   }
 
   if (regex.test(name)) {
-    return { error: 'invalid quiz name characters' };
+    return returnError('invalid quiz name characters', 400);
   }
 
-  if (name.length < quizNameMinLength) {
-    return { error: 'invalid quiz name length: too short' };
-  }
-
-  if (name.length > quizNameMaxLength) {
-    return { error: 'invalid quiz name length: too long' };
+  if (name.length < quizNameMinLength || name.length > quizNameMaxLength) {
+    return returnError('invalid quiz name length', 400);
   }
 
   const duplicateName = user.userQuizzes.find(quizId => fetchQuizFromQuizId(quizId).name === name);
 
   if (duplicateName !== undefined) {
-    return { error: 'Duplicate quiz name' };
+    return returnError('Duplicate quiz name', 400);
   }
 
   if (description.length > quizDescriptionMaxLength) {
-    return { error: 'Quiz description invalid length' };
+    return returnError('Quiz description invalid length', 400);
   }
 
   const unixTime = currentTime();
