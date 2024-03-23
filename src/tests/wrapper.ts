@@ -42,6 +42,9 @@ export const requestQuestionUpdate = (sessionId: string, quizId: number, questio
 export const requestQuizQuestionMove = (token: string, quizId: number, questionId: number, newPosition: number) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}/move`, { token, newPosition });
 
+export const requestQuizQuestionDuplicate = (token: string, quizId: number, questionId: number) =>
+  requestHelper('POST', `/v1/admin/quiz/${quizId}/question/${questionId}/duplicate`, { token });
+
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 
 export const ERROR = { error: expect.any(String) };
