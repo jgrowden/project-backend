@@ -1,12 +1,11 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, requestQuizQuestionMove, errorCode, clear, ERRORANDSTATUS } from '../wrapper';
-import { adminQuizQuestionCreate, adminQuizQuestionCreateArgument } from '../../quiz';
+import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, requestQuizQuestionMove, clear, ERRORANDSTATUS } from '../wrapper';
+import { adminQuizQuestionCreateArgument } from '../../quiz';
 
 let token: string;
 let quizId: number;
 let questionId1: number;
 let questionId2: number;
 let questionId3: number;
-let questionId4: number;
 
 beforeEach(() => {
   clear();
@@ -20,7 +19,7 @@ beforeEach(() => {
     points: 4,
     answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
   };
- 	const questionBody2: adminQuizQuestionCreateArgument = {
+  const questionBody2: adminQuizQuestionCreateArgument = {
     question: 'Question2?',
     duration: 3,
     points: 4,
@@ -32,25 +31,17 @@ beforeEach(() => {
     points: 4,
     answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
   };
-	const questionBody4: adminQuizQuestionCreateArgument = {
-    question: 'Question3?',
-    duration: 3,
-    points: 4,
-    answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
-  };
-	questionId1 = requestQuizQuestionCreate(token, quizId, questionBody1).jsonBody.questionId;
-	questionId2 = requestQuizQuestionCreate(token, quizId, questionBody2).jsonBody.questionId;
-	questionId3 = requestQuizQuestionCreate(token, quizId, questionBody3).jsonBody.questionId;
-	questionId4 = requestQuizQuestionCreate(token, quizId, questionBody4).jsonBody.questionId;
-
+  questionId1 = requestQuizQuestionCreate(token, quizId, questionBody1).jsonBody.questionId;
+  questionId2 = requestQuizQuestionCreate(token, quizId, questionBody2).jsonBody.questionId;
+  questionId3 = requestQuizQuestionCreate(token, quizId, questionBody3).jsonBody.questionId;
 });
 
 describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
   test('Successfully moving quiz to start', () => {
-		expect(requestQuizQuestionMove(token, quizId, questionId3, 0)).toStrictEqual({
-			statusCode: 200, 
-			jsonBody: {}
-		});
+    expect(requestQuizQuestionMove(token, quizId, questionId3, 0)).toStrictEqual({
+      statusCode: 200,
+      jsonBody: {}
+    });
     expect(requestQuizInfo(token, quizId)).toStrictEqual({
       statusCode: 200,
       jsonBody: {
@@ -64,21 +55,21 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
         questions: [
           {
             questionId: questionId3,
-            question: 'Question?',
+            question: 'Question3?',
             duration: 3,
             points: 4,
             answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
           },
-					{
+          {
             questionId: questionId1,
-            question: 'Question?',
+            question: 'Question1?',
             duration: 3,
             points: 4,
             answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
           },
-					{
+          {
             questionId: questionId2,
-            question: 'Question?',
+            question: 'Question2?',
             duration: 3,
             points: 4,
             answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
@@ -87,11 +78,11 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
       }
     });
   });
-	test('Successfully moving quiz to end', () => {
-		expect(requestQuizQuestionMove(token, quizId, questionId1, 2)).toStrictEqual({
-			statusCode: 200, 
-			jsonBody: {}
-		});
+  test('Successfully moving quiz to end', () => {
+    expect(requestQuizQuestionMove(token, quizId, questionId1, 2)).toStrictEqual({
+      statusCode: 200,
+      jsonBody: {}
+    });
     expect(requestQuizInfo(token, quizId)).toStrictEqual({
       statusCode: 200,
       jsonBody: {
@@ -105,21 +96,21 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
         questions: [
           {
             questionId: questionId2,
-            question: 'Question?',
+            question: 'Question2?',
             duration: 3,
             points: 4,
             answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
           },
-					{
+          {
             questionId: questionId3,
-            question: 'Question?',
+            question: 'Question3?',
             duration: 3,
             points: 4,
             answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
           },
-					{
+          {
             questionId: questionId1,
-            question: 'Question?',
+            question: 'Question1?',
             duration: 3,
             points: 4,
             answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
@@ -128,11 +119,11 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
       }
     });
   });
-	test('Successfully moving quiz', () => {
-		expect(requestQuizQuestionMove(token, quizId, questionId1, 1)).toStrictEqual({
-			statusCode: 200, 
-			jsonBody: {}
-		});
+  test('Successfully moving quiz', () => {
+    expect(requestQuizQuestionMove(token, quizId, questionId1, 1)).toStrictEqual({
+      statusCode: 200,
+      jsonBody: {}
+    });
     expect(requestQuizInfo(token, quizId)).toStrictEqual({
       statusCode: 200,
       jsonBody: {
@@ -146,21 +137,21 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
         questions: [
           {
             questionId: questionId2,
-            question: 'Question?',
+            question: 'Question2?',
             duration: 3,
             points: 4,
             answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
           },
-					{
+          {
             questionId: questionId1,
-            question: 'Question?',
+            question: 'Question1?',
             duration: 3,
             points: 4,
             answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
           },
-					{
+          {
             questionId: questionId3,
-            question: 'Question?',
+            question: 'Question3?',
             duration: 3,
             points: 4,
             answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
@@ -170,62 +161,62 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
     });
   });
   test('Failed test: question ID does not refer to a valid question within this quiz.', () => {
-    expect(requestQuizQuestionMove(token, quizId, questionId4, 0)).toStrictEqual({
-			statusCode: 400, 
-			jsonBody: ERRORANDSTATUS
-		});
+    expect(requestQuizQuestionMove(token, quizId, -1, 0)).toStrictEqual({
+      statusCode: 400,
+      jsonBody: ERRORANDSTATUS
+    });
   });
   test('Failed test: NewPosition is less than 0.', () => {
     expect(requestQuizQuestionMove(token, quizId, questionId1, -1)).toStrictEqual({
-			statusCode: 400, 
-			jsonBody: ERRORANDSTATUS
-		});
+      statusCode: 400,
+      jsonBody: ERRORANDSTATUS
+    });
   });
-	test('Failed test: NewPosition is greater than n-1 (n is number of questions in quiz).', () => {
+  test('Failed test: NewPosition is greater than n-1 (n is number of questions in quiz).', () => {
     expect(requestQuizQuestionMove(token, quizId, questionId1, 3)).toStrictEqual({
-			statusCode: 400, 
-			jsonBody: ERRORANDSTATUS
-		});
+      statusCode: 400,
+      jsonBody: ERRORANDSTATUS
+    });
   });
-	test('Failed test: NewPosition is the position of the current question.', () => {
+  test('Failed test: NewPosition is the position of the current question.', () => {
     expect(requestQuizQuestionMove(token, quizId, questionId1, 0)).toStrictEqual({
-			statusCode: 400, 
-			jsonBody: ERRORANDSTATUS
-		});
+      statusCode: 400,
+      jsonBody: ERRORANDSTATUS
+    });
   });
-	test('Failed test: Empty token.', () => {
+  test('Failed test: Empty token.', () => {
     expect(requestQuizQuestionMove('', quizId, questionId1, 0)).toStrictEqual({
-			statusCode: 401, 
-			jsonBody: ERRORANDSTATUS
-		});
+      statusCode: 401,
+      jsonBody: ERRORANDSTATUS
+    });
   });
-	test('Failed test: Invalid token.', () => {
+  test('Failed test: Invalid token.', () => {
     expect(requestQuizQuestionMove(token + '1', quizId, questionId1, 0)).toStrictEqual({
-			statusCode: 401, 
-			jsonBody: ERRORANDSTATUS
-		});
+      statusCode: 401,
+      jsonBody: ERRORANDSTATUS
+    });
   });
-	test('Failed test: Quiz ID invalid.', () => {
+  test('Failed test: Quiz ID invalid.', () => {
     expect(requestQuizQuestionMove(token, quizId + 1, questionId1, 0)).toStrictEqual({
-			statusCode: 403, 
-			jsonBody: ERRORANDSTATUS
-		});
+      statusCode: 403,
+      jsonBody: ERRORANDSTATUS
+    });
   });
-	test('Failed test: User does not own the quiz.', () => {
-		const newUser = requestAuthRegister('frieren.theslayer@gmail.com', 'ushouldwatchfr1eren', 'Frieren', 'TheSlayer');
-		const newToken = newUser.jsonBody.token as string;
-		const newQuiz = requestQuizCreate(newToken, 'Quiz Name', 'Quiz Description');
-  	const newQuizId = newQuiz.jsonBody.quizId as number;
-  	const newQuestionBody: adminQuizQuestionCreateArgument = {
-    	question: 'new question',
-    	duration: 3,
-    	points: 4,
-    	answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
-  	};
-		const newQuestionId = requestQuizQuestionCreate(newToken, newQuizId, newQuestionBody).jsonBody.questionId;
+  test('Failed test: User does not own the quiz.', () => {
+    const newUser = requestAuthRegister('frieren.theslayer@gmail.com', 'ushouldwatchfr1eren', 'Frieren', 'TheSlayer');
+    const newToken = newUser.jsonBody.token as string;
+    const newQuiz = requestQuizCreate(newToken, 'Quiz Name', 'Quiz Description');
+    const newQuizId = newQuiz.jsonBody.quizId as number;
+    const newQuestionBody: adminQuizQuestionCreateArgument = {
+      question: 'new question',
+      duration: 3,
+      points: 4,
+      answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
+    };
+    const newQuestionId = requestQuizQuestionCreate(newToken, newQuizId, newQuestionBody).jsonBody.questionId;
     expect(requestQuizQuestionMove(token, newQuizId, newQuestionId, 0)).toStrictEqual({
-			statusCode: 403, 
-			jsonBody: ERRORANDSTATUS
-		});
+      statusCode: 403,
+      jsonBody: ERRORANDSTATUS
+    });
   });
 });
