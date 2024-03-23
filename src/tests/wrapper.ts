@@ -24,8 +24,14 @@ export const requestQuizQuestionCreate = (token: string, quizId: number,
   question: adminQuizQuestionCreateArgument) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/question`, { token, quizId, question });
 
+export const requestQuizTrashInfo = (token: string) =>
+  requestHelper('GET', '/v1/admin/quiz/trash', { token });
+
 export const requestUserDetails = (token: string) =>
   requestHelper('GET', '/v1/admin/user/details', { token });
+
+export const requestUserDetailsUpdate = (token: string, email: string, nameFirst: string, nameLast: string) =>
+  requestHelper('PUT', '/v1/admin/user/details', { token, email, nameFirst, nameLast });
 
 export const requestUserPasswordUpdate = (token: TokenType, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v1/admin/user/password', { token, oldPassword, newPassword });

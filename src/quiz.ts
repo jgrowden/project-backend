@@ -1,15 +1,5 @@
-// import { string } from 'yaml/dist/schema/common/string';
-import { getData, QuizType, AnswerType, QuestionType, ErrorObject } from './dataStore';
-import { fetchUserFromSessionId, fetchQuizFromQuizId, fetchQuestionFromQuestionId, generateNewQuizId, generateNewQuestionId, currentTime, returnError } from './helper';
-
-export interface ErrorString {
-  error: string
-}
-
-export interface ErrorObjectWithCode {
-  errorObject: ErrorString;
-  errorCode: number;
-}
+import { AnswerType, getData, QuestionType, QuizType } from './dataStore';
+import { fetchUserFromSessionId, fetchQuizFromQuizId, fetchQuestionFromQuestionId, generateNewQuizId, generateNewQuestionId, currentTime, returnError, ErrorObject, ErrorObjectWithCode } from './helper';
 
 interface AdminQuizListReturnElement {
   quizId: number;
@@ -244,6 +234,19 @@ export function adminQuizRemove(sessionId: string, quizId: number): ErrorObjectW
   data.quizzes.splice(data.quizzes.indexOf(quiz), 1);
 
   return {};
+}
+
+export function adminQuizTrashList(sessionId: string): ErrorObjectWithCode | AdminQuizListReturn {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    return returnError("invalid user ID'", 401);
+  }
+
+  const data = getData();
+  const userDeletedQuizzes = data.deletedQuizzes.filter(quiz => quiz.ownerId === user.authUserId);
+  const trashedQuizList = userDeletedQuizzes.map(quiz => { return { quizId: quiz.quizId, name: quiz.name }; });
+
+  return { quizzes: trashedQuizList };
 }
 
 /**

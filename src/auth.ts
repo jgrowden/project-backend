@@ -1,7 +1,7 @@
-import { getData, ErrorObject, TokenType } from './dataStore';
+import { getData, TokenType } from './dataStore';
 import validator from 'validator';
 import { nanoid } from 'nanoid';
-import { fetchUserFromSessionId, userWithEmailExists, generateNewUserId } from './helper';
+import { fetchUserFromSessionId, userWithEmailExists, generateNewUserId, returnError, ErrorObject, ErrorObjectWithCode } from './helper';
 
 interface AdminUserDetailsReturn {
   user: {
@@ -187,41 +187,45 @@ export function adminUserDetails(sessionId: string): AdminUserDetailsReturn | Er
  *
  * @return {} - an empty object
 */
-export function adminUserDetailsUpdate(sessionId: string, email: string, nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
+export function adminUserDetailsUpdate(sessionId: string, email: string, nameFirst: string, nameLast: string): ErrorObjectWithCode | Record<string, never> {
+  const userToEdit = fetchUserFromSessionId(sessionId);
+  if (!userToEdit) {
+    return returnError('User ID not found', 401);
+  }
+
   if (validator.isEmail(email) === false) {
-    return { error: 'Invalid email' };
+    return returnError('Invalid email', 400);
   }
 
   // Check for invalid first name
   if (validName(nameFirst)) {
-    return { error: 'Invalid first name' };
+    return returnError('Invalid first name', 400);
   }
   if (nameFirst.length < userNameMinLength || nameFirst.length > userNameMaxLength) {
-    return { error: 'nameFirst does not satisfy length requirements' };
+    return returnError('First name does not satisfy length requirements', 400);
   }
 
   // Check for invalid last name
   if (validName(nameLast)) {
-    return { error: 'invalid last name' };
+    return returnError('Invalid last name', 400);
   }
   if (nameLast.length < userNameMinLength || nameLast.length > userNameMaxLength) {
-    return { error: 'nameLast does not satisfy length requirements' };
+    return returnError('Last name does not satisfy length requirements', 400);
   }
 
-  const duplicateEmail = userWithEmailExists(email);
+  // get userId from sessionId
+  // loop through datastore userIds. if a user has the same email and a different userId, email already registered
 
-  if (duplicateEmail !== undefined) {
-    return { error: 'Email already registered' };
+  const data = getData();
+  for (const user of data.users) {
+    if (user.email === email && user.authUserId !== userToEdit.authUserId) {
+      return returnError('Email already registered', 400);
+    }
   }
 
-  const user = fetchUserFromSessionId(sessionId);
-  if (!user) {
-    return { error: 'User ID not found' };
-  }
-
-  user.email = email;
-  user.nameFirst = nameFirst;
-  user.nameLast = nameLast;
+  userToEdit.email = email;
+  userToEdit.nameFirst = nameFirst;
+  userToEdit.nameLast = nameLast;
 
   return {};
 }
