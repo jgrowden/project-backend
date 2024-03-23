@@ -63,7 +63,7 @@ describe('Testing Question Update', () => {
       const newQuizId = newQuiz.jsonBody.quizId as number;
       const newQuestion = requestQuestionCreate(newToken, newQuizId, questionBody);
       const newQuestionId = newQuestion.jsonBody.questionId as number;
-      expect(requestionQuestionUpdate(token, newQuizId, newQuestionId, questionBody))
+      expect(requestQuestionUpdate(token, newQuizId, newQuestionId, questionBody))
         .toStrictEqual({
         statusCode: 403,
         jsonBody: ERRORANDSTATUS
@@ -217,6 +217,7 @@ describe('Testing Question Update', () => {
       });
       const timeEdited = ~~(Date.now() / 1000);
       const quizInfo = requestQuizInfo(token, quizId);
+      const quizTimeEdited = quizInfo.jsonBody.timeLastEdited;
       expect(requestQuizInfo(token, quizId)).toStrictEqual({
         statusCode: 200,
         jsonBody: {
@@ -263,8 +264,8 @@ describe('Testing Question Update', () => {
           duration: 5,
         }
       });
-      expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.timeLastEdited);
-      expect(timeEdited).toBeLessThanOrEqual(quizInfo.timeLastEdited + 1);
+      expect(timeEdited).toBeGreaterThanOrEqual(quizTimeEdited);
+      expect(timeEdited).toBeLessThanOrEqual(quizTimeEdited + 1);
     });
   });
 

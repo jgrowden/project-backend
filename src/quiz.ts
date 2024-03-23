@@ -34,6 +34,7 @@ const quizDescriptionMaxLength = 100;
 const quizNameMinLength = 3;
 const quizNameMaxLength = 30;
 const regex = /[^A-Za-z0-9 ]/;
+const QUESTIONCOLOURS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
 
 /**
  * Update the description of the relevant quiz.
@@ -395,8 +396,10 @@ export function adminQuizQuestionUpdate(sessionId: string, quizId: number, quest
   question.question = newQuestionBody.question;
   question.duration = newQuestionBody.duration;
   question.points = newQuestionBody.points;
+
+  const colours = [...QUESTIONCOLOURS];
   const newAnswerBodies = newQuestionBody.answers.map(answer => {
-    answer.colour = setRandomColour();
+    answer.colour = setRandomColour(colours);
     return answer;
   });
   question.answers = newAnswerBodies;
@@ -406,10 +409,13 @@ export function adminQuizQuestionUpdate(sessionId: string, quizId: number, quest
 }
 
 /**
- * Function returns random colour out of 6 colours
+ * Function returns random colour from an array of colours
+ * Pops the returned element from original array
  * @returns string
  */
-function setRandomColour (): string {
-  const colours = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
-  return colours[~~(Math.random() * colours.length)];
+function setRandomColour (colours: string[]): string {
+  const colourIndex = ~~(Math.random() * colours.length);
+  const colourToReturn = colours[colourIndex];
+  colours.splice(colourIndex, 1);
+  return colourToReturn;
 }
