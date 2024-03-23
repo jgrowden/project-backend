@@ -8,38 +8,71 @@ Additional data structures include an array userQuizzes in user data, which list
 let data = {
     users: [
         {
-            email: "john.smith@gmail.com"
-            password: "password123"
-            nameFirst: "John"
-            nameLast: "Smith"
-            authUserId: 1
-            numSuccessfulLogins: 1
-            numFailedPasswordsSinceLastLogin: 123
-            previousPasswords:["oldpassword123", "anotheroldpassword123"]
-            userQuizzes: [1, 2, 3]
+            email: "john.smith@gmail.com",
+            password: "password123",
+            nameFirst: "John",
+            nameLast: "Smith",
+            authUserId: 1,
+            numSuccessfulLogins: 1,
+            numFailedPasswordsSinceLastLogin: 123,
+            previousPasswords:["oldpassword123", "anotheroldpassword123"],
+            userQuizzes: [1, 2, 3],
             sessions: []
         }
-    ]
+    ],
     quizzes: [
         {
-            ownerId: 1
-            quizId: 1
-            name: "The John Smith Test"
-            description: "Tests general knowledge about John Smith."
-            timeCreated: 1
-            timeLastEdited: 1
-            // Actual quiz data to be added in later iterations
+            ownerId: 1,
+            quizId: 1,
+            name: "The John Smith Test",
+            description: "Tests general knowledge about John Smith.",
+            timeCreated: 1,
+            timeLastEdited: 1,
+            numQuestions: 1,
+            questions: [
+                {
+                    questionId: 123,
+                    question: "Who is John Smith?",
+                    duration: 4,
+                    points: 5,
+                    answers: [
+                        {
+                            answerId: 678,
+                            answer: "Nobody knows",
+                            colour: "red",
+                            correct: true
+                        }
+                    ]
+                }
+            ],
+            duration: 60
         }
-    ]
+    ],
     deletedQuizzes: [
         {
-            ownerId: 1
-            quizId: 1
-            name: "The John Smith Test"
-            description: "Tests general knowledge about John Smith."
-            timeCreated: 1
-            timeLastEdited: 1
-            // Actual quiz data to be added in later iterations
+            ownerId: 1,
+            quizId: 1,
+            name: "The John Smith Test",
+            description: "Tests general knowledge about John Smith.",
+            timeCreated: 1,
+            timeLastEdited: 1,
+            numQuestions: 1,
+            questions: [
+                {
+                    questionId: 123,
+                    question: "Who is John Smith?",
+                    duration: 4,
+                    points: 5,
+                    answers: [
+                        {
+                            answerId: 678,
+                            answer: "Nobody knows",
+                            colour: "red",
+                            correct: true
+                        }
+                    ]
+                }
+            ]
         }
     ]
 }

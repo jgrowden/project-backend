@@ -1,5 +1,5 @@
-import { clear } from '../other';
-import { adminAuthRegister, adminUserDetails, adminUserDetailsUpdate } from '../auth';
+import { clear } from '../../other';
+import { adminAuthRegister, adminUserDetails, adminUserDetailsUpdate } from '../../auth';
 
 describe('adminUserDetailsUpdate testing', () => {
   let user1;

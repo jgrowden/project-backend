@@ -1,5 +1,5 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, errorCode, clear } from './wrapper';
-import { adminQuizQuestionCreateArgument } from '../quiz';
+import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, errorCode, clear } from '../wrapper';
+import { adminQuizQuestionCreateArgument } from '../../quiz';
 
 let token: string;
 let quizId: number;

@@ -1,12 +1,15 @@
 import { requestHelper } from './requestHelper';
-import { TokenType } from '../dataStore';
 import { adminQuizQuestionCreateArgument } from '../quiz';
+import { QuestionType, TokenType } from '../dataStore';
 
 export const requestAuthRegister = (email: string, password: string, nameFirst: string, nameLast: string) =>
   requestHelper('POST', '/v1/admin/auth/register', { email, password, nameFirst, nameLast });
 
 export const requestAuthLogin = (email: string, password: string) =>
   requestHelper('POST', '/v1/admin/auth/login', { email, password });
+
+export const requestQuizList = (token: string) =>
+  requestHelper('GET', '/v1/admin/quiz/list', { token });
 
 export const requestQuizCreate = (token: string, name: string, description: string) =>
   requestHelper('POST', '/v1/admin/quiz/create', { token, name, description });
@@ -26,6 +29,9 @@ export const requestUserDetails = (token: string) =>
 
 export const requestUserPasswordUpdate = (token: TokenType, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v1/admin/user/password', { token, oldPassword, newPassword });
+
+export const requestQuestionUpdate = (sessionId: string, quizId: number, questionId: number, questionBody: QuestionType) =>
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { sessionId, questionBody });
 
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 

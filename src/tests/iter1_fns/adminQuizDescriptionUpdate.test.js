@@ -1,6 +1,6 @@
-import { adminQuizCreate, adminQuizDescriptionUpdate, adminQuizInfo } from '../quiz';
-import { clear } from '../other';
-import { adminAuthRegister } from '../auth';
+import { adminQuizCreate, adminQuizDescriptionUpdate, adminQuizInfo } from '../../quiz';
+import { clear } from '../../other';
+import { adminAuthRegister } from '../../auth';
 
 clear();
 beforeEach(() => {

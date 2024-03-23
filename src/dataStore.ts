@@ -1,6 +1,6 @@
 // YOU SHOULD MODIFY THIS OBJECT BELOW ONLY
 
-interface UserType {
+export interface UserType {
   email: string;
   password: string;
   nameFirst: string;
@@ -13,38 +13,46 @@ interface UserType {
   sessions: string[];
 }
 
-interface AnswerType {
+export interface QuizType {
+  ownerId: number;
+  quizId: number;
+  name: string;
+  timeCreated: number;
+  timeLastEdited: number;
+  description: string;
+  numQuestions?: number;
+  questions?: QuestionType[];
+  duration?: number;
+}
+
+export interface AnswerType {
+  answerId?: number;
   answer: string;
+  colour?: string;
   correct: boolean;
 }
 
-interface QuestionType {
-  questionId: number;
+export interface QuestionType {
+  questionId?: number;
   question: string;
   duration: number;
   points: number;
   answers: AnswerType[];
 }
 
-interface TokenType {
+export interface TokenType {
   token: string;
 }
 
-interface QuizType {
-  ownerId: number;
-  quizId: number;
-  name: string;
-  description: string;
-  timeCreated: number;
-  timeLastEdited: number;
-  numQuestions: number;
-  questions: QuestionType[];
-}
-
-interface DataType {
+export interface DataType {
   users: UserType[];
   quizzes: QuizType[];
   deletedQuizzes: QuizType[];
+}
+
+export interface ErrorObject {
+  error: string;
+  statusCode?: number;
 }
 
 let data: DataType = {
@@ -72,13 +80,11 @@ Example usage
 */
 
 // Use get() to access the data
-function getData() {
+export function getData() {
   return data;
 }
 
 // Use set(newData) to pass in the entire data object, with modifications made
-function setData(newData: DataType) {
+export function setData(newData: DataType) {
   data = newData;
 }
-
-export { UserType, AnswerType, QuestionType, TokenType, QuizType, DataType, getData, setData };

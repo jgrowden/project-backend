@@ -1,5 +1,5 @@
-import { getData, UserType, QuizType } from './dataStore';
-import { ErrorObject, ErrorObjectWithCode } from './quiz';
+import { getData, UserType, QuizType, QuestionType } from './dataStore';
+import { ErrorObjectWithCode, ErrorString } from './quiz';
 
 export const fetchUserFromUserId = (authUserId: number): UserType | undefined => {
   return getData().users.find(user => user.authUserId === authUserId);
@@ -13,6 +13,9 @@ export const fetchQuizFromQuizId = (quizId: number): QuizType | undefined => {
   return getData().quizzes.find(quiz => quiz.quizId === quizId);
 };
 
+export const fetchQuestionFromQuestionId = (quiz: QuizType, questionId: number): QuestionType | undefined => {
+  return quiz.questions.find(question => question.questionId === questionId);
+};
 export const userWithEmailExists = (email: string): UserType | undefined => {
   return getData().users.find(user => user.email === email);
 };
@@ -42,7 +45,7 @@ export const currentTime = (): number => {
 };
 
 export const returnError = (errorString: string, errorCode: number): ErrorObjectWithCode => {
-  const err: ErrorObject = { error: errorString };
+  const err: ErrorString = { error: errorString };
   return {
     errorObject: err,
     errorCode: errorCode
