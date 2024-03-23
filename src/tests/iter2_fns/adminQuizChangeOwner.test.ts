@@ -1,4 +1,4 @@
-import { errorCode, requestAuthRegister, requestQuizCreate, requestQuizChangeOwner, clear } from '../wrapper';
+import { errorCode, requestAuthRegister, requestQuizCreate, requestQuizChangeOwner, requestQuizInfo, clear } from '../wrapper';
 
 let User1Token: string;
 let User2Token: string;
@@ -20,6 +20,19 @@ describe('adminQuizChangeOwner Tests:', () => {
       statusCode: 200,
       jsonBody: {}
     });
+    expect(requestQuizInfo(User2Token, quiz1Id)).toStrictEqual({
+        statusCode: 200,
+        jsonBody: {
+          quizId: quiz1Id,
+          name: 'Quiz Name',
+          ownerId: 1,
+          timeCreated: expect.any(Number),
+          timeLastEdited: expect.any(Number),
+          description: 'Quiz Description',
+          numQuestions: 0,
+          questions: []
+        }
+      })
   });
   test('Failing test: userEmail is not a real user', () => {
     expect(requestQuizChangeOwner(quiz1Id, User1Token, 'president@unswunsociety.org.au')).toStrictEqual(errorCode(400));
