@@ -242,6 +242,19 @@ export function adminQuizRemove(sessionId: string, quizId: number): ErrorObjectW
   return {};
 }
 
+export function adminQuizTrashList(sessionId: string): ErrorObjectWithCode | AdminQuizListReturn {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    return returnError("invalid user ID'", 401);
+  }
+
+  const data = getData();
+  const userDeletedQuizzes = data.deletedQuizzes.filter(quiz => quiz.ownerId === user.authUserId);
+  const trashedQuizList = userDeletedQuizzes.map(quiz => { return { quizId: quiz.quizId, name: quiz.name }; });
+
+  return { quizzes: trashedQuizList };
+}
+
 /**
  * Get all of the relevant information about the current quiz.
  *

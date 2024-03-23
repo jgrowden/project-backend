@@ -12,33 +12,33 @@ beforeEach(() => {
 });
 
 describe('adminQuizTrashList testing', () => {
-  // if sess id is invalid, return error 401
   test('invalid session id', () => {
     expect(requestQuizTrashInfo(token1 + '1')).toStrictEqual({ statusCode: 401, jsonBody: ERROR });
   });
-  // if none, return quizzes: []. login with a user
+
   test('no quizzes in trash', () => {
-    expect(requestQuizTrashInfo(token1)).toStrictEqual({ quizzes: [] });
+    expect(requestQuizTrashInfo(token1)).toStrictEqual({ statusCode: 200, jsonBody: { quizzes: [] } });
   });
 
-  // if one, return one quiz. login with a user, create a quiz, then delete it.
   test('one quiz in trash', () => {
     quiz1 = requestQuizCreate(token1, 'first quiz', 'ayayayayay').jsonBody.quizId;
-    expect(requestQuizTrashInfo(token1)).toStrictEqual({ quizzes: [] });
+    expect(requestQuizTrashInfo(token1)).toStrictEqual({ statusCode: 200, jsonBody: { quizzes: [] } });
     requestQuizDelete(token1, quiz1);
     expect(requestQuizTrashInfo(token1)).toStrictEqual(
       {
-        quizzes: [
-          {
-            quizId: quiz1,
-            name: 'first quiz'
-          }
-        ]
+        statusCode: 200,
+        jsonBody: {
+          quizzes: [
+            {
+              quizId: quiz1,
+              name: 'first quiz'
+            }
+          ]
+        }
       }
     );
   });
 
-  // if two, return two quizzes. probs do tomatchobject
   test('two quizzes in trash', () => {
     quiz1 = requestQuizCreate(token1, 'first quiz', 'ayayayayay').jsonBody.quizId;
     quiz2 = requestQuizCreate(token1, 'second quiz', 'yeyeyeyeye').jsonBody.quizId;
@@ -46,50 +46,59 @@ describe('adminQuizTrashList testing', () => {
     requestQuizDelete(token1, quiz2);
     expect(requestQuizTrashInfo(token1)).toStrictEqual(
       {
-        quizzes: [
-          {
-            quizId: quiz1,
-            name: 'first quiz'
-          },
-          {
-            quizId: quiz2,
-            name: 'second quiz'
-          }
-        ]
+        statusCode: 200,
+        jsonBody: {
+          quizzes: [
+            {
+              quizId: quiz1,
+              name: 'first quiz'
+            },
+            {
+              quizId: quiz2,
+              name: 'second quiz'
+            }
+          ]
+        }
       }
     );
   });
 
   test('multiple users with trashed quizzes', () => {
-    token2 = requestAuthRegister('president@elsoc.net', 'elsocprez', 'elsoc', 'president').jsonBody.token;
+    token2 = requestAuthRegister('president@elsoc.net', 'elsocprez2024', 'elsoc', 'president').jsonBody.token;
     quiz1 = requestQuizCreate(token1, 'first quiz', 'ayayayayay').jsonBody.quizId;
     quiz2 = requestQuizCreate(token2, 'second quiz', 'yeyeyeyeye').jsonBody.quizId;
-    quiz2 = requestQuizCreate(token2, 'third quiz', 'yoyoyoyoyo').jsonBody.quizId;
+    quiz3 = requestQuizCreate(token2, 'third quiz', 'yoyoyoyoyo').jsonBody.quizId;
     requestQuizDelete(token1, quiz1);
     requestQuizDelete(token2, quiz2);
     requestQuizDelete(token2, quiz3);
     expect(requestQuizTrashInfo(token1)).toStrictEqual(
       {
-        quizzes: [
-          {
-            quizId: quiz1,
-            name: 'first quiz'
-          }
-        ]
+        statusCode: 200,
+        jsonBody: {
+          quizzes: [
+            {
+              quizId: quiz1,
+              name: 'first quiz'
+            }
+          ]
+        }
       }
     );
     expect(requestQuizTrashInfo(token2)).toStrictEqual(
       {
-        quizzes: [
-          {
-            quizId: quiz2,
-            name: 'second quiz'
-          },
-          {
-            quizId: quiz3,
-            name: 'third quiz'
-          }
-        ]
+        statusCode: 200,
+        jsonBody: {
+          quizzes: [
+            {
+              quizId: quiz2,
+              name: 'second quiz'
+            },
+            {
+              quizId: quiz3,
+              name: 'third quiz'
+            }
+          ]
+        }
       }
     );
   });
