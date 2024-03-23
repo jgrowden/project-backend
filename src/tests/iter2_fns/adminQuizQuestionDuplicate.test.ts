@@ -6,7 +6,6 @@ let quizId: number;
 let questionId1: number;
 let questionId2: number;
 
-
 beforeEach(() => {
   clear();
   const user = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
@@ -57,7 +56,7 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
           },
           {
             questionId: expect.any(Number),
-            question: 'Question2?',
+            question: 'Question1?',
             duration: 3,
             points: 4,
             answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
@@ -74,7 +73,9 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
     });
     expect(requestQuizQuestionDuplicate(token, quizId, questionId2)).toStrictEqual({
       statusCode: 200,
-      jsonBody: {}
+      jsonBody: {
+        newQuestionId: expect.any(Number)
+      }
     });
     expect(requestQuizInfo(token, quizId)).toStrictEqual({
       statusCode: 200,
@@ -85,7 +86,7 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),
         description: 'Quiz Description',
-        numQuestions: 3,
+        numQuestions: 4,
         questions: [
           {
             questionId: questionId1,
@@ -126,19 +127,19 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
     });
   });
   test('Failed test: Empty token.', () => {
-    expect(requestQuizQuestionDuplicate('', quizId, questionId1, 0)).toStrictEqual({
+    expect(requestQuizQuestionDuplicate('', quizId, questionId1)).toStrictEqual({
       statusCode: 401,
       jsonBody: ERRORANDSTATUS
     });
   });
   test('Failed test: Invalid token.', () => {
-    expect(requestQuizQuestionDuplicate(token + '1', quizId, questionId1, 0)).toStrictEqual({
+    expect(requestQuizQuestionDuplicate(token + '1', quizId, questionId1)).toStrictEqual({
       statusCode: 401,
       jsonBody: ERRORANDSTATUS
     });
   });
   test('Failed test: Quiz ID invalid.', () => {
-    expect(requestQuizQuestionDuplicate(token, quizId + 1, questionId1, 0)).toStrictEqual({
+    expect(requestQuizQuestionDuplicate(token, quizId + 1, questionId1)).toStrictEqual({
       statusCode: 403,
       jsonBody: ERRORANDSTATUS
     });
@@ -155,7 +156,7 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
       answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
     };
     const newQuestionId = requestQuizQuestionCreate(newToken, newQuizId, newQuestionBody).jsonBody.questionId;
-    expect(requestQuizQuestionDuplicate(token, newQuizId, newQuestionId, 0)).toStrictEqual({
+    expect(requestQuizQuestionDuplicate(token, newQuizId, newQuestionId)).toStrictEqual({
       statusCode: 403,
       jsonBody: ERRORANDSTATUS
     });

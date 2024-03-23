@@ -11,7 +11,7 @@ import process from 'process';
 import { getData, setData } from './dataStore';
 
 import { adminAuthRegister, adminAuthLogin, adminUserDetails, adminUserPasswordUpdate } from './auth';
-import { adminQuizList, adminQuizCreate, adminQuizRemove, adminQuizInfo, adminQuizQuestionCreate, adminQuizQuestionUpdate } from './quiz';
+import { adminQuizList, adminQuizCreate, adminQuizRemove, adminQuizInfo, adminQuizQuestionCreate, adminQuizQuestionUpdate, adminQuizQuestionDuplicate } from './quiz';
 
 import { clear } from './other';
 // Set up web app
@@ -156,6 +156,19 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Respo
   const questionId = parseInt(req.params.questionid);
   const { token, questionBody } = req.body;
   const result = adminQuizQuestionUpdate(token, quizId, questionId, questionBody);
+  if ('error' in result) {
+    return res.status(result.statusCode).json(result);
+  }
+  save();
+  res.json(result);
+});
+
+// adminQuizQuestionDuplicate Route
+app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const { token } = req.body;
+  const result = adminQuizQuestionDuplicate(token, quizId, questionId);
   if ('error' in result) {
     return res.status(result.statusCode).json(result);
   }

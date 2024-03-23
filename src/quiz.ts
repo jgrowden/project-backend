@@ -35,6 +35,10 @@ export interface adminQuizQuestionCreateArgument {
   answers: AnswerType[];
 }
 
+interface AdminQuizQuestionDuplicateReturn {
+  newQuestionId: number;
+}
+
 const quizDescriptionMaxLength = 100;
 const quizNameMinLength = 3;
 const quizNameMaxLength = 30;
@@ -477,6 +481,69 @@ export function adminQuizQuestionUpdate(sessionId: string, quizId: number, quest
   quiz.timeLastEdited = ~~(Date.now() / 1000);
 
   return {};
+}
+
+/**
+ * A particular question gets duplicated to immediately after where the source question is
+ * When this route is called, the timeLastEdited is updated
+ * @param {string} token
+ * @param {number} quizId
+ * @param {number} questionId
+ * @returns {newQuestionId: number} - object containing question Id of duplicated quiz.
+ */
+export function adminQuizQuestionDuplicate(token: string, quizId: number, questionId: number): ErrorObject | AdminQuizQuestionDuplicateReturn {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    return {
+      error: 'Invalid token',
+      statusCode: 401,
+    };
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    return {
+      error: 'Invalid quizId',
+      statusCode: 403,
+    };
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    return {
+      error: 'Invalid quiz ownership',
+      statusCode: 403,
+    };
+  }
+
+  const question = fetchQuestionFromQuestionId(quiz, questionId);
+  if (!question) {
+    return {
+      error: 'Invalid questionId',
+      statusCode: 400,
+    };
+  }
+
+  let oldPosition = 0;
+  for (const question of quiz.questions) {
+    if (question.questionId === questionId) {
+      break;
+    }
+    oldPosition++;
+  }
+
+  const newQuestion: QuestionType = {
+    questionId: generateNewQuestionId(),
+    question: question.question,
+    duration: question.duration,
+    points: question.points,
+    answers: question.answers
+  };
+
+  quiz.questions.splice(oldPosition + 1, 0, newQuestion);
+  quiz.numQuestions = quiz.questions.length;
+  quiz.timeLastEdited = Math.floor(Date.now() / 1000);
+
+  return { newQuestionId: newQuestion.questionId };
 }
 
 /**
