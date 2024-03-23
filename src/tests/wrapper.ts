@@ -22,6 +22,9 @@ const requestUserDetails = (token: string) =>
 const requestUserPasswordUpdate = (token: TokenType, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v1/admin/user/password', { token, oldPassword, newPassword });
 
+const requestQuizNameUpdate = (token: TokenType, quizId: number, name: string) =>
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/name`, { token, quizId, name });
+
 const requestQuestionUpdate = (sessionId: string, quizId: number, questionId: number, questionBody: QuestionType) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { sessionId, questionBody });
 
