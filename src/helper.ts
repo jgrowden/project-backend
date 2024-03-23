@@ -1,5 +1,5 @@
-import { getData, UserType, QuizType, QuestionType, ErrorObject } from './dataStore';
-import { ErrorObjectWithCode } from './quiz';
+import { getData, UserType, QuizType, QuestionType } from './dataStore';
+import { ErrorObjectWithCode, ErrorString } from './quiz';
 
 export const fetchUserFromUserId = (authUserId: number): UserType | undefined => {
   return getData().users.find(user => user.authUserId === authUserId);
@@ -45,9 +45,24 @@ export const currentTime = (): number => {
 };
 
 export const returnError = (errorString: string, errorCode: number): ErrorObjectWithCode => {
-  const err: ErrorObject = { error: errorString };
+  const err: ErrorString = { error: errorString };
   return {
     errorObject: err,
     errorCode: errorCode
   };
+};
+
+export const generateNewQuestionId = (): number => {
+  const data = getData();
+  let newQuestionId = 0;
+  const QuestionIds = [];
+  for (const quiz of data.quizzes) {
+    for (const question of quiz.questions) {
+      QuestionIds.push(question.questionId);
+    }
+  }
+  while (QuestionIds.includes(newQuestionId)) {
+    newQuestionId++;
+  }
+  return newQuestionId;
 };
