@@ -1,6 +1,6 @@
-import { clear } from '../other';
-import { adminQuizList, adminQuizCreate } from '../quiz';
-import { adminAuthRegister } from '../auth';
+import { clear } from '../../other';
+import { adminQuizList, adminQuizCreate } from '../../quiz';
+import { adminAuthRegister } from '../../auth';
 
 describe('adminQuizList', () => {
   beforeEach(() => {
@@ -57,6 +57,9 @@ describe('adminQuizList', () => {
     });
   });
   test('invalid token', () => {
-    expect(adminQuizList(1)).toMatchObject({ error: expect.any(String) });
+    expect(adminQuizList(1)).toStrictEqual({
+      statusCode: 200,
+      jsonBody: { token: expect.any(String) }
+    });
   });
 });

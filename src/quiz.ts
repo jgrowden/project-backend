@@ -1,9 +1,9 @@
-// import { string } from 'yaml/dist/schema/common/string';
-import { getData } from './dataStore';
-import { fetchUserFromSessionId, fetchQuizFromQuizId, generateNewQuizId, currentTime } from './helper';
+import { getData, QuestionType, ErrorObject } from './dataStore';
+import { fetchUserFromSessionId, fetchQuizFromQuizId, fetchQuestionFromQuestionId, generateNewQuizId, currentTime, returnError } from './helper';
 
-interface ErrorObject {
-  error: string
+export interface ErrorObjectWithCode {
+  errorObject: ErrorObject;
+  errorCode: number;
 }
 
 interface AdminQuizListReturnElement {
@@ -25,6 +25,9 @@ interface AdminQuizInfoReturn {
   timeCreated: number;
   timeLastEdited: number;
   description: string;
+  numQuestions?: number;
+  questions?: QuestionType;
+  duration?: number;
 }
 
 const quizDescriptionMaxLength = 100;
@@ -154,35 +157,31 @@ export function adminQuizList(sessionId: string): AdminQuizListReturn | ErrorObj
  * @returns {quizId: 2} - object with a unique quiz identification number
 */
 
-export function adminQuizCreate(sessionId: string, name: string, description: string): AdminQuizCreateReturn | ErrorObject {
+export function adminQuizCreate(sessionId: string, name: string, description: string): AdminQuizCreateReturn | ErrorObjectWithCode {
   const data = getData();
 
   const user = fetchUserFromSessionId(sessionId);
 
   if (!user) {
-    return { error: 'invalid user ID' };
+    return returnError('invalid user ID', 401);
   }
 
   if (regex.test(name)) {
-    return { error: 'invalid quiz name characters' };
+    return returnError('invalid quiz name characters', 400);
   }
 
-  if (name.length < quizNameMinLength) {
-    return { error: 'invalid quiz name length: too short' };
-  }
-
-  if (name.length > quizNameMaxLength) {
-    return { error: 'invalid quiz name length: too long' };
+  if (name.length < quizNameMinLength || name.length > quizNameMaxLength) {
+    return returnError('invalid quiz name length', 400);
   }
 
   const duplicateName = user.userQuizzes.find(quizId => fetchQuizFromQuizId(quizId).name === name);
 
   if (duplicateName !== undefined) {
-    return { error: 'Duplicate quiz name' };
+    return returnError('Duplicate quiz name', 400);
   }
 
   if (description.length > quizDescriptionMaxLength) {
-    return { error: 'Quiz description invalid length' };
+    return returnError('Quiz description invalid length', 400);
   }
 
   const unixTime = currentTime();
@@ -198,6 +197,7 @@ export function adminQuizCreate(sessionId: string, name: string, description: st
     description: description,
     timeCreated: unixTime,
     timeLastEdited: unixTime,
+    questions: []
   });
 
   return { quizId: newQuizId };
@@ -211,22 +211,22 @@ export function adminQuizCreate(sessionId: string, name: string, description: st
  *
  * @returns {} - an empty object
  */
-export function adminQuizRemove(sessionId: string, quizId: number): ErrorObject | Record<string, never> {
+export function adminQuizRemove(sessionId: string, quizId: number): ErrorObjectWithCode | Record<string, never> {
   const data = getData();
 
   const user = fetchUserFromSessionId(sessionId);
   const quiz = fetchQuizFromQuizId(quizId);
 
   if (!user) {
-    return { error: 'invalid user ID' };
+    return returnError('invalid user ID', 401);
   }
 
   if (!quiz) {
-    return { error: 'invalid quiz ID' };
+    return returnError('invalid quiz ID', 403);
   }
 
   if (!user.userQuizzes.includes(quizId)) {
-    return { error: 'you do not own this quiz' };
+    return returnError('you do not own this quiz', 403);
   }
 
   data.deletedQuizzes.push(fetchQuizFromQuizId(quizId));
@@ -250,20 +250,20 @@ export function adminQuizRemove(sessionId: string, quizId: number): ErrorObject 
  *      description: string
  * } - returns an object with details about the quiz queried for information.
  */
-export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoReturn | ErrorObject {
+export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoReturn | ErrorObjectWithCode {
   const user = fetchUserFromSessionId(sessionId);
   const quiz = fetchQuizFromQuizId(quizId);
 
   if (!user) {
-    return { error: 'invalid user ID' };
+    return returnError('invalid user ID', 401);
   }
 
   if (!quiz) {
-    return { error: 'invalid quiz ID' };
+    return returnError('invalid quiz ID', 403);
   }
 
   if (!user.userQuizzes.includes(quizId)) {
-    return { error: 'you do not own this quiz' };
+    return returnError('you do not own this quiz', 403);
   }
 
   return {
@@ -273,4 +273,143 @@ export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoR
     timeLastEdited: quiz.timeLastEdited,
     description: quiz.description,
   };
+}
+
+/**
+ * Update the relevant details of a particular question within a quiz.
+ * When this route is called, the last edited time is updated,
+ * and the colours of all answers of that question are randomly generated.
+ * @param {string} sessionId
+ * @param {number} quizId
+ * @param {number} questionId
+ * @param {AdminQuizQuestionBody} questionBody
+ * @returns {} - empty object
+ */
+export function adminQuizQuestionUpdate(sessionId: string, quizId: number, questionId: number, newQuestionBody: QuestionType): ErrorObject | Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    return {
+      error: 'Invalid token',
+      statusCode: 401,
+    };
+  }
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    return {
+      error: 'Invalid quizId',
+      statusCode: 403,
+    };
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    return {
+      error: 'Invalid quiz ownership',
+      statusCode: 403,
+    };
+  }
+
+  const question = fetchQuestionFromQuestionId(quiz, questionId);
+  if (!question) {
+    return {
+      error: 'Invalid questionId',
+      statusCode: 400,
+    };
+  }
+
+  const questionLength = newQuestionBody.question.length;
+  if (questionLength < 5 || questionLength > 50) {
+    return {
+      error: 'Invalid question string',
+      statusCode: 400,
+    };
+  }
+
+  const answersArrayLength = newQuestionBody.answers.length;
+  if (answersArrayLength < 2 || answersArrayLength > 6) {
+    return {
+      error: 'Invalid amount of answers',
+      statusCode: 400,
+    };
+  }
+
+  if (newQuestionBody.duration < 1) {
+    return {
+      error: 'Duration must be positive',
+      statusCode: 400,
+    };
+  }
+
+  const quizDuration = quiz.duration - question.duration;
+  if (quizDuration + newQuestionBody.duration > 180) {
+    return {
+      error: 'Quiz duration must not exceed 3 mins',
+      statusCode: 400,
+    };
+  }
+
+  if (newQuestionBody.points < 1 || newQuestionBody.points > 10) {
+    return {
+      error: 'Question points must be between 1 and 10 (inclusive)',
+      statusCode: 400,
+    };
+  }
+
+  let noCorrectAnswers = true;
+  let noDuplicateAnswers = true;
+  let nextIndex = 1;
+  for (const answerBody of newQuestionBody.answers) {
+    const answerLength = answerBody.answer.length;
+    if (answerLength < 1 || answerLength > 30) {
+      return {
+        error: 'Invalid answer string length',
+        statusCode: 400,
+      };
+    }
+    if (answerBody.correct === true) {
+      noCorrectAnswers = false;
+    }
+    for (let i = nextIndex; i < newQuestionBody.answers.length; i++) {
+      if (answerBody.answer === newQuestionBody.answers[i].answer) {
+        noDuplicateAnswers = false;
+      }
+    }
+    nextIndex++;
+  }
+
+  if (noCorrectAnswers) {
+    return {
+      error: 'Question must contain at least one correct answer',
+      statusCode: 400,
+    };
+  }
+
+  if (!noDuplicateAnswers) {
+    return {
+      error: 'Answer strings must be unique',
+      statusCode: 400,
+    };
+  }
+
+  // No errors, update question
+  quiz.duration = quizDuration + newQuestionBody.duration;
+  question.question = newQuestionBody.question;
+  question.duration = newQuestionBody.duration;
+  question.points = newQuestionBody.points;
+  const newAnswerBodies = newQuestionBody.answers.map(answer => {
+    answer.colour = setRandomColour();
+    return answer;
+  });
+  question.answers = newAnswerBodies;
+  quiz.timeLastEdited = ~~(Date.now() / 1000);
+
+  return {};
+}
+
+/**
+ * Function returns random colour out of 6 colours
+ * @returns string
+ */
+function setRandomColour (): string {
+  const colours = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
+  return colours[~~(Math.random() * colours.length)];
 }
