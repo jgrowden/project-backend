@@ -24,6 +24,9 @@ export const requestQuizQuestionCreate = (token: string, quizId: number,
   question: adminQuizQuestionCreateArgument) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/question`, { token, quizId, question });
 
+export const requestQuizTrashInfo = (token: string) =>
+  requestHelper('GET', '/v1/admin/quiz/trash', { token });
+
 export const requestUserDetails = (token: string) =>
   requestHelper('GET', '/v1/admin/user/details', { token });
 
