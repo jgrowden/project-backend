@@ -480,6 +480,77 @@ export function adminQuizQuestionUpdate(sessionId: string, quizId: number, quest
 }
 
 /**
+ * Moves a question from one particular position in the quiz to another
+ * When this route is called, the timeLastEdited is updated
+ * @param {string} token
+ * @param {number} quizId
+ * @param {number} questionId
+ * @param {number} newPosition
+ * @returns {} - empty object
+ */
+export function adminQuizQuestionMove(token: string, quizId: number, questionId: number, newPosition: number): ErrorObject | Record<string, never> {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    return {
+      error: 'Invalid token',
+      statusCode: 401,
+    };
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    return {
+      error: 'Invalid quizId',
+      statusCode: 403,
+    };
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    return {
+      error: 'Invalid quiz ownership',
+      statusCode: 403,
+    };
+  }
+
+  const question = fetchQuestionFromQuestionId(quiz, questionId);
+  if (!question) {
+    return {
+      error: 'Invalid questionId',
+      statusCode: 400,
+    };
+  }
+
+  if (newPosition < 0 || newPosition >= (quiz.questions.length)) {
+    return {
+      error: 'Invalid new position',
+      statusCode: 400,
+    };
+  }
+
+  if (quiz.questions[newPosition].questionId === questionId) {
+    return {
+      error: 'Question is already in the new position',
+      statusCode: 400,
+    };
+  }
+
+  let oldPosition = 0;
+  for (const question of quiz.questions) {
+    if (question.questionId === questionId) {
+      break;
+    }
+    oldPosition++;
+  }
+
+  const questionToMove = quiz.questions[oldPosition];
+  quiz.questions.splice(oldPosition, 1);
+  quiz.questions.splice(newPosition, 0, questionToMove);
+  quiz.timeLastEdited = Math.floor(Date.now() / 1000);
+
+  return {};
+}
+
+/**
  * Function returns random colour out of 6 colours
  * @returns string
  */
