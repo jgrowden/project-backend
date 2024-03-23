@@ -11,7 +11,7 @@ import process from 'process';
 import { getData, setData } from './dataStore';
 
 import { adminAuthRegister, adminAuthLogin, adminUserDetails, adminUserPasswordUpdate } from './auth';
-import { adminQuizList, adminQuizCreate, adminQuizRemove, adminQuizInfo, adminQuizQuestionCreate, adminQuizQuestionUpdate, adminQuizQuestionDuplicate } from './quiz';
+import { adminQuizList, adminQuizCreate, adminQuizRemove, adminQuizInfo, adminQuizQuestionCreate, adminQuizQuestionUpdate, adminQuizQuestionMove, adminQuizQuestionDuplicate } from './quiz';
 
 import { clear } from './other';
 // Set up web app
@@ -140,6 +140,7 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizQuestionCreate Route
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const { token, question } = req.body;
   const quizId = parseInt(req.params.quizid);
@@ -156,6 +157,19 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Respo
   const questionId = parseInt(req.params.questionid);
   const { token, questionBody } = req.body;
   const result = adminQuizQuestionUpdate(token, quizId, questionId, questionBody);
+  if ('error' in result) {
+    return res.status(result.statusCode).json(result);
+  }
+  save();
+  res.json(result);
+});
+
+// adminQuizQuestionMove Route
+app.put('/v1/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const { token, newPosition } = req.body;
+  const result = adminQuizQuestionMove(token, quizId, questionId, newPosition);
   if ('error' in result) {
     return res.status(result.statusCode).json(result);
   }
