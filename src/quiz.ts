@@ -1,9 +1,14 @@
 // import { string } from 'yaml/dist/schema/common/string';
-import { getData } from './dataStore';
-import { fetchUserFromSessionId, fetchQuizFromQuizId, generateNewQuizId, currentTime } from './helper';
+import { getData, QuizType, AnswerType } from './dataStore';
+import { fetchUserFromSessionId, fetchQuizFromQuizId, generateNewQuizId, generateNewQuestionId, currentTime, returnError } from './helper';
 
-interface ErrorObject {
+export interface ErrorObject {
   error: string
+}
+
+export interface ErrorObjectWithCode {
+  errorObject: ErrorObject;
+  errorCode: number;
 }
 
 interface AdminQuizListReturnElement {
@@ -20,30 +25,14 @@ interface AdminQuizCreateReturn {
 }
 
 interface AdminQuizQuestionCreateReturn {
-  quizId: number;
+  questionId: number;
 }
 
-interface AdminQuizInfoReturn {
-  quizId: number;
-  name: string;
-  timeCreated: number;
-  timeLastEdited: number;
-  description: string;
-}
-
-interface AnswersType {
-  answer: string;
-  correct: boolean;
-}
-
-interface adminQuizQuestionCreateArgument {
-  token: string;
-  questionBody: {
-    question: string;
-    duration: number;
-    points: number;
-    answers: AnswersType[];
-  }
+export interface adminQuizQuestionCreateArgument {
+  question: string;
+  duration: number;
+  points: number;
+  answers: AnswerType[];
 }
 
 const quizDescriptionMaxLength = 100;
@@ -173,35 +162,31 @@ export function adminQuizList(sessionId: string): AdminQuizListReturn | ErrorObj
  * @returns {quizId: 2} - object with a unique quiz identification number
 */
 
-export function adminQuizCreate(sessionId: string, name: string, description: string): AdminQuizCreateReturn | ErrorObject {
+export function adminQuizCreate(sessionId: string, name: string, description: string): AdminQuizCreateReturn | ErrorObjectWithCode {
   const data = getData();
 
   const user = fetchUserFromSessionId(sessionId);
 
   if (!user) {
-    return { error: 'invalid user ID' };
+    return returnError('invalid user ID', 401);
   }
 
   if (regex.test(name)) {
-    return { error: 'invalid quiz name characters' };
+    return returnError('invalid quiz name characters', 400);
   }
 
-  if (name.length < quizNameMinLength) {
-    return { error: 'invalid quiz name length: too short' };
-  }
-
-  if (name.length > quizNameMaxLength) {
-    return { error: 'invalid quiz name length: too long' };
+  if (name.length < quizNameMinLength || name.length > quizNameMaxLength) {
+    return returnError('invalid quiz name length', 400);
   }
 
   const duplicateName = user.userQuizzes.find(quizId => fetchQuizFromQuizId(quizId).name === name);
 
   if (duplicateName !== undefined) {
-    return { error: 'Duplicate quiz name' };
+    return returnError('Duplicate quiz name', 400);
   }
 
   if (description.length > quizDescriptionMaxLength) {
-    return { error: 'Quiz description invalid length' };
+    return returnError('Quiz description invalid length', 400);
   }
 
   const unixTime = currentTime();
@@ -232,22 +217,22 @@ export function adminQuizCreate(sessionId: string, name: string, description: st
  *
  * @returns {} - an empty object
  */
-export function adminQuizRemove(sessionId: string, quizId: number): ErrorObject | Record<string, never> {
+export function adminQuizRemove(sessionId: string, quizId: number): ErrorObjectWithCode | Record<string, never> {
   const data = getData();
 
   const user = fetchUserFromSessionId(sessionId);
   const quiz = fetchQuizFromQuizId(quizId);
 
   if (!user) {
-    return { error: 'invalid user ID' };
+    return returnError('invalid user ID', 401);
   }
 
   if (!quiz) {
-    return { error: 'invalid quiz ID' };
+    return returnError('invalid quiz ID', 403);
   }
 
   if (!user.userQuizzes.includes(quizId)) {
-    return { error: 'you do not own this quiz' };
+    return returnError('you do not own this quiz', 403);
   }
 
   data.deletedQuizzes.push(fetchQuizFromQuizId(quizId));
@@ -271,80 +256,95 @@ export function adminQuizRemove(sessionId: string, quizId: number): ErrorObject 
  *      description: string
  * } - returns an object with details about the quiz queried for information.
  */
-export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoReturn | ErrorObject {
+export function adminQuizInfo(sessionId: string, quizId: number): QuizType | ErrorObjectWithCode {
   const user = fetchUserFromSessionId(sessionId);
   const quiz = fetchQuizFromQuizId(quizId);
 
   if (!user) {
-    return { error: 'invalid user ID' };
+    return returnError('invalid user ID', 401);
   }
 
   if (!quiz) {
-    return { error: 'invalid quiz ID' };
+    return returnError('invalid quiz ID', 403);
   }
 
   if (!user.userQuizzes.includes(quizId)) {
-    return { error: 'you do not own this quiz' };
+    return returnError('you do not own this quiz', 403);
   }
 
-  return {
-    quizId: quizId,
-    name: quiz.name,
-    timeCreated: quiz.timeCreated,
-    timeLastEdited: quiz.timeLastEdited,
-    description: quiz.description,
-  };
+  return quiz;
 }
 
 export function adminQuizQuestionCreate(
-  sessionId: string, 
-  quizId: number, 
-  question: adminQuizQuestionCreateArgument
-): AdminQuizQuestionCreateReturn {
+  sessionId: string,
+  quizId: number,
+  questionParameters: adminQuizQuestionCreateArgument
+): AdminQuizQuestionCreateReturn | ErrorObjectWithCode {
   const user = fetchUserFromSessionId(sessionId);
-  let quiz = fetchQuizFromQuizId(quizId);
-  if (question.questionBody.question.length < 5 || 
-    question.questionBody.question.length > 50 ||
-    question.questionBody.question.answers.length < 2 ||
-    question.questionBody.question.answers.length > 6 ||
-    question.questionBody.duration < 1 ||
-    quiz.questions.reduce((pSum, question) => pSum + question.duration, 0) + question.questionBody.duration > 180 ||
-    question.questionBody.points < 1 ||
-    question.questionBody.points > 10 ||
-    question.questionBody.answers.find(answer => answer.length < 1 || answer.length > 30) !== undefined ||
-    question.questionBody.answers.filter((answer, index) => question.questionBody.answers.indexOf(answer) !== index) !== [] || 
-    question.questionBody.answers.find(answer => answer.correct === true) === undefined
-  ) {
-    return { error: 'something is wrong...' };
-  } 
-  
+  const quiz = fetchQuizFromQuizId(quizId);
+
   if (!user) {
-    return { error: 'invalid user ID' };
+    return returnError('invalid user ID', 401);
   }
 
+  if (!quiz) {
+    return returnError('invalid quiz ID', 403);
+  }
   if (!user.userQuizzes.includes(quizId)) {
-    return { error: 'you do not own this quiz' };
+    return returnError('you do not own this quiz', 403);
   }
 
-  let newQuestionId = generateNewQuestionId();
+  if (questionParameters.question.length < 5 || questionParameters.question.length > 50) {
+    return returnError('Question has invalid length: must be between 5 and 50 characters', 400);
+  }
+
+  if (questionParameters.answers.length < 2 || questionParameters.answers.length > 6) {
+    return returnError('Invalid number of answers: there must be between 2 and 6 answers', 400);
+  }
+
+  if (questionParameters.duration < 1) {
+    return returnError('Question must have positive duration', 400);
+  }
+
+  const questionLength = quiz.questions.reduce((pSum, question) => pSum + question.duration, 0);
+
+  if (questionLength + questionParameters.duration > 180) {
+    return returnError('Quiz must have duration lower than 180', 400);
+  }
+
+  if (questionParameters.points < 1 || questionParameters.points > 10) {
+    return returnError('Invalid quiz point count: question must have between 1 and 10 points', 400);
+  }
+
+  if (questionParameters.answers.find(entry => entry.answer.length < 1 || entry.answer.length > 30) !== undefined) {
+    return returnError('Invalid answer length: answers must be between 1 and 30 characters long', 400);
+  }
+
+  // check for duplicate entries
+  const answer = questionParameters.answers.map(entry => entry.answer);
+  const duplicates = answer.filter((entry, index) => answer.indexOf(entry) !== index);
+
+  if (duplicates.length !== 0) {
+    return returnError('Question cannot have duplicate answers', 400);
+  }
+
+  if (questionParameters.answers.find(answer => answer.correct === true) === undefined) {
+    return returnError('There are no correct answers', 400);
+  }
+
+  const newQuestionId = generateNewQuestionId();
 
   quiz.questions.push({
     questionId: newQuestionId,
-    question: question.questionBody.question,
-    duration: question.questionBody.duration,
-    points: question.questionBody.points,
-    answers: question.questionBody.answers
-  })
+    question: questionParameters.question,
+    duration: questionParameters.duration,
+    points: questionParameters.points,
+    answers: questionParameters.answers
+  });
   quiz.numQuestions++;
   quiz.timeLastEdited = Math.floor(Date.now() / 1000);
-}
 
-export const generateNewQuestionId = (): number => {
-  const data = getData();
-  let newQuizId = 0;
-  const quizIds = data.quizzes.map(quiz => quiz.quizId);
-  while (quizIds.includes(newQuizId)) {
-    newQuizId++;
-  }
-  return newQuizId;
-};
+  return {
+    questionId: newQuestionId
+  };
+}
