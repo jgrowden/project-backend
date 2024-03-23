@@ -1,4 +1,4 @@
-import { getData, QuestionType, ErrorObject } from './dataStore';
+import { getData, UserType, QuizType, QuestionType, ErrorObject } from './dataStore';
 import { fetchUserFromSessionId, fetchQuizFromQuizId, fetchQuestionFromQuestionId, generateNewQuizId, currentTime, returnError } from './helper';
 
 export interface ErrorObjectWithCode {
@@ -34,7 +34,8 @@ const quizDescriptionMaxLength = 100;
 const quizNameMinLength = 3;
 const quizNameMaxLength = 30;
 const regex = /[^A-Za-z0-9 ]/;
-const QUESTIONCOLOURS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
+const QUESTION_COLOURS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
+const INVALID_INDEX = -1;
 
 /**
  * Update the description of the relevant quiz.
@@ -287,14 +288,14 @@ export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoR
  * @returns {} - empty object | ErrorObject
  */
 export function adminQuizQuestionUpdate(sessionId: string, quizId: number, questionId: number, newQuestionBody: QuestionType): ErrorObject | Record<string, never> {
-  const user = fetchUserFromSessionId(sessionId);
+  const user: UserType | undefined = fetchUserFromSessionId(sessionId);
   if (!user) {
     return {
       error: 'Invalid token',
       statusCode: 401,
     };
   }
-  const quiz = fetchQuizFromQuizId(quizId);
+  const quiz: QuizType | undefined = fetchQuizFromQuizId(quizId);
   if (!quiz) {
     return {
       error: 'Invalid quizId',
@@ -309,7 +310,7 @@ export function adminQuizQuestionUpdate(sessionId: string, quizId: number, quest
     };
   }
 
-  const question = fetchQuestionFromQuestionId(quiz, questionId);
+  const question: QuestionType | undefined = fetchQuestionFromQuestionId(quiz, questionId);
   if (!question) {
     return {
       error: 'Invalid questionId',
@@ -397,7 +398,7 @@ export function adminQuizQuestionUpdate(sessionId: string, quizId: number, quest
   question.duration = newQuestionBody.duration;
   question.points = newQuestionBody.points;
 
-  const colours = [...QUESTIONCOLOURS];
+  const colours = [...QUESTION_COLOURS];
   const newAnswerBodies = newQuestionBody.answers.map(answer => {
     answer.colour = setRandomColour(colours);
     return answer;
@@ -417,6 +418,42 @@ export function adminQuizQuestionUpdate(sessionId: string, quizId: number, quest
  * @returns
  */
 export function adminQuizQuestionDelete(sessionId: string, quizId: number, questionId: number): ErrorObject | Record<string, never> {
+  const user: UserType | undefined = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    return {
+      error: 'Invalid token',
+      statusCode: 401
+    };
+  }
+
+  const quiz: QuizType | undefined = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    return {
+      error: 'Invalid quizId',
+      statusCode: 403,
+    };
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    return {
+      error: 'Invalid quiz ownership',
+      statusCode: 403,
+    };
+  }
+  const questionIndex = quiz.questions.findIndex(question => question.questionId === questionId);
+  if (questionIndex === INVALID_INDEX) {
+    return {
+      error: 'Invalid questionId',
+      statusCode: 400
+    };
+  }
+
+  // No errors, delete question from quiz
+  // No requirement in spec to change lastEdited, but will do anyway
+  quiz.numQuestions--;
+  quiz.duration -= quiz.questions[questionIndex].duration;
+  quiz.questions.splice(questionIndex, 1);
+  quiz.timeLastEdited = ~~(Date.now() / 1000);
   return {};
 }
 
