@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuestionCreate, requestQuestionUpdate, clear, ERROR, ERRORANDSTATUS } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuestionCreate, requestQuestionUpdate, clear, ERRORANDSTATUS } from '../wrapper';
 import { QuestionType } from '../../dataStore';
 
 let token: string;
