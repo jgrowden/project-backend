@@ -284,7 +284,7 @@ export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoR
  * @param {number} quizId
  * @param {number} questionId
  * @param {AdminQuizQuestionBody} questionBody
- * @returns {} - empty object
+ * @returns {} - empty object | ErrorObject
  */
 export function adminQuizQuestionUpdate(sessionId: string, quizId: number, questionId: number, newQuestionBody: QuestionType): ErrorObject | Record<string, never> {
   const user = fetchUserFromSessionId(sessionId);
@@ -405,6 +405,18 @@ export function adminQuizQuestionUpdate(sessionId: string, quizId: number, quest
   question.answers = newAnswerBodies;
   quiz.timeLastEdited = ~~(Date.now() / 1000);
 
+  return {};
+}
+
+/**
+ * Delete a particular question from a quiz
+ * @param {string} sessionId
+ * @param {number} quizId
+ * @param {number} questionId
+ * @returns {} - empty object | ErrorObject
+ * @returns
+ */
+export function adminQuizQuestionDelete(sessionId: string, quizId: number, questionId: number): ErrorObject | Record<string, never> {
   return {};
 }
 
