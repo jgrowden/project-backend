@@ -33,6 +33,9 @@ export const requestUserPasswordUpdate = (token: TokenType, oldPassword: string,
 export const requestQuestionUpdate = (sessionId: string, quizId: number, questionId: number, questionBody: QuestionType) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { sessionId, questionBody });
 
+export const requestQuizChangeOwner = (quizId: number, token: string, userEmail: string) =>
+  requestHelper('POST', `/v1/admin/quiz/${quizId}/transfer`, { token, quizId, userEmail });
+
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 
 export const ERROR = { error: expect.any(String) };

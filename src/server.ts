@@ -11,7 +11,7 @@ import process from 'process';
 import { getData, setData } from './dataStore';
 
 import { adminAuthRegister, adminAuthLogin, adminUserDetails, adminUserPasswordUpdate } from './auth';
-import { adminQuizList, adminQuizCreate, adminQuizRemove, adminQuizInfo, adminQuizQuestionCreate, adminQuizQuestionUpdate } from './quiz';
+import { adminQuizList, adminQuizCreate, adminQuizRemove, adminQuizInfo, adminQuizQuestionCreate, adminQuizQuestionUpdate, adminQuizChangeOwner } from './quiz';
 
 import { clear } from './other';
 // Set up web app
@@ -144,6 +144,16 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const { token, question } = req.body;
   const quizId = parseInt(req.params.quizid);
   const result = adminQuizQuestionCreate(token, quizId, question);
+  if ('errorCode' in result) {
+    return res.status(result.errorCode).json(result.errorObject);
+  }
+  res.json(result);
+});
+
+app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+  const { token, userEmail } = req.body;
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizChangeOwner(token, quizId, userEmail);
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }

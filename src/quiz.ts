@@ -1,6 +1,6 @@
 // import { string } from 'yaml/dist/schema/common/string';
 import { getData, QuizType, AnswerType, QuestionType, ErrorObject } from './dataStore';
-import { fetchUserFromSessionId, fetchQuizFromQuizId, fetchQuestionFromQuestionId, generateNewQuizId, generateNewQuestionId, currentTime, returnError } from './helper';
+import { fetchUserFromSessionId, fetchQuizFromQuizId, fetchQuestionFromQuestionId, generateNewQuizId, generateNewQuestionId, currentTime, returnError, userWithEmailExists } from './helper';
 
 export interface ErrorString {
   error: string
@@ -287,9 +287,6 @@ export function adminQuizQuestionCreate(
     return returnError('invalid user ID', 401);
   }
 
-  if (!quiz) {
-    return returnError('invalid quiz ID', 403);
-  }
   if (!user.userQuizzes.includes(quizId)) {
     return returnError('you do not own this quiz', 403);
   }
@@ -347,6 +344,43 @@ export function adminQuizQuestionCreate(
   return {
     questionId: newQuestionId
   };
+}
+
+export function adminQuizChangeOwner(sessionId: string, quizId: number, userEmail: string): Record<string, never> | ErrorObjectWithCode {
+  const userWithEmailExist = userWithEmailExists(userEmail);
+  const user = fetchUserFromSessionId(sessionId);
+  const quiz = fetchQuizFromQuizId(quizId);
+
+  if (!user) {
+    return returnError('Token is invalid', 401);
+  }
+
+  if (!userWithEmailExist) {
+    return returnError('User email does not exist', 400);
+  }
+
+  if (!quiz) {
+    return returnError('invalid quiz ID', 403);
+  }
+
+  if (!user.userQuizzes.includes(quizId)) {
+    return returnError('you do not own this quiz', 403);
+  }
+
+  if (fetchUserFromSessionId(sessionId).email === userEmail) {
+    return returnError('Email provided is the same as the logged in user', 400);
+  }
+
+  const quizNames = userWithEmailExist.userQuizzes.map(quizIds => fetchQuizFromQuizId(quizIds).name);
+  if (quizNames.indexOf(fetchQuizFromQuizId(quizId).name) !== -1) {
+    return returnError('Quiz name is a duplicate of a quiz the other user currently owns', 400);
+  }
+
+  quiz.ownerId = userWithEmailExist.authUserId;
+  user.userQuizzes.splice(user.userQuizzes.indexOf(quizId), 1);
+  userWithEmailExist.userQuizzes.push(quizId);
+
+  return {};
 }
 
 /**
@@ -483,7 +517,7 @@ export function adminQuizQuestionUpdate(sessionId: string, quizId: number, quest
  * Function returns random colour out of 6 colours
  * @returns string
  */
-function setRandomColour (): string {
+function setRandomColour(): string {
   const colours = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
   return colours[~~(Math.random() * colours.length)];
 }
