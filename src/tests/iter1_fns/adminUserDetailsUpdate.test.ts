@@ -1,10 +1,9 @@
-import { clear, requestUserDetailsUpdate } from './wrapper';
-import { requestAuthRegister } from './wrapper';
-import { ERROR } from './wrapper';
+import { clear, errorCode, requestUserDetails, requestUserDetailsUpdate } from '../wrapper';
+import { requestAuthRegister } from '../wrapper';
 
 describe('adminUserDetailsUpdate http testing', () => {
-  let user1Token;
-  let user2Token;
+  let user1Token: string;
+  let user2Token: string;
 
   beforeEach(() => {
     clear();
@@ -15,91 +14,47 @@ describe('adminUserDetailsUpdate http testing', () => {
   test('invalid ID', () => {
     clear();
     user1Token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token;
-    expect(requestUserDetailsUpdate(user1Token + 1, 'test@email.com', 'John', 'Smith'))
-      .toStrictEqual({
-        statusCode: 401,
-        jsonBody: ERROR
-      });
+    expect(requestUserDetailsUpdate(user1Token + 1, 'test@email.com', 'John', 'Smith')).toStrictEqual(errorCode(401));
   });
 
   test('email used by another user', () => {
-    expect(requestUserDetailsUpdate(user2Token, 'go.d.usopp@gmail.com', 'John', 'Smith'))
-      .toStrictEqual({
-        statusCode: 400,
-        jsonBody: ERROR
-      });
+    expect(requestUserDetailsUpdate(user2Token, 'go.d.usopp@gmail.com', 'John', 'Smith')).toStrictEqual(errorCode(400));
   });
 
   test('email does not satisfy validator', () => {
-    expect(requestUserDetailsUpdate(user2Token, 'not_an_email', 'John', 'Smith'))
-      .toStrictEqual({
-        statusCode: 400,
-        jsonBody: ERROR
-      });
+    expect(requestUserDetailsUpdate(user2Token, 'not_an_email', 'John', 'Smith')).toStrictEqual(errorCode(400));
   });
 
   test('invalid characters in nameFirst 1', () => {
-    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'Jo!hn', 'Smith'))
-      .toStrictEqual({
-        statusCode: 400,
-        jsonBody: ERROR
-      });
+    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'Jo!hn', 'Smith')).toStrictEqual(errorCode(400));
   });
 
   test('invalid characters in nameFirst 2', () => {
-    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'J0hn', 'Smith'))
-      .toStrictEqual({
-        statusCode: 400,
-        jsonBody: ERROR
-      });
+    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'J0hn', 'Smith')).toStrictEqual(errorCode(400));
   });
 
   test('nameFirst less than 2 characters long', () => {
-    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'J', 'Smith'))
-      .toStrictEqual({
-        statusCode: 400,
-        jsonBody: ERROR
-      });
+    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'J', 'Smith')).toStrictEqual(errorCode(400));
   });
 
   test('nameFirst more than 20 characters long', () => {
-    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'Abcdefghijklmnopqrstuvwxyz', 'Smith'))
-      .toStrictEqual({
-        statusCode: 400,
-        jsonBody: ERROR
-      });
+    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'Abcdefghijklmnopqrstuvwxyz', 'Smith')).toStrictEqual(errorCode(400));
   });
 
   test('invalid characters in nameLast 1', () => {
-    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'John', 'Sm1th'))
-      .toStrictEqual({
-        statusCode: 400,
-        jsonBody: ERROR
-      });
+    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'John', 'Sm1th')).toStrictEqual(errorCode(400));
   });
 
   test('invalid characters in nameLast 2', () => {
-    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'John', 'Sm@th'))
-      .toStrictEqual({
-        statusCode: 400,
-        jsonBody: ERROR
-      });
+    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'John', 'Sm@th')).toStrictEqual(errorCode(400));
   });
 
   test('nameLast less than 2 characters', () => {
-    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'John', 'S'))
-      .toStrictEqual({
-        statusCode: 400,
-        jsonBody: ERROR
-      });
+    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'John', 'S')).toStrictEqual(errorCode(400));
   });
 
   test('nameLast more than 20 characters', () => {
-    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'John', 'Abcdefghijklmnopqrstuvwxyz'))
-      .toStrictEqual({
-        statusCode: 400,
-        jsonBody: ERROR
-      });
+    expect(requestUserDetailsUpdate(user2Token, 'test@email.com', 'John', 'Abcdefghijklmnopqrstuvwxyz')).toStrictEqual(errorCode(400));
   });
 
   // tests ensure that data has actually been written to the database

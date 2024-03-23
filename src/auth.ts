@@ -1,15 +1,7 @@
-import { getData } from './dataStore';
+import { getData, ErrorObject, TokenType, ErrorObjectWithCode } from './dataStore';
 import validator from 'validator';
 import { nanoid } from 'nanoid';
-import { fetchUserFromSessionId, userWithEmailExists, generateNewUserId } from './helper';
-
-interface ErrorObject {
-  error: string;
-}
-
-interface ReturnSessionId {
-  token: string;
-}
+import { fetchUserFromSessionId, userWithEmailExists, generateNewUserId, returnError } from './helper';
 
 interface AdminUserDetailsReturn {
   user: {
@@ -58,7 +50,7 @@ function hasLetterAndNumber(str: string): boolean {
  */
 
 export function adminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string):
- ReturnSessionId | ErrorObject {
+ TokenType | ErrorObject {
   const data = getData();
 
   // Check for duplicate email
@@ -128,7 +120,7 @@ export function adminAuthRegister(email: string, password: string, nameFirst: st
  *
  * @returns {{sessionId: string}} sessionId - the user's unique identification string
  */
-export function adminAuthLogin(email: string, password: string): ReturnSessionId | ErrorObject {
+export function adminAuthLogin(email: string, password: string): TokenType | ErrorObject {
   const user = userWithEmailExists(email);
   if (!user) {
     return { error: 'user doesn\'t exist' };
@@ -195,40 +187,39 @@ export function adminUserDetails(sessionId: string): AdminUserDetailsReturn | Er
  *
  * @return {} - an empty object
 */
-export function adminUserDetailsUpdate(sessionId: string, email: string, nameFirst: string, nameLast: string): ErrorObject | Record<string, never> {
+export function adminUserDetailsUpdate(sessionId: string, email: string, nameFirst: string, nameLast: string): ErrorObjectWithCode | Record<string, never> {
+  const userToEdit = fetchUserFromSessionId(sessionId);
+  if (!userToEdit) {
+    return returnError('User ID not found', 401);
+  }
+
   if (validator.isEmail(email) === false) {
-    return { error: 'Invalid email' };
+    return returnError('Invalid email', 400);
   }
 
   // Check for invalid first name
   if (validName(nameFirst)) {
-    return { error: 'Invalid first name' };
+    return returnError('Invalid first name', 400);
   }
   if (nameFirst.length < userNameMinLength || nameFirst.length > userNameMaxLength) {
-    return { error: 'nameFirst does not satisfy length requirements' };
+    return returnError('First name does not satisfy length requirements', 400);
   }
 
   // Check for invalid last name
   if (validName(nameLast)) {
-    return { error: 'invalid last name' };
+    return returnError('Invalid last name', 400);
   }
   if (nameLast.length < userNameMinLength || nameLast.length > userNameMaxLength) {
-    return { error: 'nameLast does not satisfy length requirements' };
+    return returnError('Last name does not satisfy length requirements', 400);
   }
 
   // get userId from sessionId
   // loop through datastore userIds. if a user has the same email and a different userId, email already registered
 
-  const userToEdit = fetchUserFromSessionId(sessionId);
-
-  if (!userToEdit) {
-    return { error: 'User ID not found' };
-  }
-
   const data = getData();
   for (const user of data.users) {
     if (user.email === email && user.authUserId !== userToEdit.authUserId) {
-      return { error: 'Email already registered' };
+      return returnError('Email already registered', 400);
     }
   }
 
@@ -253,33 +244,51 @@ export function adminUserPasswordUpdate(sessionId: string, oldPassword: string, 
   // check sessionId exists
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
-    return { error: 'User ID not found' };
+    return {
+      error: 'User ID not found',
+      statusCode: 401
+    };
   }
 
   // check oldPassword is correct
   if (oldPassword !== user.password) {
-    return { error: 'Old password is not correct' };
+    return {
+      error: 'Old password is not correct',
+      statusCode: 400
+    };
   }
   // check oldPassword and newPassword match exactly
   if (oldPassword === newPassword) {
-    return { error: 'New password is the same as old password' };
+    return {
+      error: 'New password is the same as old password',
+      statusCode: 400
+    };
   }
 
   // check newPassword has not previously been used
   for (const prevPassword of user.previousPasswords) {
     if (prevPassword === newPassword) {
-      return { error: 'Password has been used before' };
+      return {
+        error: 'Password has been used before',
+        statusCode: 400
+      };
     }
   }
 
   // check newPassword is at least 8 characters
   if (newPassword.length < userPasswordMinLength) {
-    return { error: 'Password is less than 8 characters' };
+    return {
+      error: 'Password is less than 8 characters',
+      statusCode: 400
+    };
   }
 
   // check newPassword is at least 1 letter and 1 number
   if (!hasLetterAndNumber(newPassword)) {
-    return { error: 'Password must contain at least one letter and at least one number' };
+    return {
+      error: 'Password must contain at least one letter and at least one number',
+      statusCode: 400
+    };
   }
 
   // update password if no errors
