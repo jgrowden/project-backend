@@ -1,15 +1,5 @@
-// import { string } from 'yaml/dist/schema/common/string';
-import { getData, QuizType, AnswerType, QuestionType, ErrorObject } from './dataStore';
-import { fetchUserFromSessionId, fetchQuizFromQuizId, fetchQuestionFromQuestionId, generateNewQuizId, generateNewQuestionId, currentTime, returnError } from './helper';
-
-export interface ErrorString {
-  error: string
-}
-
-export interface ErrorObjectWithCode {
-  errorObject: ErrorString;
-  errorCode: number;
-}
+import { AnswerType, getData, QuestionType, QuizType } from './dataStore';
+import { fetchUserFromSessionId, fetchQuizFromQuizId, fetchQuestionFromQuestionId, generateNewQuizId, generateNewQuestionId, currentTime, returnError, ErrorObject, ErrorObjectWithCode } from './helper';
 
 interface AdminQuizListReturnElement {
   quizId: number;

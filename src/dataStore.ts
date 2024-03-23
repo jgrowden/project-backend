@@ -50,11 +50,6 @@ export interface DataType {
   deletedQuizzes: QuizType[];
 }
 
-export interface ErrorObject {
-  error: string;
-  statusCode?: number;
-}
-
 let data: DataType = {
   users: [],
   quizzes: [],
