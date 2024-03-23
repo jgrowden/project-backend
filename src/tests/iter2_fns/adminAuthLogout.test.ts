@@ -8,11 +8,10 @@ beforeEach(() => {
 });
 
 describe('adminAuthLogout tests for POST /v1/admin/auth/logout', () => {
-  // invalid token
   test('invalid token', () => {
     expect(requestAuthLogout(token1 + '1')).toStrictEqual(errorCode(401));
   });
-  // successful logout. can test by attempting to logout again, which should fail
+
   test('succesful logout', () => {
     expect(requestAuthLogout(token1)).toStrictEqual({ statusCode: 200, jsonBody: {} });
     expect(requestAuthLogout(token1)).toStrictEqual(errorCode(401));
