@@ -1,5 +1,5 @@
-import { getData, QuestionType, ErrorObject, ErrorObjectWithCode } from './dataStore';
-import { fetchUserFromSessionId, fetchQuizFromQuizId, fetchQuestionFromQuestionId, generateNewQuizId, currentTime, returnError } from './helper';
+import { AnswerType, getData, QuestionType, QuizType } from './dataStore';
+import { fetchUserFromSessionId, fetchQuizFromQuizId, fetchQuestionFromQuestionId, generateNewQuizId, generateNewQuestionId, currentTime, returnError, ErrorObject, ErrorObjectWithCode } from './helper';
 
 interface AdminQuizListReturnElement {
   quizId: number;
@@ -14,15 +14,15 @@ interface AdminQuizCreateReturn {
   quizId: number;
 }
 
-interface AdminQuizInfoReturn {
-  quizId: number;
-  name: string;
-  timeCreated: number;
-  timeLastEdited: number;
-  description: string;
-  numQuestions?: number;
-  questions?: QuestionType;
-  duration?: number;
+interface AdminQuizQuestionCreateReturn {
+  questionId: number;
+}
+
+export interface adminQuizQuestionCreateArgument {
+  question: string;
+  duration: number;
+  points: number;
+  answers: AnswerType[];
 }
 
 const quizDescriptionMaxLength = 100;
@@ -192,6 +192,7 @@ export function adminQuizCreate(sessionId: string, name: string, description: st
     description: description,
     timeCreated: unixTime,
     timeLastEdited: unixTime,
+    numQuestions: 0,
     questions: []
   });
 
@@ -245,7 +246,7 @@ export function adminQuizRemove(sessionId: string, quizId: number): ErrorObjectW
  *      description: string
  * } - returns an object with details about the quiz queried for information.
  */
-export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoReturn | ErrorObjectWithCode {
+export function adminQuizInfo(sessionId: string, quizId: number): QuizType | ErrorObjectWithCode {
   const user = fetchUserFromSessionId(sessionId);
   const quiz = fetchQuizFromQuizId(quizId);
 
@@ -261,12 +262,80 @@ export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoR
     return returnError('you do not own this quiz', 403);
   }
 
+  return quiz;
+}
+
+export function adminQuizQuestionCreate(
+  sessionId: string,
+  quizId: number,
+  questionParameters: adminQuizQuestionCreateArgument
+): AdminQuizQuestionCreateReturn | ErrorObjectWithCode {
+  const user = fetchUserFromSessionId(sessionId);
+  const quiz = fetchQuizFromQuizId(quizId);
+
+  if (!user) {
+    return returnError('invalid user ID', 401);
+  }
+
+  if (!quiz) {
+    return returnError('invalid quiz ID', 403);
+  }
+  if (!user.userQuizzes.includes(quizId)) {
+    return returnError('you do not own this quiz', 403);
+  }
+
+  if (questionParameters.question.length < 5 || questionParameters.question.length > 50) {
+    return returnError('Question has invalid length: must be between 5 and 50 characters', 400);
+  }
+
+  if (questionParameters.answers.length < 2 || questionParameters.answers.length > 6) {
+    return returnError('Invalid number of answers: there must be between 2 and 6 answers', 400);
+  }
+
+  if (questionParameters.duration < 1) {
+    return returnError('Question must have positive duration', 400);
+  }
+
+  const questionLength = quiz.questions.reduce((pSum, question) => pSum + question.duration, 0);
+
+  if (questionLength + questionParameters.duration > 180) {
+    return returnError('Quiz must have duration lower than 180', 400);
+  }
+
+  if (questionParameters.points < 1 || questionParameters.points > 10) {
+    return returnError('Invalid quiz point count: question must have between 1 and 10 points', 400);
+  }
+
+  if (questionParameters.answers.find(entry => entry.answer.length < 1 || entry.answer.length > 30) !== undefined) {
+    return returnError('Invalid answer length: answers must be between 1 and 30 characters long', 400);
+  }
+
+  // check for duplicate entries
+  const answer = questionParameters.answers.map(entry => entry.answer);
+  const duplicates = answer.filter((entry, index) => answer.indexOf(entry) !== index);
+
+  if (duplicates.length !== 0) {
+    return returnError('Question cannot have duplicate answers', 400);
+  }
+
+  if (questionParameters.answers.find(answer => answer.correct === true) === undefined) {
+    return returnError('There are no correct answers', 400);
+  }
+
+  const newQuestionId = generateNewQuestionId();
+
+  quiz.questions.push({
+    questionId: newQuestionId,
+    question: questionParameters.question,
+    duration: questionParameters.duration,
+    points: questionParameters.points,
+    answers: questionParameters.answers
+  });
+  quiz.numQuestions++;
+  quiz.timeLastEdited = Math.floor(Date.now() / 1000);
+
   return {
-    quizId: quizId,
-    name: quiz.name,
-    timeCreated: quiz.timeCreated,
-    timeLastEdited: quiz.timeLastEdited,
-    description: quiz.description,
+    questionId: newQuestionId
   };
 }
 

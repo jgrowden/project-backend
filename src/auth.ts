@@ -1,7 +1,7 @@
-import { getData, ErrorObject, TokenType, ErrorObjectWithCode } from './dataStore';
+import { getData, TokenType } from './dataStore';
 import validator from 'validator';
 import { nanoid } from 'nanoid';
-import { fetchUserFromSessionId, userWithEmailExists, generateNewUserId, returnError } from './helper';
+import { fetchUserFromSessionId, userWithEmailExists, generateNewUserId, returnError, ErrorObject, ErrorObjectWithCode } from './helper';
 
 interface AdminUserDetailsReturn {
   user: {
