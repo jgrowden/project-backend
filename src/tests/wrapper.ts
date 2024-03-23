@@ -30,11 +30,17 @@ export const requestQuizTrashInfo = (token: string) =>
 export const requestUserDetails = (token: string) =>
   requestHelper('GET', '/v1/admin/user/details', { token });
 
+export const requestUserDetailsUpdate = (token: string, email: string, nameFirst: string, nameLast: string) =>
+  requestHelper('PUT', '/v1/admin/user/details', { token, email, nameFirst, nameLast });
+
 export const requestUserPasswordUpdate = (token: TokenType, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v1/admin/user/password', { token, oldPassword, newPassword });
 
 export const requestQuestionUpdate = (sessionId: string, quizId: number, questionId: number, questionBody: QuestionType) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { sessionId, questionBody });
+
+export const requestQuizQuestionMove = (token: string, quizId: number, questionId: number, newPosition: number) =>
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}/move`, { token, newPosition });
 
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 
