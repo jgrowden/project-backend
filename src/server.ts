@@ -77,7 +77,7 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   const token = req.query.token as string;
   const result = adminQuizList(token);
   if ('error' in result) {
-    return res.status(400).json(result);
+    return res.status(401).json(result);
   }
   save();
   res.json(result);
@@ -116,6 +116,7 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizRemove Route
 app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const token = req.query.token as string;
   const quizId = parseInt(req.params.quizid);
@@ -127,6 +128,7 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizInfo Route
 app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const token = req.query.token as string;
   const quizId = parseInt(req.params.quizid);

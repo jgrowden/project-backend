@@ -41,5 +41,18 @@ const errorCode = (statusCode: number) => {
   return { statusCode: statusCode, jsonBody: ERROR };
 };
 
-export { requestAuthRegister, requestAuthLogin, requestQuizList, requestQuizCreate, requestQuizDelete, requestQuizInfo, 
-  requestUserDetails, requestUserPasswordUpdate, requestQuestionUpdate, clear, ERROR, ERRORANDSTATUS, errorCode };
+export {
+  requestAuthRegister,
+  requestAuthLogin,
+  requestQuizList,
+  requestQuizCreate,
+  requestQuizDelete,
+  requestQuizInfo,
+  requestUserDetails,
+  requestUserPasswordUpdate,
+  requestQuestionUpdate,
+  clear,
+  ERROR,
+  ERRORANDSTATUS,
+  errorCode
+};
