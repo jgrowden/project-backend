@@ -8,6 +8,9 @@ export const requestAuthRegister = (email: string, password: string, nameFirst: 
 export const requestAuthLogin = (email: string, password: string) =>
   requestHelper('POST', '/v1/admin/auth/login', { email, password });
 
+export const requestAuthLogout = (token: string) =>
+  requestHelper('POST', '/v1/admin/auth/logout', { token });
+
 export const requestQuizList = (token: string) =>
   requestHelper('GET', '/v1/admin/quiz/list', { token });
 
