@@ -26,6 +26,7 @@ import {
   adminQuizQuestionUpdate,
   adminQuizQuestionMove,
   adminQuizTrashList,
+  adminQuizChangeOwner,
   adminQuizQuestionDuplicate,
   adminQuizQuestionDelete
 } from './quiz';
@@ -195,6 +196,16 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const { token, question } = req.body;
   const quizId = parseInt(req.params.quizid);
   const result = adminQuizQuestionCreate(token, quizId, question);
+  if ('errorCode' in result) {
+    return res.status(result.errorCode).json(result.errorObject);
+  }
+  res.json(result);
+});
+
+app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+  const { token, userEmail } = req.body;
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizChangeOwner(token, quizId, userEmail);
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
