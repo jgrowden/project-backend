@@ -18,13 +18,18 @@ describe('Testing authRegister', () => {
 
   test('Check for duplicate email', () => {
     requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-    expect(requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp'))
-      .toMatchObject({ statusCode: 400, jsonBody: ERROR });
+    expect(requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp')).toMatchObject({ 
+        statusCode: 400, 
+        jsonBody: ERROR 
+      });
   });
 
   test('Check for valid email', () => {
     expect(requestAuthRegister('notanEmail', 'P4ssword', 'No', 'Email'))
-      .toMatchObject({ statusCode: 400, jsonBody: ERROR });
+      .toMatchObject({ 
+        statusCode: 400, 
+        jsonBody: ERROR 
+      });
   });
 
   test.each([
