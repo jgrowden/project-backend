@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, requestQuizQuestionMove, clear, ERRORANDSTATUS } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, requestQuizQuestionMove, clear, ERROR } from '../wrapper';
 import { adminQuizQuestionCreateArgument } from '../../quiz';
 
 let token: string;
@@ -166,43 +166,43 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
   test('Failed test: question ID does not refer to a valid question within this quiz.', () => {
     expect(requestQuizQuestionMove(token, quizId, -1, 0)).toStrictEqual({
       statusCode: 400,
-      jsonBody: ERRORANDSTATUS
+      jsonBody: ERROR
     });
   });
   test('Failed test: NewPosition is less than 0.', () => {
     expect(requestQuizQuestionMove(token, quizId, questionId1, -1)).toStrictEqual({
       statusCode: 400,
-      jsonBody: ERRORANDSTATUS
+      jsonBody: ERROR
     });
   });
   test('Failed test: NewPosition is greater than n-1 (n is number of questions in quiz).', () => {
     expect(requestQuizQuestionMove(token, quizId, questionId1, 3)).toStrictEqual({
       statusCode: 400,
-      jsonBody: ERRORANDSTATUS
+      jsonBody: ERROR
     });
   });
   test('Failed test: NewPosition is the position of the current question.', () => {
     expect(requestQuizQuestionMove(token, quizId, questionId1, 0)).toStrictEqual({
       statusCode: 400,
-      jsonBody: ERRORANDSTATUS
+      jsonBody: ERROR
     });
   });
   test('Failed test: Empty token.', () => {
     expect(requestQuizQuestionMove('', quizId, questionId1, 0)).toStrictEqual({
       statusCode: 401,
-      jsonBody: ERRORANDSTATUS
+      jsonBody: ERROR
     });
   });
   test('Failed test: Invalid token.', () => {
     expect(requestQuizQuestionMove(token + '1', quizId, questionId1, 0)).toStrictEqual({
       statusCode: 401,
-      jsonBody: ERRORANDSTATUS
+      jsonBody: ERROR
     });
   });
   test('Failed test: Quiz ID invalid.', () => {
     expect(requestQuizQuestionMove(token, quizId + 1, questionId1, 0)).toStrictEqual({
       statusCode: 403,
-      jsonBody: ERRORANDSTATUS
+      jsonBody: ERROR
     });
   });
   test('Failed test: User does not own the quiz.', () => {
@@ -219,7 +219,7 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
     const newQuestionId = requestQuizQuestionCreate(newToken, newQuizId, newQuestionBody).jsonBody.questionId;
     expect(requestQuizQuestionMove(token, newQuizId, newQuestionId, 0)).toStrictEqual({
       statusCode: 403,
-      jsonBody: ERRORANDSTATUS
+      jsonBody: ERROR
     });
   });
 });

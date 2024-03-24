@@ -59,6 +59,14 @@ const save = () => {
   fs.writeFileSync('./tooHakData.json', JSON.stringify(getData()));
 };
 
+const returnHandler = (res: Response, result: any) => {
+  if ('errorCode' in result) {
+    return res.status(result.errorCode).json(result.errorObject);
+  }
+  save();
+  res.json(result);  
+}
+
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
 // ====================================================================
@@ -72,88 +80,56 @@ app.get('/echo', (req: Request, res: Response) => {
 app.post('/v1/admin/auth/register', (req: Request, res: Response) => {
   const { email, password, nameFirst, nameLast } = req.body;
   const result = adminAuthRegister(email, password, nameFirst, nameLast);
-  if ('error' in result) {
-    return res.status(400).json(result);
-  }
-  save();
-  res.json(result);
+  returnHandler(res, result);
 });
 
 // adminAuthLogin Route
 app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
   const { email, password } = req.body;
   const result = adminAuthLogin(email, password);
-  if ('error' in result) {
-    return res.status(400).json(result);
-  }
-  save();
-  res.json(result);
+  returnHandler(res, result);
 });
 
 // adminAuthLogout Route
 app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
   const { token } = req.body;
   const result = adminAuthLogout(token);
-  if ('errorCode' in result) {
-    return res.status(result.errorCode).json(result.errorObject);
-  }
-  save();
-  res.json(result);
+  returnHandler(res, result);
 });
 
 // adminUserDetails Route
 app.get('/v1/admin/user/details', (req: Request, res: Response) => {
   const token = req.query.token as string;
   const result = adminUserDetails(token);
-  if ('error' in result) {
-    return res.status(401).json(result);
-  }
-  save();
-  res.json(result);
+  returnHandler(res, result);
 });
 
 // adminUserDetailsUpdate Route
 app.put('/v1/admin/user/details', (req: Request, res: Response) => {
   const { token, email, nameFirst, nameLast } = req.body;
   const result = adminUserDetailsUpdate(token, email, nameFirst, nameLast);
-  if ('errorCode' in result) {
-    return res.status(result.errorCode).json(result.errorObject);
-  }
-  save();
-  res.json(result);
+  returnHandler(res, result);
 });
 
 // adminQuizList Route
 app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   const token = req.query.token as string;
   const result = adminQuizList(token);
-  if ('error' in result) {
-    return res.status(401).json(result);
-  }
-  save();
-  res.json(result);
+  returnHandler(res, result);
 });
 
 // adminQuizCreate route
 app.post('/v1/admin/quiz/create', (req: Request, res: Response) => {
   const { token, name, description } = req.body;
   const result = adminQuizCreate(token, name, description);
-  if ('errorCode' in result) {
-    return res.status(result.errorCode).json(result.errorObject);
-  }
-  save();
-  res.json(result);
+  returnHandler(res, result);
 });
 
 // adminUserPasswordUpdate Route
 app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   const { token, oldPassword, newPassword } = req.body;
-  const result = adminUserPasswordUpdate(token.token, oldPassword, newPassword);
-  if ('error' in result) {
-    return res.status(result.statusCode).json(result);
-  }
-  save();
-  res.json(result);
+  const result = adminUserPasswordUpdate(token, oldPassword, newPassword);
+  returnHandler(res, result);
 });
 
 // adminQuizRemove Route
@@ -161,22 +137,14 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const token = req.query.token as string;
   const quizId = parseInt(req.params.quizid);
   const result = adminQuizRemove(token, quizId);
-  if ('errorCode' in result) {
-    return res.status(result.errorCode).json(result.errorObject);
-  }
-  save();
-  res.json(result);
+  returnHandler(res, result);
 });
 
 // adminQuizTrashList Route
 app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
   const token = req.query.token as string;
   const result = adminQuizTrashList(token);
-  if ('errorCode' in result) {
-    return res.status(result.errorCode).json(result.errorObject);
-  }
-  save();
-  res.json(result);
+  returnHandler(res, result);
 });
 
 // adminQuizInfo Route
@@ -184,11 +152,7 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const token = req.query.token as string;
   const quizId = parseInt(req.params.quizid);
   const result = adminQuizInfo(token, quizId);
-  if ('errorCode' in result) {
-    return res.status(result.errorCode).json(result.errorObject);
-  }
-  save();
-  res.json(result);
+  returnHandler(res, result);
 });
 
 // adminQuizQuestionCreate Route
@@ -196,20 +160,14 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   const { token, question } = req.body;
   const quizId = parseInt(req.params.quizid);
   const result = adminQuizQuestionCreate(token, quizId, question);
-  if ('errorCode' in result) {
-    return res.status(result.errorCode).json(result.errorObject);
-  }
-  res.json(result);
+  returnHandler(res, result);
 });
 
 app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   const { token, userEmail } = req.body;
   const quizId = parseInt(req.params.quizid);
   const result = adminQuizChangeOwner(token, quizId, userEmail);
-  if ('errorCode' in result) {
-    return res.status(result.errorCode).json(result.errorObject);
-  }
-  res.json(result);
+  returnHandler(res, result);
 });
 
 // adminQuizQuestionUpdate Route
@@ -218,11 +176,7 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Respo
   const questionId = parseInt(req.params.questionid);
   const { token, questionBody } = req.body;
   const result = adminQuizQuestionUpdate(token, quizId, questionId, questionBody);
-  if ('error' in result) {
-    return res.status(result.statusCode).json(result);
-  }
-  save();
-  res.json(result);
+  returnHandler(res, result);
 });
 
 // adminQuizQuestionMove Route
@@ -231,11 +185,7 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: 
   const questionId = parseInt(req.params.questionid);
   const { token, newPosition } = req.body;
   const result = adminQuizQuestionMove(token, quizId, questionId, newPosition);
-  if ('error' in result) {
-    return res.status(result.statusCode).json(result);
-  }
-  save();
-  res.json(result);
+  returnHandler(res, result);
 });
 
 // adminQuizQuestionDuplicate Route
@@ -244,11 +194,7 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
   const questionId = parseInt(req.params.questionid);
   const { token } = req.body;
   const result = adminQuizQuestionDuplicate(token, quizId, questionId);
-  if ('error' in result) {
-    return res.status(result.statusCode).json(result);
-  }
-  save();
-  res.json(result);
+  returnHandler(res, result);
 });
 
 // adminQuizQuestionDelete Route
@@ -257,11 +203,7 @@ app.delete('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Re
   const questionId = parseInt(req.params.questionid);
   const token = req.query.token as string;
   const result = adminQuizQuestionDelete(token, quizId, questionId);
-  if ('error' in result) {
-    return res.status(result.statusCode).json(result);
-  }
-  save();
-  res.json(result);
+  returnHandler(res, result);
 });
 
 // clear Route

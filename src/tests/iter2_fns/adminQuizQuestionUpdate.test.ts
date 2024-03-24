@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, requestQuestionUpdate, clear, ERRORANDSTATUS } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, requestQuestionUpdate, clear, ERROR } from '../wrapper';
 import { QuestionType } from '../../dataStore';
 
 let token: string;
@@ -112,7 +112,7 @@ describe('Testing Question Update', () => {
               ],
             },
           ],
-          duration: 5,
+          duration: 10,
         }
       });
       expect(timeEdited).toBeGreaterThanOrEqual(quizTimeEdited);
@@ -127,18 +127,18 @@ describe('Testing Question Update', () => {
     test('Error 401: Empty or invalid token', () => {
       expect(requestQuestionUpdate('', quizId, questionId, questionBody)).toStrictEqual({
         statusCode: 401,
-        jsonBody: ERRORANDSTATUS
+        jsonBody: ERROR
       });
       expect(requestQuestionUpdate(token + '1', quizId, questionId, questionBody)).toStrictEqual({
         statusCode: 401,
-        jsonBody: ERRORANDSTATUS
+        jsonBody: ERROR
       });
     });
 
     test('Error 403: Valid token, invalid quizId', () => {
       expect(requestQuestionUpdate(token, quizId + 1, questionId, questionBody)).toStrictEqual({
         statusCode: 403,
-        jsonBody: ERRORANDSTATUS
+        jsonBody: ERROR
       });
       // Testing with valid quizId that the user does NOT own
       const newUser = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
@@ -150,7 +150,7 @@ describe('Testing Question Update', () => {
       expect(requestQuestionUpdate(token, newQuizId, newQuestionId, questionBody))
         .toStrictEqual({
           statusCode: 403,
-          jsonBody: ERRORANDSTATUS
+          jsonBody: ERROR
         });
     });
 
@@ -158,7 +158,7 @@ describe('Testing Question Update', () => {
       expect(requestQuestionUpdate(token, quizId, questionId + 1, questionBody))
         .toStrictEqual({
           statusCode: 400,
-          jsonBody: ERRORANDSTATUS
+          jsonBody: ERROR
         });
     });
 
@@ -167,13 +167,13 @@ describe('Testing Question Update', () => {
       expect(requestQuestionUpdate(token, quizId, questionId, newQuestionBody))
         .toStrictEqual({
           statusCode: 400,
-          jsonBody: ERRORANDSTATUS
+          jsonBody: ERROR
         });
       newQuestionBody.question = 'whooooooooooooooooooooooooooooooooooooooooooooooooo';
       expect(requestQuestionUpdate(token, quizId, questionId, newQuestionBody))
         .toStrictEqual({
           statusCode: 400,
-          jsonBody: ERRORANDSTATUS
+          jsonBody: ERROR
         });
     });
 
@@ -186,7 +186,7 @@ describe('Testing Question Update', () => {
       expect(requestQuestionUpdate(token, quizId, questionId, newQuestionBody))
         .toStrictEqual({
           statusCode: 400,
-          jsonBody: ERRORANDSTATUS
+          jsonBody: ERROR
         });
       newQuestionBody.answers = questionBody.answers;
       newQuestionBody.answers.push(
@@ -206,7 +206,7 @@ describe('Testing Question Update', () => {
       expect(requestQuestionUpdate(token, quizId, questionId, newQuestionBody))
         .toStrictEqual({
           statusCode: 400,
-          jsonBody: ERRORANDSTATUS
+          jsonBody: ERROR
         });
     });
 
@@ -215,13 +215,13 @@ describe('Testing Question Update', () => {
       expect(requestQuestionUpdate(token, quizId, questionId, newQuestionBody))
         .toStrictEqual({
           statusCode: 400,
-          jsonBody: ERRORANDSTATUS
+          jsonBody: ERROR
         });
       newQuestionBody.duration = 181;
       expect(requestQuestionUpdate(token, quizId, questionId, newQuestionBody))
         .toStrictEqual({
           statusCode: 400,
-          jsonBody: ERRORANDSTATUS
+          jsonBody: ERROR
         });
     });
 
@@ -230,13 +230,13 @@ describe('Testing Question Update', () => {
       expect(requestQuestionUpdate(token, quizId, questionId, newQuestionBody))
         .toStrictEqual({
           statusCode: 400,
-          jsonBody: ERRORANDSTATUS
+          jsonBody: ERROR
         });
       newQuestionBody.points = 11;
       expect(requestQuestionUpdate(token, quizId, questionId, newQuestionBody))
         .toStrictEqual({
           statusCode: 400,
-          jsonBody: ERRORANDSTATUS
+          jsonBody: ERROR
         });
     });
 
@@ -245,13 +245,13 @@ describe('Testing Question Update', () => {
       expect(requestQuestionUpdate(token, quizId, questionId, newQuestionBody))
         .toStrictEqual({
           statusCode: 400,
-          jsonBody: ERRORANDSTATUS
+          jsonBody: ERROR
         });
       newQuestionBody.answers[0].answer = 'answerrrrrrrrrrrrrrrrrrrrrrrrrr';
       expect(requestQuestionUpdate(token, quizId, questionId, newQuestionBody))
         .toStrictEqual({
           statusCode: 400,
-          jsonBody: ERRORANDSTATUS
+          jsonBody: ERROR
         });
     });
 
@@ -260,7 +260,7 @@ describe('Testing Question Update', () => {
       expect(requestQuestionUpdate(token, quizId, questionId, newQuestionBody))
         .toStrictEqual({
           statusCode: 400,
-          jsonBody: ERRORANDSTATUS
+          jsonBody: ERROR
         });
     });
 
@@ -269,7 +269,7 @@ describe('Testing Question Update', () => {
       expect(requestQuestionUpdate(token, quizId, questionId, newQuestionBody))
         .toStrictEqual({
           statusCode: 400,
-          jsonBody: ERRORANDSTATUS
+          jsonBody: ERROR
         });
     });
   });
