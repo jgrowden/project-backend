@@ -13,10 +13,6 @@ export interface UserType {
   sessions: string[];
 }
 
-export interface TokenType {
-  token: string;
-}
-
 export interface QuizType {
   ownerId: number;
   quizId: number;
@@ -43,15 +39,15 @@ export interface QuestionType {
   points: number;
   answers: AnswerType[];
 }
+
+export interface TokenType {
+  token: string;
+}
+
 export interface DataType {
   users: UserType[];
   quizzes: QuizType[];
   deletedQuizzes: QuizType[];
-}
-
-export interface ErrorObject {
-  error: string;
-  statusCode?: number;
 }
 
 let data: DataType = {
