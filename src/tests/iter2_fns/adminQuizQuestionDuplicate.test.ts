@@ -45,7 +45,7 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),
         description: 'Quiz Description',
-        duration: 6,
+        duration: 9,
         numQuestions: 3,
         questions: [
           {
@@ -87,7 +87,7 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),
         description: 'Quiz Description',
-        duration: 6,
+        duration: 12,
         numQuestions: 4,
         questions: [
           {

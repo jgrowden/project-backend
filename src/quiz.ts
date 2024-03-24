@@ -621,6 +621,7 @@ export function adminQuizQuestionDuplicate(token: string, quizId: number, questi
 
   quiz.questions.splice(oldPosition + 1, 0, newQuestion);
   quiz.numQuestions = quiz.questions.length;
+  quiz.duration += newQuestion.duration;
   quiz.timeLastEdited = Math.floor(Date.now() / 1000);
 
   return { newQuestionId: newQuestion.questionId };
