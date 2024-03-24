@@ -24,6 +24,5 @@ describe('adminAuthLogout tests for POST /v1/admin/auth/logout', () => {
     token2 = requestAuthLogin('hayden.smith@unsw.edu.au', 'haydensmith123').jsonBody.token;
     expect(requestAuthLogout(token2)).toStrictEqual({ statusCode: 200, jsonBody: {} });
     expect(requestAuthLogout(token2)).toStrictEqual(errorCode(401));
-    
-  })
+  });
 });

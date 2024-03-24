@@ -39,11 +39,17 @@ export const requestUserDetailsUpdate = (token: string, email: string, nameFirst
 export const requestUserPasswordUpdate = (token: TokenType, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v1/admin/user/password', { token, oldPassword, newPassword });
 
-export const requestQuestionUpdate = (sessionId: string, quizId: number, questionId: number, questionBody: QuestionType) =>
-  requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { sessionId, questionBody });
+export const requestQuestionUpdate = (token: string, quizId: number, questionId: number, questionBody: QuestionType) =>
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { token, questionBody });
+
+export const requestQuestionDelete = (token: string, quizId: number, questionId: number) =>
+  requestHelper('DELETE', `/v1/admin/quiz/${quizId}/question/${questionId}`, { token });
 
 export const requestQuizQuestionMove = (token: string, quizId: number, questionId: number, newPosition: number) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}/move`, { token, newPosition });
+
+export const requestQuizQuestionDuplicate = (token: string, quizId: number, questionId: number) =>
+  requestHelper('POST', `/v1/admin/quiz/${quizId}/question/${questionId}/duplicate`, { token });
 
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 
