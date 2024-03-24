@@ -9,23 +9,25 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { getData, setData } from './dataStore';
-import { 
+import {
   adminAuthRegister,
-  adminAuthLogin, 
-  adminUserDetails, 
-  adminUserPasswordUpdate, 
-  adminUserDetailsUpdate } from './auth';
-import { 
+  adminAuthLogin,
+  adminUserDetails,
+  adminUserPasswordUpdate,
+  adminUserDetailsUpdate
+} from './auth';
+import {
   adminQuizList,
-  adminQuizCreate, 
-  adminQuizRemove, 
-  adminQuizInfo, 
-  adminQuizQuestionCreate, 
-  adminQuizQuestionUpdate, 
-  adminQuizQuestionMove, 
-  adminQuizTrashList, 
-  adminQuizQuestionDuplicate, 
-  adminQuizQuestionDelete }
+  adminQuizCreate,
+  adminQuizRemove,
+  adminQuizInfo,
+  adminQuizQuestionCreate,
+  adminQuizQuestionUpdate,
+  adminQuizQuestionMove,
+  adminQuizTrashList,
+  adminQuizQuestionDuplicate,
+  adminQuizQuestionDelete
+}
   from './quiz';
 
 import { clear } from './other';
@@ -228,7 +230,7 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
 });
 
 // adminQuizQuestionDelete Route
-app.delete('/v1/admin/quiz/:quizid/quesiton/:questionid', (req: Request, res: Response) => {
+app.delete('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const questionId = parseInt(req.params.questionid);
   const token = req.query.token as string;

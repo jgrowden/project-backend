@@ -1,4 +1,4 @@
-import { AnswerType, getData, QuestionType, QuizType } from './dataStore';
+import { AnswerType, getData, UserType, QuestionType, QuizType } from './dataStore';
 import { fetchUserFromSessionId, fetchQuizFromQuizId, fetchQuestionFromQuestionId, generateNewQuizId, generateNewQuestionId, currentTime, returnError, ErrorObject, ErrorObjectWithCode } from './helper';
 
 interface AdminQuizListReturnElement {
@@ -199,7 +199,8 @@ export function adminQuizCreate(sessionId: string, name: string, description: st
     timeCreated: unixTime,
     timeLastEdited: unixTime,
     numQuestions: 0,
-    questions: []
+    questions: [],
+    duration: 0
   });
 
   return { quizId: newQuizId };
@@ -351,6 +352,7 @@ export function adminQuizQuestionCreate(
     answers: questionParameters.answers
   });
   quiz.numQuestions++;
+  quiz.duration += questionParameters.duration;
   quiz.timeLastEdited = Math.floor(Date.now() / 1000);
 
   return {
@@ -485,7 +487,7 @@ export function adminQuizQuestionUpdate(sessionId: string, quizId: number, quest
     return answer;
   });
   question.answers = newAnswerBodies;
-  quiz.timeLastEdited = currentTime;
+  quiz.timeLastEdited = currentTime();
 
   return {};
 }
@@ -668,7 +670,7 @@ export function adminQuizQuestionDelete(sessionId: string, quizId: number, quest
   quiz.numQuestions--;
   quiz.duration -= quiz.questions[questionIndex].duration;
   quiz.questions.splice(questionIndex, 1);
-  quiz.timeLastEdited = currentTime;
+  quiz.timeLastEdited = currentTime();
   return {};
 }
 
