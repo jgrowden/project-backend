@@ -1,6 +1,5 @@
 import { requestHelper } from './requestHelper';
-import { adminQuizQuestionCreateArgument } from '../quiz';
-import { QuestionType, TokenType } from '../dataStore';
+import { QuestionType } from '../dataStore';
 
 export const requestAuthRegister = (email: string, password: string, nameFirst: string, nameLast: string) =>
   requestHelper('POST', '/v1/admin/auth/register', { email, password, nameFirst, nameLast });
@@ -23,8 +22,7 @@ export const requestQuizDelete = (token: string, quizId: number) =>
 export const requestQuizInfo = (token: string, quizId: number) =>
   requestHelper('GET', `/v1/admin/quiz/${quizId}`, { token, quizId });
 
-export const requestQuizQuestionCreate = (token: string, quizId: number,
-  question: adminQuizQuestionCreateArgument) =>
+export const requestQuizQuestionCreate = (token: string, quizId: number, question: QuestionType) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/question`, { token, quizId, question });
 
 export const requestQuizTrashInfo = (token: string) =>
@@ -56,13 +54,6 @@ export const requestQuizChangeOwner = (quizId: number, token: string, userEmail:
 
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 
-export const ERROR = { error: expect.any(String) };
-
-export const ERRORANDSTATUS = {
-  error: expect.any(String),
-  statusCode: expect.any(Number)
-};
-
 export const errorCode = (statusCode: number) => {
-  return { statusCode: statusCode, jsonBody: ERROR };
+  return { statusCode: statusCode, jsonBody: { error: expect.any(String) } };
 };

@@ -1,5 +1,5 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, requestQuizQuestionMove, clear, ERROR } from '../wrapper';
-import { adminQuizQuestionCreateArgument } from '../../quiz';
+import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, requestQuizQuestionMove, clear, errorCode } from '../wrapper';
+import { QuestionType } from '../../dataStore';
 
 let token: string;
 let quizId: number;
@@ -13,19 +13,19 @@ beforeEach(() => {
   token = user.jsonBody.token as string;
   const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
   quizId = quiz.jsonBody.quizId as number;
-  const questionBody1: adminQuizQuestionCreateArgument = {
+  const questionBody1: QuestionType = {
     question: 'Question1?',
     duration: 3,
     points: 4,
     answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
   };
-  const questionBody2: adminQuizQuestionCreateArgument = {
+  const questionBody2: QuestionType = {
     question: 'Question2?',
     duration: 3,
     points: 4,
     answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
   };
-  const questionBody3: adminQuizQuestionCreateArgument = {
+  const questionBody3: QuestionType = {
     question: 'Question3?',
     duration: 3,
     points: 4,
@@ -164,62 +164,38 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
     });
   });
   test('Failed test: question ID does not refer to a valid question within this quiz.', () => {
-    expect(requestQuizQuestionMove(token, quizId, -1, 0)).toStrictEqual({
-      statusCode: 400,
-      jsonBody: ERROR
-    });
+    expect(requestQuizQuestionMove(token, quizId, -1, 0)).toStrictEqual(errorCode(400));
   });
   test('Failed test: NewPosition is less than 0.', () => {
-    expect(requestQuizQuestionMove(token, quizId, questionId1, -1)).toStrictEqual({
-      statusCode: 400,
-      jsonBody: ERROR
-    });
+    expect(requestQuizQuestionMove(token, quizId, questionId1, -1)).toStrictEqual(errorCode(400));
   });
   test('Failed test: NewPosition is greater than n-1 (n is number of questions in quiz).', () => {
-    expect(requestQuizQuestionMove(token, quizId, questionId1, 3)).toStrictEqual({
-      statusCode: 400,
-      jsonBody: ERROR
-    });
+    expect(requestQuizQuestionMove(token, quizId, questionId1, 3)).toStrictEqual(errorCode(400));
   });
   test('Failed test: NewPosition is the position of the current question.', () => {
-    expect(requestQuizQuestionMove(token, quizId, questionId1, 0)).toStrictEqual({
-      statusCode: 400,
-      jsonBody: ERROR
-    });
+    expect(requestQuizQuestionMove(token, quizId, questionId1, 0)).toStrictEqual(errorCode(400));
   });
   test('Failed test: Empty token.', () => {
-    expect(requestQuizQuestionMove('', quizId, questionId1, 0)).toStrictEqual({
-      statusCode: 401,
-      jsonBody: ERROR
-    });
+    expect(requestQuizQuestionMove('', quizId, questionId1, 0)).toStrictEqual(errorCode(401));
   });
   test('Failed test: Invalid token.', () => {
-    expect(requestQuizQuestionMove(token + '1', quizId, questionId1, 0)).toStrictEqual({
-      statusCode: 401,
-      jsonBody: ERROR
-    });
+    expect(requestQuizQuestionMove(token + '1', quizId, questionId1, 0)).toStrictEqual(errorCode(401));
   });
   test('Failed test: Quiz ID invalid.', () => {
-    expect(requestQuizQuestionMove(token, quizId + 1, questionId1, 0)).toStrictEqual({
-      statusCode: 403,
-      jsonBody: ERROR
-    });
+    expect(requestQuizQuestionMove(token, quizId + 1, questionId1, 0)).toStrictEqual(errorCode(403));
   });
   test('Failed test: User does not own the quiz.', () => {
     const newUser = requestAuthRegister('frieren.theslayer@gmail.com', 'ushouldwatchfr1eren', 'Frieren', 'TheSlayer');
     const newToken = newUser.jsonBody.token as string;
     const newQuiz = requestQuizCreate(newToken, 'Quiz Name', 'Quiz Description');
     const newQuizId = newQuiz.jsonBody.quizId as number;
-    const newQuestionBody: adminQuizQuestionCreateArgument = {
+    const newQuestionBody: QuestionType = {
       question: 'new question',
       duration: 3,
       points: 4,
       answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
     };
     const newQuestionId = requestQuizQuestionCreate(newToken, newQuizId, newQuestionBody).jsonBody.questionId;
-    expect(requestQuizQuestionMove(token, newQuizId, newQuestionId, 0)).toStrictEqual({
-      statusCode: 403,
-      jsonBody: ERROR
-    });
+    expect(requestQuizQuestionMove(token, newQuizId, newQuestionId, 0)).toStrictEqual(errorCode(403));
   });
 });

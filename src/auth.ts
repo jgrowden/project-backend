@@ -1,12 +1,11 @@
-import { getData, TokenType, UserType } from './dataStore';
+import { getData, TokenType } from './dataStore';
 import validator from 'validator';
 import { nanoid } from 'nanoid';
-import { 
-  fetchUserFromSessionId, 
-  userWithEmailExists, 
-  generateNewUserId, 
-  returnError, 
-  ErrorObject, 
+import {
+  fetchUserFromSessionId,
+  userWithEmailExists,
+  generateNewUserId,
+  returnError,
   ErrorObjectWithCode
 } from './helper';
 
@@ -15,6 +14,8 @@ interface AdminUserDetailsReturn {
     userId: number;
     name: string;
     email: string;
+    password: string;
+    previousPasswords: string[];
     numSuccessfulLogins: number;
     numFailedPasswordsSinceLastLogin: number;
   }
@@ -57,12 +58,11 @@ function hasLetterAndNumber(str: string): boolean {
  */
 
 export function adminAuthRegister(
-  email: string, 
-  password: string, 
-  nameFirst: string, 
+  email: string,
+  password: string,
+  nameFirst: string,
   nameLast: string
 ): TokenType | ErrorObjectWithCode {
-
   const data = getData();
 
   // Check for duplicate email
@@ -163,7 +163,6 @@ export function adminAuthLogout(sessionId: string): ErrorObjectWithCode | Record
     return returnError('User ID not found', 401);
   }
 
-  
   user.sessions = user.sessions.filter(sessions => { return sessions !== sessionId; });
 
   return {};
@@ -202,6 +201,8 @@ export function adminUserDetails(sessionId: string): AdminUserDetailsReturn | Er
       name: `${user.nameFirst} ${user.nameLast}`,
       email: user.email,
       numSuccessfulLogins: user.numSuccessfulLogins,
+      password: user.password,
+      previousPasswords: user.previousPasswords,
       numFailedPasswordsSinceLastLogin: user.numFailedPasswordsSinceLastLogin,
     }
   };
@@ -219,12 +220,11 @@ export function adminUserDetails(sessionId: string): AdminUserDetailsReturn | Er
  * @return {} - an empty object
 */
 export function adminUserDetailsUpdate(
-  sessionId: string, 
-  email: string, 
-  nameFirst: string, 
+  sessionId: string,
+  email: string,
+  nameFirst: string,
   nameLast: string
 ): ErrorObjectWithCode | Record<string, never> {
-
   const userToEdit = fetchUserFromSessionId(sessionId);
   if (!userToEdit) {
     return returnError('User ID not found', 401);
@@ -253,7 +253,7 @@ export function adminUserDetailsUpdate(
   // get userId from sessionId
   // loop through datastore userIds. if a user has the same email and a different userId, email already registered
 
-  let registered = getData().users.find(user => user.email === email && user.authUserId !== userToEdit.authUserId);
+  const registered = getData().users.find(user => user.email === email && user.authUserId !== userToEdit.authUserId);
   if (registered !== undefined) {
     return returnError('Email already registered');
   }
@@ -276,14 +276,14 @@ export function adminUserDetailsUpdate(
 */
 
 export function adminUserPasswordUpdate(
-  token: string, 
-  oldPassword: string, 
+  token: string,
+  oldPassword: string,
   newPassword: string
 ): ErrorObjectWithCode | Record<string, never> {
   // check sessionId exists
   const user = fetchUserFromSessionId(token);
   if (!user) {
-    returnError('User Id not found', 401);
+    return returnError('User Id not found', 401);
   }
 
   // check oldPassword is correct
@@ -297,7 +297,7 @@ export function adminUserPasswordUpdate(
   }
 
   // check newPassword has not previously been used
-  if (!user.previousPasswords.find(password => password === newPassword)) {
+  if (user.previousPasswords.find(password => password === newPassword)) {
     return returnError('Password has been used before');
   }
 

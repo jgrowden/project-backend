@@ -1,4 +1,4 @@
-import { AnswerType, getData, UserType, QuestionType, QuizType } from './dataStore';
+import { getData, UserType, QuestionType, QuizType } from './dataStore';
 import {
   fetchUserFromSessionId,
   fetchQuizFromQuizId,
@@ -27,13 +27,6 @@ interface AdminQuizCreateReturn {
 
 interface AdminQuizQuestionCreateReturn {
   questionId: number;
-}
-
-export interface adminQuizQuestionCreateArgument {
-  question: string;
-  duration: number;
-  points: number;
-  answers: AnswerType[];
 }
 
 interface AdminQuizQuestionDuplicateReturn {
@@ -136,9 +129,9 @@ export function adminQuizNameUpdate(sessionId: string, quizId: number, name: str
 
 // Everything below has been migrated over to the server
 
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
+/// /////////////////////////////////////////////////////////////////////////////
+/// /////////////////////////////////////////////////////////////////////////////
+/// /////////////////////////////////////////////////////////////////////////////
 
 /**
  * Provide a list of all quizzes that are owned by the currently logged in user.
@@ -164,7 +157,7 @@ export function adminQuizList(sessionId: string): AdminQuizListReturn | ErrorObj
 
   const data = getData();
   const filteredQuiz = data.quizzes.filter(quiz => quiz.ownerId === user.authUserId);
-  const userQuizzes = filteredQuiz.map(quiz => {return { quizId: quiz.quizId, name: quiz.name }});
+  const userQuizzes = filteredQuiz.map(quiz => { return { quizId: quiz.quizId, name: quiz.name }; });
 
   return { quizzes: userQuizzes };
 }
@@ -180,11 +173,10 @@ export function adminQuizList(sessionId: string): AdminQuizListReturn | ErrorObj
 */
 
 export function adminQuizCreate(
-  sessionId: string, 
-  name: string, 
+  sessionId: string,
+  name: string,
   description: string
 ): AdminQuizCreateReturn | ErrorObjectWithCode {
-
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
     return returnError('invalid user ID', 401);
@@ -238,10 +230,9 @@ export function adminQuizCreate(
  * @returns {} - an empty object
  */
 export function adminQuizRemove(
-  sessionId: string, 
+  sessionId: string,
   quizId: number
 ): ErrorObjectWithCode | Record<string, never> {
-
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
     return returnError('invalid user ID', 401);
@@ -281,7 +272,6 @@ export function adminQuizRemove(
 export function adminQuizTrashList(
   sessionId: string
 ): ErrorObjectWithCode | AdminQuizListReturn {
-
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
     return returnError("invalid user ID'", 401);
@@ -309,10 +299,9 @@ export function adminQuizTrashList(
  * } - returns an object with details about the quiz queried for information.
  */
 export function adminQuizInfo(
-  sessionId: string, 
+  sessionId: string,
   quizId: number
 ): QuizType | ErrorObjectWithCode {
-
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
     return returnError('invalid user ID', 401);
@@ -333,9 +322,8 @@ export function adminQuizInfo(
 export function adminQuizQuestionCreate(
   sessionId: string,
   quizId: number,
-  newQuestion: adminQuizQuestionCreateArgument
+  newQuestion: QuestionType
 ): AdminQuizQuestionCreateReturn | ErrorObjectWithCode {
-  
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
     return returnError('invalid user ID', 401);
@@ -370,7 +358,7 @@ export function adminQuizQuestionCreate(
 
   if (newQuestion.points < questionPointsMin || newQuestion.points > questionPointsMax) {
     return returnError('Invalid quiz point count: question must have between 1 and 10 points');
-  }  
+  }
 
   if (newQuestion.answers.find(entry => entry.answer.length < answersLenMin || entry.answer.length > answersLenMax) !== undefined) {
     return returnError('Invalid answer length: answers must be between 1 and 30 characters long');
@@ -407,11 +395,10 @@ export function adminQuizQuestionCreate(
 }
 
 export function adminQuizChangeOwner(
-  sessionId: string, 
-  quizId: number, 
+  sessionId: string,
+  quizId: number,
   userEmail: string
 ): Record<string, never> | ErrorObjectWithCode {
-
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
     return returnError('invalid user ID', 401);
@@ -458,12 +445,11 @@ export function adminQuizChangeOwner(
  * @returns {} - empty object | ErrorObject
  */
 export function adminQuizQuestionUpdate(
-  sessionId: string, 
-  quizId: number, 
-  questionId: number, 
+  sessionId: string,
+  quizId: number,
+  questionId: number,
   newQuestionBody: QuestionType
 ): ErrorObjectWithCode | Record<string, never> {
-
   const user: UserType | undefined = fetchUserFromSessionId(sessionId);
   if (!user) {
     return returnError('Invalid token', 401);
@@ -471,8 +457,8 @@ export function adminQuizQuestionUpdate(
 
   const quiz: QuizType | undefined = fetchQuizFromQuizId(quizId);
   if (!quiz) {
-    return returnError('Invalid quizId', 403)
-  };
+    return returnError('Invalid quizId', 403);
+  }
 
   if (quiz.ownerId !== user.authUserId) {
     return returnError('Invalid quiz ownership', 403);
@@ -505,7 +491,7 @@ export function adminQuizQuestionUpdate(
     return returnError('Question points must be between 1 and 10 (inclusive)');
   }
 
-  let invalidAnswer = newQuestionBody.answers.find(entry => entry.answer.length < 1 || entry.answer.length > 30);
+  const invalidAnswer = newQuestionBody.answers.find(entry => entry.answer.length < 1 || entry.answer.length > 30);
   if (invalidAnswer !== undefined) {
     return returnError('Invalid answer string length');
   }
@@ -549,12 +535,11 @@ export function adminQuizQuestionUpdate(
  * @returns {} - empty object
  */
 export function adminQuizQuestionMove(
-  token: string, 
-  quizId: number, 
-  questionId: number, 
+  token: string,
+  quizId: number,
+  questionId: number,
   newPosition: number
 ): ErrorObjectWithCode | Record<string, never> {
-  
   const user = fetchUserFromSessionId(token);
   if (!user) {
     return returnError('Invalid token', 401);
@@ -582,8 +567,8 @@ export function adminQuizQuestionMove(
     return returnError('Question is already in the new position');
   }
 
-  let oldElement = quiz.questions.find(question => question.questionId === questionId);
-  let oldPosition = quiz.questions.indexOf(oldElement);
+  const oldElement = quiz.questions.find(question => question.questionId === questionId);
+  const oldPosition = quiz.questions.indexOf(oldElement);
 
   quiz.questions.splice(oldPosition, 1);
   quiz.questions.splice(newPosition, 0, oldElement);
@@ -601,11 +586,10 @@ export function adminQuizQuestionMove(
  * @returns {newQuestionId: number} - object containing question Id of duplicated quiz.
  */
 export function adminQuizQuestionDuplicate(
-  token: string, 
-  quizId: number, 
+  token: string,
+  quizId: number,
   questionId: number
 ): ErrorObjectWithCode | AdminQuizQuestionDuplicateReturn {
-
   const user = fetchUserFromSessionId(token);
   if (!user) {
     return returnError('Invalid token', 401);
@@ -625,8 +609,8 @@ export function adminQuizQuestionDuplicate(
     return returnError('Invalid questionId');
   }
 
-  let oldElement = quiz.questions.find(question => question.questionId === questionId);
-  let oldPosition = quiz.questions.indexOf(oldElement);
+  const oldElement = quiz.questions.find(question => question.questionId === questionId);
+  const oldPosition = quiz.questions.indexOf(oldElement);
 
   const newQuestion: QuestionType = {
     questionId: generateNewQuestionId(),
@@ -653,11 +637,10 @@ export function adminQuizQuestionDuplicate(
  * @returns
  */
 export function adminQuizQuestionDelete(
-  sessionId: string, 
-  quizId: number, 
+  sessionId: string,
+  quizId: number,
   questionId: number
 ): ErrorObjectWithCode | Record<string, never> {
-
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
     return returnError('Invalid token', 401);

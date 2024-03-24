@@ -64,8 +64,8 @@ const returnHandler = (res: Response, result: any) => {
     return res.status(result.errorCode).json(result.errorObject);
   }
   save();
-  res.json(result);  
-}
+  res.json(result);
+};
 
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
