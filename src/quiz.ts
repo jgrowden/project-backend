@@ -1,4 +1,4 @@
-import { AnswerType, getData, QuestionType, QuizType } from './dataStore';
+import { AnswerType, getData, UserType, QuestionType, QuizType } from './dataStore';
 import { fetchUserFromSessionId, fetchQuizFromQuizId, fetchQuestionFromQuestionId, generateNewQuizId, generateNewQuestionId, currentTime, returnError, ErrorObject, ErrorObjectWithCode } from './helper';
 
 interface AdminQuizListReturnElement {
@@ -33,6 +33,8 @@ const quizDescriptionMaxLength = 100;
 const quizNameMinLength = 3;
 const quizNameMaxLength = 30;
 const regex = /[^A-Za-z0-9 ]/;
+const QUESTION_COLOURS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
+const INVALID_INDEX = -1;
 
 /**
  * Update the description of the relevant quiz.
@@ -197,7 +199,8 @@ export function adminQuizCreate(sessionId: string, name: string, description: st
     timeCreated: unixTime,
     timeLastEdited: unixTime,
     numQuestions: 0,
-    questions: []
+    questions: [],
+    duration: 0
   });
 
   return { quizId: newQuizId };
@@ -349,6 +352,7 @@ export function adminQuizQuestionCreate(
     answers: questionParameters.answers
   });
   quiz.numQuestions++;
+  quiz.duration += questionParameters.duration;
   quiz.timeLastEdited = Math.floor(Date.now() / 1000);
 
   return {
@@ -364,17 +368,17 @@ export function adminQuizQuestionCreate(
  * @param {number} quizId
  * @param {number} questionId
  * @param {AdminQuizQuestionBody} questionBody
- * @returns {} - empty object
+ * @returns {} - empty object | ErrorObject
  */
 export function adminQuizQuestionUpdate(sessionId: string, quizId: number, questionId: number, newQuestionBody: QuestionType): ErrorObject | Record<string, never> {
-  const user = fetchUserFromSessionId(sessionId);
+  const user: UserType | undefined = fetchUserFromSessionId(sessionId);
   if (!user) {
     return {
       error: 'Invalid token',
       statusCode: 401,
     };
   }
-  const quiz = fetchQuizFromQuizId(quizId);
+  const quiz: QuizType | undefined = fetchQuizFromQuizId(quizId);
   if (!quiz) {
     return {
       error: 'Invalid quizId',
@@ -389,7 +393,7 @@ export function adminQuizQuestionUpdate(sessionId: string, quizId: number, quest
     };
   }
 
-  const question = fetchQuestionFromQuestionId(quiz, questionId);
+  const question: QuestionType | undefined = fetchQuestionFromQuestionId(quiz, questionId);
   if (!question) {
     return {
       error: 'Invalid questionId',
@@ -476,12 +480,14 @@ export function adminQuizQuestionUpdate(sessionId: string, quizId: number, quest
   question.question = newQuestionBody.question;
   question.duration = newQuestionBody.duration;
   question.points = newQuestionBody.points;
+
+  const colours = [...QUESTION_COLOURS];
   const newAnswerBodies = newQuestionBody.answers.map(answer => {
-    answer.colour = setRandomColour();
+    answer.colour = setRandomColour(colours);
     return answer;
   });
   question.answers = newAnswerBodies;
-  quiz.timeLastEdited = ~~(Date.now() / 1000);
+  quiz.timeLastEdited = currentTime();
 
   return {};
 }
@@ -621,10 +627,61 @@ export function adminQuizQuestionDuplicate(token: string, quizId: number, questi
 }
 
 /**
- * Function returns random colour out of 6 colours
+ * Delete a particular question from a quiz
+ * @param {string} sessionId
+ * @param {number} quizId
+ * @param {number} questionId
+ * @returns {} - empty object | ErrorObject
+ * @returns
+ */
+export function adminQuizQuestionDelete(sessionId: string, quizId: number, questionId: number): ErrorObject | Record<string, never> {
+  const user: UserType | undefined = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    return {
+      error: 'Invalid token',
+      statusCode: 401
+    };
+  }
+
+  const quiz: QuizType | undefined = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    return {
+      error: 'Invalid quizId',
+      statusCode: 403,
+    };
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    return {
+      error: 'Invalid quiz ownership',
+      statusCode: 403,
+    };
+  }
+  const questionIndex = quiz.questions.findIndex(question => question.questionId === questionId);
+  if (questionIndex === INVALID_INDEX) {
+    return {
+      error: 'Invalid questionId',
+      statusCode: 400
+    };
+  }
+
+  // No errors, delete question from quiz
+  // No requirement in spec to change lastEdited, but will do anyway
+  quiz.numQuestions--;
+  quiz.duration -= quiz.questions[questionIndex].duration;
+  quiz.questions.splice(questionIndex, 1);
+  quiz.timeLastEdited = currentTime();
+  return {};
+}
+
+/**
+ * Function returns random colour from an array of colours
+ * Pops the returned element from original array
  * @returns string
  */
-function setRandomColour (): string {
-  const colours = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
-  return colours[~~(Math.random() * colours.length)];
+function setRandomColour (colours: string[]): string {
+  const colourIndex = ~~(Math.random() * colours.length);
+  const colourToReturn = colours[colourIndex];
+  colours.splice(colourIndex, 1);
+  return colourToReturn;
 }

@@ -23,6 +23,7 @@ describe('Testing /v1/admin/quiz/{quizid}:', () => {
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),
         description: 'Quiz Description',
+        duration: 0,
         numQuestions: 0,
         questions: []
       }

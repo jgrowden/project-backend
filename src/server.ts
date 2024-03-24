@@ -9,9 +9,26 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { getData, setData } from './dataStore';
-
-import { adminAuthRegister, adminAuthLogin, adminUserDetails, adminUserPasswordUpdate, adminUserDetailsUpdate } from './auth';
-import { adminQuizList, adminQuizCreate, adminQuizRemove, adminQuizInfo, adminQuizQuestionCreate, adminQuizQuestionUpdate, adminQuizQuestionMove, adminQuizTrashList, adminQuizQuestionDuplicate } from './quiz';
+import {
+  adminAuthRegister,
+  adminAuthLogin,
+  adminUserDetails,
+  adminUserPasswordUpdate,
+  adminUserDetailsUpdate
+} from './auth';
+import {
+  adminQuizList,
+  adminQuizCreate,
+  adminQuizRemove,
+  adminQuizInfo,
+  adminQuizQuestionCreate,
+  adminQuizQuestionUpdate,
+  adminQuizQuestionMove,
+  adminQuizTrashList,
+  adminQuizQuestionDuplicate,
+  adminQuizQuestionDelete
+}
+  from './quiz';
 
 import { clear } from './other';
 // Set up web app
@@ -205,6 +222,19 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
   const questionId = parseInt(req.params.questionid);
   const { token } = req.body;
   const result = adminQuizQuestionDuplicate(token, quizId, questionId);
+  if ('error' in result) {
+    return res.status(result.statusCode).json(result);
+  }
+  save();
+  res.json(result);
+});
+
+// adminQuizQuestionDelete Route
+app.delete('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const token = req.query.token as string;
+  const result = adminQuizQuestionDelete(token, quizId, questionId);
   if ('error' in result) {
     return res.status(result.statusCode).json(result);
   }
