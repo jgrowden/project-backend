@@ -319,6 +319,15 @@ export function adminQuizInfo(
   return quiz;
 }
 
+/**
+ * Adds a new question to the quiz provided by quizId and sessionId
+ *
+ * @param {string} sessionId - unique user identification string
+ * @param {number} quizId - a quiz's unique identification number
+ * @param {QuestionType} newQuestion - the question to be added
+ *
+ * @returns {questionId} - a unique number to identify the question
+*/
 export function adminQuizQuestionCreate(
   sessionId: string,
   quizId: number,
