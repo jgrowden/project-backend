@@ -14,7 +14,8 @@ import {
   adminAuthLogin,
   adminUserDetails,
   adminUserPasswordUpdate,
-  adminUserDetailsUpdate
+  adminUserDetailsUpdate,
+  adminAuthLogout
 } from './auth';
 import {
   adminQuizList,
@@ -27,8 +28,7 @@ import {
   adminQuizTrashList,
   adminQuizQuestionDuplicate,
   adminQuizQuestionDelete
-}
-  from './quiz';
+} from './quiz';
 
 import { clear } from './other';
 // Set up web app
@@ -84,6 +84,17 @@ app.post('/v1/admin/auth/login', (req: Request, res: Response) => {
   const result = adminAuthLogin(email, password);
   if ('error' in result) {
     return res.status(400).json(result);
+  }
+  save();
+  res.json(result);
+});
+
+// adminAuthLogout Route
+app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
+  const { token } = req.body;
+  const result = adminAuthLogout(token);
+  if ('errorCode' in result) {
+    return res.status(result.errorCode).json(result.errorObject);
   }
   save();
   res.json(result);

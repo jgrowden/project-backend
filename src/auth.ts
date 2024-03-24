@@ -139,6 +139,24 @@ export function adminAuthLogin(email: string, password: string): TokenType | Err
 }
 
 /**
+ * Given an admin user's sessionId, log the user out from the session
+ *
+ * @param {string} sessionId
+ * @returns {} - an empty object
+ */
+export function adminAuthLogout(sessionId: string): ErrorObjectWithCode | Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    return returnError('User ID not found', 401);
+  }
+
+  const filteredArray = user.sessions.filter(sessions => { return sessions !== sessionId; });
+  user.sessions = filteredArray;
+
+  return {};
+}
+
+/**
  * Given an admin user's sessionId, return details about the user.
  *
  * 'name' is the first and last name concatenated with a single space between them.
