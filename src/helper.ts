@@ -1,5 +1,18 @@
 import { getData, UserType, QuizType, QuestionType } from './dataStore';
-import { ErrorObjectWithCode, ErrorString } from './quiz';
+
+export interface ErrorObject {
+  error: string;
+  statusCode?: number;
+}
+
+export interface ErrorObjectWithCode {
+  errorObject: ErrorObject;
+  errorCode: number;
+}
+
+export interface ErrorString {
+  error: string
+}
 
 export const fetchUserFromUserId = (authUserId: number): UserType | undefined => {
   return getData().users.find(user => user.authUserId === authUserId);

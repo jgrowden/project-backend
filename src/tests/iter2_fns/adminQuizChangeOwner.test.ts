@@ -21,18 +21,19 @@ describe('adminQuizChangeOwner Tests:', () => {
       jsonBody: {}
     });
     expect(requestQuizInfo(User2Token, quiz1Id)).toStrictEqual({
-        statusCode: 200,
-        jsonBody: {
-          quizId: quiz1Id,
-          name: 'Quiz Name',
-          ownerId: 1,
-          timeCreated: expect.any(Number),
-          timeLastEdited: expect.any(Number),
-          description: 'Quiz Description',
-          numQuestions: 0,
-          questions: []
-        }
-      })
+      statusCode: 200,
+      jsonBody: {
+        quizId: quiz1Id,
+        name: 'Quiz Name',
+        ownerId: 1,
+        duration: 0,
+        timeCreated: expect.any(Number),
+        timeLastEdited: expect.any(Number),
+        description: 'Quiz Description',
+        numQuestions: 0,
+        questions: []
+      }
+    });
   });
   test('Failing test: userEmail is not a real user', () => {
     expect(requestQuizChangeOwner(quiz1Id, User1Token, 'president@unswunsociety.org.au')).toStrictEqual(errorCode(400));
