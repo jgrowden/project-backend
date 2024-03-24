@@ -355,10 +355,6 @@ export function adminQuizChangeOwner(sessionId: string, quizId: number, userEmai
     return returnError('Token is invalid', 401);
   }
 
-  if (!userWithEmailExist) {
-    return returnError('User email does not exist', 400);
-  }
-
   if (!quiz) {
     return returnError('invalid quiz ID', 403);
   }
@@ -371,6 +367,10 @@ export function adminQuizChangeOwner(sessionId: string, quizId: number, userEmai
     return returnError('Email provided is the same as the logged in user', 400);
   }
 
+  if (!userWithEmailExist) {
+    return returnError('User email does not exist', 400);
+  }
+  
   const quizNames = userWithEmailExist.userQuizzes.map(quizIds => fetchQuizFromQuizId(quizIds).name);
   if (quizNames.indexOf(fetchQuizFromQuizId(quizId).name) !== -1) {
     return returnError('Quiz name is a duplicate of a quiz the other user currently owns', 400);
