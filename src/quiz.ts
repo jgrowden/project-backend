@@ -39,7 +39,7 @@ const INVALID_INDEX = -1;
 /**
  * Update the description of the relevant quiz.
  *
- * @param {string} sessionId - unique user identification number
+ * @param {string} sessionId - unique user identification string
  * @param {number} quizId - a quiz's unique identification number
  * @param {string} description - description of the quiz being created
  *
@@ -73,7 +73,7 @@ export function adminQuizDescriptionUpdate(sessionId: string, quizId: number, de
 /**
  * Update the name of the relevant quiz.
  *
- * @param {string} sessionId - unique user identification number
+ * @param {string} sessionId - unique user identification string
  * @param {number} quizId - a quiz's unique identification number
  * @param {string} name - name of quiz created
  *
@@ -151,7 +151,7 @@ export function adminQuizList(sessionId: string): AdminQuizListReturn | ErrorObj
 /**
  * Given basic details about a new quiz, create one for the logged in user.
  *
- * @param {string} sessionId - unique user identification number
+ * @param {string} sessionId - unique user identification string
  * @param {string} name - name of quiz created
  * @param {string} description - description of the quiz being created
  *
@@ -209,7 +209,7 @@ export function adminQuizCreate(sessionId: string, name: string, description: st
 /**
  * Given a particular quiz, permanently remove the quiz.
  *
- * @param {string} sessionId - a user's unique identification number
+ * @param {string} sessionId - a user's unique identification string
  * @param {number} quizId - a quiz's unique identification number
  *
  * @returns {} - an empty object
@@ -239,6 +239,20 @@ export function adminQuizRemove(sessionId: string, quizId: number): ErrorObjectW
   return {};
 }
 
+/**
+ * Returns a list with details of a user's deleted quizzes
+ *
+ * @param {string} sessionId
+ *
+ * @returns {{
+*    quizzes: [
+*       {
+*          quizId: number,
+*          name: string
+*       }
+*    ]
+* }} - object with list of all quizzes by their unique ID number and name.
+ */
 export function adminQuizTrashList(sessionId: string): ErrorObjectWithCode | AdminQuizListReturn {
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
@@ -255,7 +269,7 @@ export function adminQuizTrashList(sessionId: string): ErrorObjectWithCode | Adm
 /**
  * Get all of the relevant information about the current quiz.
  *
- * @param {string} sessionId - a user's unique identification number
+ * @param {string} sessionId - a user's unique identification string
  * @param {number} quizId - a quiz's unique identification number
  *
  * @returns {
