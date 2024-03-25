@@ -90,9 +90,13 @@ describe('Testing Quiz Name Update', () => {
         jsonBody: { 
           quizId: quizId,
           name: 'Succesful Name Update',
+          ownerId: 0,
           timeCreated: expect.any(Number),
           timeLastEdited: expect.any(Number),
           description: 'Quiz Description',
+          duration: 0,
+          numQuestions: 0,
+          questions: []
         }
       });
       expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited);
@@ -112,9 +116,13 @@ describe('Testing Quiz Name Update', () => {
         jsonBody: { 
           quizId: quizId,
           name: 'Abc',
+          ownerId: 0,
           timeCreated: expect.any(Number),
           timeLastEdited: expect.any(Number),
           description: 'Quiz Description',
+          duration: 0,
+          numQuestions: 0,
+          questions: []
         }
       });
       expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited);
@@ -134,9 +142,13 @@ describe('Testing Quiz Name Update', () => {
         jsonBody: { 
           quizId: quizId,
           name: 'ABCdefghijklmnopqrstuvwxyz1234',
+          ownerId: 0,
           timeCreated: expect.any(Number),
           timeLastEdited: expect.any(Number),
           description: 'Quiz Description',
+          duration: 0,
+          numQuestions: 0,
+          questions: []
         }
       });
       expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited);
