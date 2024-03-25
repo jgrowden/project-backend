@@ -1,4 +1,4 @@
-import { errorCode, requestAuthRegister, requestQuizCreate, requestQuizChangeOwner, requestQuizInfo, clear } from '../wrapper';
+import { errorCode, requestAuthRegister, requestQuizCreate, requestQuizChangeOwner, requestQuizInfo, clear, requestQuizList } from '../wrapper';
 
 let User1Token: string;
 let User2Token: string;
@@ -20,18 +20,21 @@ describe('adminQuizChangeOwner Tests:', () => {
       statusCode: 200,
       jsonBody: {}
     });
-    expect(requestQuizInfo(User2Token, quiz1Id)).toStrictEqual({
+    expect(requestQuizList(User1Token)).toStrictEqual({
       statusCode: 200,
       jsonBody: {
-        quizId: quiz1Id,
-        name: 'Quiz Name',
-        ownerId: 1,
-        duration: 0,
-        timeCreated: expect.any(Number),
-        timeLastEdited: expect.any(Number),
-        description: 'Quiz Description',
-        numQuestions: 0,
-        questions: []
+        quizzes: []
+      }
+    });
+    expect(requestQuizList(User2Token)).toStrictEqual({
+      statusCode: 200,
+      jsonBody: {
+        quizzes: [
+          {
+            quizId: quiz1Id,
+            name: 'Quiz Name'
+          }
+        ]
       }
     });
   });

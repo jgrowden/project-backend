@@ -25,6 +25,17 @@ interface AdminQuizCreateReturn {
   quizId: number;
 }
 
+interface AdminQuizInfoReturn {
+  quizId: number;
+  name: string;
+  timeCreated: number;
+  timeLastEdited: number;
+  description: string;
+  numQuestions: number;
+  questions: QuestionType[];
+  duration: number;
+}
+
 interface AdminQuizQuestionCreateReturn {
   questionId: number;
 }
@@ -291,7 +302,7 @@ export function adminQuizTrashList(sessionId: string): ErrorObjectWithCode | Adm
  *      description: string
  * } - returns an object with details about the quiz queried for information.
  */
-export function adminQuizInfo(sessionId: string, quizId: number): QuizType | ErrorObjectWithCode {
+export function adminQuizInfo(sessionId: string, quizId: number): AdminQuizInfoReturn | ErrorObjectWithCode {
   const user = fetchUserFromSessionId(sessionId);
   const quiz = fetchQuizFromQuizId(quizId);
 
@@ -307,7 +318,16 @@ export function adminQuizInfo(sessionId: string, quizId: number): QuizType | Err
     return returnError('you do not own this quiz', 403);
   }
 
-  return quiz;
+  return {
+    quizId: quiz.quizId,
+    name: quiz.name,
+    timeCreated: quiz.timeCreated,
+    timeLastEdited: quiz.timeLastEdited,
+    description: quiz.description,
+    numQuestions: quiz.numQuestions,
+    questions: quiz.questions,
+    duration: quiz.duration
+  };
 }
 
 export function adminQuizQuestionCreate(

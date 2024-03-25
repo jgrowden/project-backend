@@ -19,13 +19,12 @@ describe('Testing /v1/admin/quiz/{quizid}:', () => {
       jsonBody: {
         quizId: quizId,
         name: 'Quiz Name',
-        ownerId: 0,
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),
         description: 'Quiz Description',
-        duration: 0,
         numQuestions: 0,
-        questions: []
+        questions: [],
+        duration: 0
       }
     });
   });
