@@ -14,7 +14,7 @@ export interface UserType {
 }
 
 export interface QuizType {
-  ownerId: number;
+  ownerId?: number;
   quizId: number;
   name: string;
   timeCreated: number;

@@ -10,7 +10,7 @@ beforeEach(() => {
 
 describe('Testing adminQuizCreate:', () => {
   test('Successful test.', () => {
-    let returnedQuiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
+    const returnedQuiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
     expect(returnedQuiz).toStrictEqual({
       statusCode: 200,
       jsonBody: { quizId: expect.any(Number) }

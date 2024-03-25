@@ -156,7 +156,7 @@ export function adminQuizList(sessionId: string): AdminQuizListReturn | ErrorObj
   }
 
   const userQuizzes = user.userQuizzes.map(quizId => fetchQuizFromQuizId(quizId));
-  const returnQuizzes = userQuizzes.map(quiz => { return { quizId: quiz.quizId, name: quiz.name } });
+  const returnQuizzes = userQuizzes.map(quiz => { return { quizId: quiz.quizId, name: quiz.name }; });
   return { quizzes: returnQuizzes };
 }
 
