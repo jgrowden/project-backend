@@ -1,44 +1,71 @@
 import { requestHelper } from './requestHelper';
+import { adminQuizQuestionCreateArgument } from '../quiz';
 import { QuestionType, TokenType } from '../dataStore';
 
-const requestAuthRegister = (email: string, password: string, nameFirst: string, nameLast: string) =>
+export const requestAuthRegister = (email: string, password: string, nameFirst: string, nameLast: string) =>
   requestHelper('POST', '/v1/admin/auth/register', { email, password, nameFirst, nameLast });
 
-const requestAuthLogin = (email: string, password: string) =>
+export const requestAuthLogin = (email: string, password: string) =>
   requestHelper('POST', '/v1/admin/auth/login', { email, password });
 
-const requestQuizCreate = (token: string, name: string, description: string) =>
+export const requestAuthLogout = (token: string) =>
+  requestHelper('POST', '/v1/admin/auth/logout', { token });
+
+export const requestQuizList = (token: string) =>
+  requestHelper('GET', '/v1/admin/quiz/list', { token });
+
+export const requestQuizCreate = (token: string, name: string, description: string) =>
   requestHelper('POST', '/v1/admin/quiz/create', { token, name, description });
 
-const requestQuizDelete = (token: string, quizId: number) =>
+export const requestQuizDelete = (token: string, quizId: number) =>
   requestHelper('DELETE', `/v1/admin/quiz/${quizId}`, { token, quizId });
 
-const requestQuizInfo = (token: string, quizId: number) =>
+export const requestQuizInfo = (token: string, quizId: number) =>
   requestHelper('GET', `/v1/admin/quiz/${quizId}`, { token, quizId });
 
-const requestUserDetails = (token: string) =>
+export const requestQuizQuestionCreate = (token: string, quizId: number,
+  question: adminQuizQuestionCreateArgument) =>
+  requestHelper('POST', `/v1/admin/quiz/${quizId}/question`, { token, quizId, question });
+
+export const requestQuizTrashInfo = (token: string) =>
+  requestHelper('GET', '/v1/admin/quiz/trash', { token });
+
+export const requestUserDetails = (token: string) =>
   requestHelper('GET', '/v1/admin/user/details', { token });
 
-const requestUserPasswordUpdate = (token: TokenType, oldPassword: string, newPassword: string) =>
+export const requestUserDetailsUpdate = (token: string, email: string, nameFirst: string, nameLast: string) =>
+  requestHelper('PUT', '/v1/admin/user/details', { token, email, nameFirst, nameLast });
+
+export const requestUserPasswordUpdate = (token: TokenType, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v1/admin/user/password', { token, oldPassword, newPassword });
 
-const requestQuizNameUpdate = (token: string, quizId: number, name: string) =>
+export const requestQuizNameUpdate = (token: string, quizId: number, name: string) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/name`, { token, quizId, name });
 
-const requestQuestionUpdate = (sessionId: string, quizId: number, questionId: number, questionBody: QuestionType) =>
-  requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { sessionId, questionBody });
+export const requestQuestionUpdate = (token: string, quizId: number, questionId: number, questionBody: QuestionType) =>
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { token, questionBody });
 
-const clear = () => requestHelper('DELETE', '/v1/clear');
+export const requestQuestionDelete = (token: string, quizId: number, questionId: number) =>
+  requestHelper('DELETE', `/v1/admin/quiz/${quizId}/question/${questionId}`, { token });
 
-const ERROR = { error: expect.any(String) };
+export const requestQuizQuestionMove = (token: string, quizId: number, questionId: number, newPosition: number) =>
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}/move`, { token, newPosition });
 
-const ERRORANDSTATUS = {
+export const requestQuizQuestionDuplicate = (token: string, quizId: number, questionId: number) =>
+  requestHelper('POST', `/v1/admin/quiz/${quizId}/question/${questionId}/duplicate`, { token });
+
+export const requestQuizChangeOwner = (quizId: number, token: string, userEmail: string) =>
+  requestHelper('POST', `/v1/admin/quiz/${quizId}/transfer`, { token, quizId, userEmail });
+
+export const clear = () => requestHelper('DELETE', '/v1/clear');
+
+export const ERROR = { error: expect.any(String) };
+
+export const ERRORANDSTATUS = {
   error: expect.any(String),
   statusCode: expect.any(Number)
 };
 
-const errorCode = (statusCode: number) => {
+export const errorCode = (statusCode: number) => {
   return { statusCode: statusCode, jsonBody: ERROR };
 };
-
-export { requestAuthRegister, requestAuthLogin, requestUserDetails, requestQuizDelete, requestQuizCreate, requestQuizInfo, requestUserPasswordUpdate, requestQuizNameUpdate, requestQuestionUpdate, errorCode, clear, ERROR, ERRORANDSTATUS };
