@@ -9,7 +9,7 @@ import fs from 'fs';
 import path from 'path';
 import process from 'process';
 import { getData, setData } from './dataStore';
-import { adminQuizCreate, adminQuizRemove, adminQuizInfo, adminQuizQuestionUpdate } from './quiz';
+import { adminQuizCreate, adminQuizRemove, adminQuizInfo, adminQuizNameUpdate, adminQuizQuestionUpdate } from './quiz';
 import { adminAuthRegister, adminAuthLogin, adminUserDetails, adminUserPasswordUpdate } from './auth';
 import { clear } from './other';
 // Set up web app
@@ -120,6 +120,18 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const result = adminQuizInfo(token, quizId);
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
+  }
+  save();
+  res.json(result);
+});
+
+// adminQuizNameUpdate Route
+app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const { token, name } = req.body;
+  const result = adminQuizNameUpdate(token, quizId, name);
+  if ('error' in result) {
+    return res.status(result.statusCode).json(result);
   }
   save();
   res.json(result);
