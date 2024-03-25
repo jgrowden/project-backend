@@ -14,7 +14,7 @@ export const requestQuizList = (token: string) =>
   requestHelper('GET', '/v1/admin/quiz/list', { token });
 
 export const requestQuizCreate = (token: string, name: string, description: string) =>
-  requestHelper('POST', '/v1/admin/quiz/create', { token, name, description });
+  requestHelper('POST', '/v1/admin/quiz', { token, name, description });
 
 export const requestQuizDelete = (token: string, quizId: number) =>
   requestHelper('DELETE', `/v1/admin/quiz/${quizId}`, { token, quizId });
@@ -22,8 +22,8 @@ export const requestQuizDelete = (token: string, quizId: number) =>
 export const requestQuizInfo = (token: string, quizId: number) =>
   requestHelper('GET', `/v1/admin/quiz/${quizId}`, { token, quizId });
 
-export const requestQuizQuestionCreate = (token: string, quizId: number, question: QuestionType) =>
-  requestHelper('POST', `/v1/admin/quiz/${quizId}/question`, { token, quizId, question });
+export const requestQuizQuestionCreate = (token: string, quizId: number, questionBody: QuestionType) =>
+  requestHelper('POST', `/v1/admin/quiz/${quizId}/question`, { token, quizId, questionBody });
 
 export const requestQuizTrashInfo = (token: string) =>
   requestHelper('GET', '/v1/admin/quiz/trash', { token });

@@ -119,7 +119,7 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
 });
 
 // adminQuizCreate route
-app.post('/v1/admin/quiz/create', (req: Request, res: Response) => {
+app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const { token, name, description } = req.body;
   const result = adminQuizCreate(token, name, description);
   returnHandler(res, result);
@@ -157,9 +157,9 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
 
 // adminQuizQuestionCreate Route
 app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
-  const { token, question } = req.body;
+  const { token, questionBody } = req.body;
   const quizId = parseInt(req.params.quizid);
-  const result = adminQuizQuestionCreate(token, quizId, question);
+  const result = adminQuizQuestionCreate(token, quizId, questionBody);
   returnHandler(res, result);
 });
 

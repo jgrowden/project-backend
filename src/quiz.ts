@@ -155,11 +155,9 @@ export function adminQuizList(sessionId: string): AdminQuizListReturn | ErrorObj
     return returnError('User ID not found', 401);
   }
 
-  const data = getData();
-  const filteredQuiz = data.quizzes.filter(quiz => quiz.ownerId === user.authUserId);
-  const userQuizzes = filteredQuiz.map(quiz => { return { quizId: quiz.quizId, name: quiz.name }; });
-
-  return { quizzes: userQuizzes };
+  const userQuizzes = user.userQuizzes.map(quizId => fetchQuizFromQuizId(quizId));
+  const returnQuizzes = userQuizzes.map(quiz => { return { quizId: quiz.quizId, name: quiz.name } });
+  return { quizzes: returnQuizzes };
 }
 
 /**
@@ -324,14 +322,14 @@ export function adminQuizInfo(
  *
  * @param {string} sessionId - unique user identification string
  * @param {number} quizId - a quiz's unique identification number
- * @param {QuestionType} newQuestion - the question to be added
+ * @param {QuestionType} questionBody - the question to be added
  *
  * @returns {questionId} - a unique number to identify the question
 */
 export function adminQuizQuestionCreate(
   sessionId: string,
   quizId: number,
-  newQuestion: QuestionType
+  questionBody: QuestionType
 ): AdminQuizQuestionCreateReturn | ErrorObjectWithCode {
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
@@ -347,41 +345,41 @@ export function adminQuizQuestionCreate(
     return returnError('you do not own this quiz', 403);
   }
 
-  if (newQuestion.question.length < questionLenMin || newQuestion.question.length > questionLenMax) {
+  if (questionBody.question.length < questionLenMin || questionBody.question.length > questionLenMax) {
     return returnError('Question must be between 5 and 50 characters long');
   }
 
-  if (newQuestion.answers.length < questionNumAnswersMin || newQuestion.answers.length > questionNumAnswersMax) {
+  if (questionBody.answers.length < questionNumAnswersMin || questionBody.answers.length > questionNumAnswersMax) {
     return returnError('Invalid number of answers: there must be between 2 and 6 answers');
   }
 
-  if (newQuestion.duration <= 0) {
+  if (questionBody.duration <= 0) {
     return returnError('Question must have positive duration');
   }
 
   const questionLength = quiz.questions.reduce((pSum, question) => pSum + question.duration, 0);
 
-  if (questionLength + newQuestion.duration > questionDurationMax) {
+  if (questionLength + questionBody.duration > questionDurationMax) {
     return returnError('Quiz must have duration lower than 180');
   }
 
-  if (newQuestion.points < questionPointsMin || newQuestion.points > questionPointsMax) {
+  if (questionBody.points < questionPointsMin || questionBody.points > questionPointsMax) {
     return returnError('Invalid quiz point count: question must have between 1 and 10 points');
   }
 
-  if (newQuestion.answers.find(entry => entry.answer.length < answersLenMin || entry.answer.length > answersLenMax) !== undefined) {
+  if (questionBody.answers.find(entry => entry.answer.length < answersLenMin || entry.answer.length > answersLenMax) !== undefined) {
     return returnError('Invalid answer length: answers must be between 1 and 30 characters long');
   }
 
   // check for duplicate entries
-  const answer = newQuestion.answers.map(entry => entry.answer);
+  const answer = questionBody.answers.map(entry => entry.answer);
   const duplicates = answer.filter((entry, index) => answer.indexOf(entry) !== index);
 
   if (duplicates.length !== 0) {
     return returnError('Question cannot have duplicate answers');
   }
 
-  if (newQuestion.answers.find(answer => answer.correct === true) === undefined) {
+  if (questionBody.answers.find(answer => answer.correct === true) === undefined) {
     return returnError('There are no correct answers');
   }
 
@@ -389,13 +387,13 @@ export function adminQuizQuestionCreate(
 
   quiz.questions.push({
     questionId: newQuestionId,
-    question: newQuestion.question,
-    duration: newQuestion.duration,
-    points: newQuestion.points,
-    answers: newQuestion.answers
+    question: questionBody.question,
+    duration: questionBody.duration,
+    points: questionBody.points,
+    answers: questionBody.answers
   });
   quiz.numQuestions++;
-  quiz.duration += newQuestion.duration;
+  quiz.duration += questionBody.duration;
   quiz.timeLastEdited = Math.floor(Date.now() / 1000);
 
   return {
@@ -684,7 +682,7 @@ export function adminQuizQuestionDelete(
  * Pops the returned element from original array
  * @returns string
  */
-function setRandomColour (colours: string[]): string {
+function setRandomColour(colours: string[]): string {
   const colourIndex = ~~(Math.random() * colours.length);
   const colourToReturn = colours[colourIndex];
   colours.splice(colourIndex, 1);
