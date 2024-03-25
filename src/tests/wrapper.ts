@@ -22,7 +22,7 @@ const requestUserDetails = (token: string) =>
 const requestUserPasswordUpdate = (token: TokenType, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v1/admin/user/password', { token, oldPassword, newPassword });
 
-const requestQuizNameUpdate = (token: TokenType, quizId: number, name: string) =>
+const requestQuizNameUpdate = (token: string, quizId: number, name: string) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/name`, { token, quizId, name });
 
 const requestQuestionUpdate = (sessionId: string, quizId: number, questionId: number, questionBody: QuestionType) =>
@@ -41,4 +41,4 @@ const errorCode = (statusCode: number) => {
   return { statusCode: statusCode, jsonBody: ERROR };
 };
 
-export { requestAuthRegister, requestAuthLogin, requestUserDetails, requestQuizDelete, requestQuizCreate, requestQuizInfo, requestUserPasswordUpdate, requestQuestionUpdate, errorCode, clear, ERROR, ERRORANDSTATUS };
+export { requestAuthRegister, requestAuthLogin, requestUserDetails, requestQuizDelete, requestQuizCreate, requestQuizInfo, requestUserPasswordUpdate, requestQuizNameUpdate, requestQuestionUpdate, errorCode, clear, ERROR, ERRORANDSTATUS };
