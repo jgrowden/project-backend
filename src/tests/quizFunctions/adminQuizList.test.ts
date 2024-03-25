@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizList, clear, ERROR } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizList, clear, errorCode } from '../wrapper';
 
 describe('adminQuizList', () => {
   beforeEach(() => {
@@ -80,6 +80,6 @@ describe('adminQuizList', () => {
     const token = user.jsonBody.token as string;
     clear();
     expect(requestQuizList(token))
-      .toStrictEqual({ statusCode: 401, jsonBody: ERROR });
+      .toStrictEqual(errorCode(401));
   });
 });

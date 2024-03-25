@@ -1,4 +1,4 @@
-import { ERROR, clear, requestAuthRegister, requestQuizCreate, requestQuizDelete, requestQuizTrashInfo } from '../wrapper';
+import { errorCode, clear, requestAuthRegister, requestQuizCreate, requestQuizDelete, requestQuizTrashInfo } from '../wrapper';
 
 let token1: string;
 let token2: string;
@@ -13,7 +13,7 @@ beforeEach(() => {
 
 describe('adminQuizTrashList testing', () => {
   test('invalid session id', () => {
-    expect(requestQuizTrashInfo(token1 + '1')).toStrictEqual({ statusCode: 401, jsonBody: ERROR });
+    expect(requestQuizTrashInfo(token1 + '1')).toStrictEqual(errorCode(401));
   });
 
   test('no quizzes in trash', () => {

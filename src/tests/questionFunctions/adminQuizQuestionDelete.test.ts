@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, requestQuestionDelete, clear, ERRORANDSTATUS } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, requestQuestionDelete, clear, errorCode } from '../wrapper';
 import { QuestionType } from '../../dataStore';
 
 let token: string;
@@ -63,20 +63,11 @@ describe('Testing Question Delete', () => {
   });
   describe('Testing error cases', () => {
     test('Error 401: Empty or invalid token', () => {
-      expect(requestQuestionDelete('', quizId, questionId)).toStrictEqual({
-        statusCode: 401,
-        jsonBody: ERRORANDSTATUS
-      });
-      expect(requestQuestionDelete(token + '1', quizId, questionId)).toStrictEqual({
-        statusCode: 401,
-        jsonBody: ERRORANDSTATUS
-      });
+      expect(requestQuestionDelete('', quizId, questionId)).toStrictEqual(errorCode(401));
+      expect(requestQuestionDelete(token + '1', quizId, questionId)).toStrictEqual(errorCode(401));
     });
     test('Error 403: Valid token, invalid quizId', () => {
-      expect(requestQuestionDelete(token, quizId + 1, questionId)).toStrictEqual({
-        statusCode: 403,
-        jsonBody: ERRORANDSTATUS
-      });
+      expect(requestQuestionDelete(token, quizId + 1, questionId)).toStrictEqual(errorCode(403));
       // Testing with valid quizId that the user does NOT own
       const newUser = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
       const newToken = newUser.jsonBody.token as string;
@@ -85,17 +76,11 @@ describe('Testing Question Delete', () => {
       const newQuestion = requestQuizQuestionCreate(newToken, newQuizId, questionBody);
       const newQuestionId = newQuestion.jsonBody.questionId as number;
       expect(requestQuestionDelete(token, newQuizId, newQuestionId))
-        .toStrictEqual({
-          statusCode: 403,
-          jsonBody: ERRORANDSTATUS
-        });
+        .toStrictEqual(errorCode(403));
     });
     test('Error 400: Valid token, valid quizId, invalid questionId', () => {
       expect(requestQuestionDelete(token, quizId, questionId + 1))
-        .toStrictEqual({
-          statusCode: 400,
-          jsonBody: ERRORANDSTATUS
-        });
+        .toStrictEqual(errorCode(400));
     });
   });
 });

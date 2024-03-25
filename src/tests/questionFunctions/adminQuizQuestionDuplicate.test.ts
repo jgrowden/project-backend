@@ -1,5 +1,5 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, requestQuizQuestionDuplicate, clear, ERRORANDSTATUS } from '../wrapper';
-import { adminQuizQuestionCreateArgument } from '../../quiz';
+import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, requestQuizQuestionDuplicate, clear, errorCode } from '../wrapper';
+import { QuestionType } from '../../dataStore';
 
 let token: string;
 let quizId: number;
@@ -12,13 +12,13 @@ beforeEach(() => {
   token = user.jsonBody.token as string;
   const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
   quizId = quiz.jsonBody.quizId as number;
-  const questionBody1: adminQuizQuestionCreateArgument = {
+  const questionBody1: QuestionType = {
     question: 'Question1?',
     duration: 3,
     points: 4,
     answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
   };
-  const questionBody2: adminQuizQuestionCreateArgument = {
+  const questionBody2: QuestionType = {
     question: 'Question2?',
     duration: 3,
     points: 4,
@@ -123,44 +123,29 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
     });
   });
   test('Failed test: question ID does not refer to a valid question within this quiz.', () => {
-    expect(requestQuizQuestionDuplicate(token, quizId, -1)).toStrictEqual({
-      statusCode: 400,
-      jsonBody: ERRORANDSTATUS
-    });
+    expect(requestQuizQuestionDuplicate(token, quizId, -1)).toStrictEqual(errorCode(400));
   });
   test('Failed test: Empty token.', () => {
-    expect(requestQuizQuestionDuplicate('', quizId, questionId1)).toStrictEqual({
-      statusCode: 401,
-      jsonBody: ERRORANDSTATUS
-    });
+    expect(requestQuizQuestionDuplicate('', quizId, questionId1)).toStrictEqual(errorCode(401));
   });
   test('Failed test: Invalid token.', () => {
-    expect(requestQuizQuestionDuplicate(token + '1', quizId, questionId1)).toStrictEqual({
-      statusCode: 401,
-      jsonBody: ERRORANDSTATUS
-    });
+    expect(requestQuizQuestionDuplicate(token + '1', quizId, questionId1)).toStrictEqual(errorCode(401));
   });
   test('Failed test: Quiz ID invalid.', () => {
-    expect(requestQuizQuestionDuplicate(token, quizId + 1, questionId1)).toStrictEqual({
-      statusCode: 403,
-      jsonBody: ERRORANDSTATUS
-    });
+    expect(requestQuizQuestionDuplicate(token, quizId + 1, questionId1)).toStrictEqual(errorCode(403));
   });
   test('Failed test: User does not own the quiz.', () => {
     const newUser = requestAuthRegister('frieren.theslayer@gmail.com', 'ushouldwatchfr1eren', 'Frieren', 'TheSlayer');
     const newToken = newUser.jsonBody.token as string;
     const newQuiz = requestQuizCreate(newToken, 'Quiz Name', 'Quiz Description');
     const newQuizId = newQuiz.jsonBody.quizId as number;
-    const newQuestionBody: adminQuizQuestionCreateArgument = {
+    const newQuestionBody: QuestionType = {
       question: 'new question',
       duration: 3,
       points: 4,
       answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
     };
     const newQuestionId = requestQuizQuestionCreate(newToken, newQuizId, newQuestionBody).jsonBody.questionId;
-    expect(requestQuizQuestionDuplicate(token, newQuizId, newQuestionId)).toStrictEqual({
-      statusCode: 403,
-      jsonBody: ERRORANDSTATUS
-    });
+    expect(requestQuizQuestionDuplicate(token, newQuizId, newQuestionId)).toStrictEqual(errorCode(403));
   });
 });
