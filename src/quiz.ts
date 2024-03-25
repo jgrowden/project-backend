@@ -80,7 +80,7 @@ export function adminQuizDescriptionUpdate(sessionId: string, quizId: number, de
 */
 export function adminQuizNameUpdate(sessionId: string, quizId: number, name: string): ErrorObject | Record<string, never> {
   const data = getData();
-  
+
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
     return {
@@ -104,21 +104,21 @@ export function adminQuizNameUpdate(sessionId: string, quizId: number, name: str
   }
 
   if (regex.test(name)) {
-    return { 
+    return {
       error: 'Invalid characters found in quiz name',
-      statusCode: 400, 
+      statusCode: 400,
     };
   }
 
   if (name.length < quizNameMinLength || name.length > quizNameMaxLength) {
-    return { 
+    return {
       error: 'Invalid quiz name length',
       statusCode: 400,
     };
   }
 
   if (data.quizzes.find(quiz => quiz.ownerId === user.authUserId && quiz.name === name)) {
-    return { 
+    return {
       error: 'Quiz name already taken',
       statusCode: 400,
     };
@@ -128,7 +128,6 @@ export function adminQuizNameUpdate(sessionId: string, quizId: number, name: str
 
   return {};
 }
-
 
 /**
  * Provide a list of all quizzes that are owned by the currently logged in user.
