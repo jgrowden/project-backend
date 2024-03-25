@@ -1,13 +1,21 @@
 import { getData, TokenType } from './dataStore';
 import validator from 'validator';
 import { nanoid } from 'nanoid';
-import { fetchUserFromSessionId, userWithEmailExists, generateNewUserId, returnError, ErrorObject, ErrorObjectWithCode } from './helper';
+import {
+  fetchUserFromSessionId,
+  userWithEmailExists,
+  generateNewUserId,
+  returnError,
+  ErrorObjectWithCode
+} from './helper';
 
 interface AdminUserDetailsReturn {
   user: {
     userId: number;
     name: string;
     email: string;
+    password: string;
+    previousPasswords: string[];
     numSuccessfulLogins: number;
     numFailedPasswordsSinceLastLogin: number;
   }
@@ -49,46 +57,50 @@ function hasLetterAndNumber(str: string): boolean {
  * @returns {{sessionId: number}} sessionId - the user's unique identification number
  */
 
-export function adminAuthRegister(email: string, password: string, nameFirst: string, nameLast: string):
- TokenType | ErrorObject {
+export function adminAuthRegister(
+  email: string,
+  password: string,
+  nameFirst: string,
+  nameLast: string
+): TokenType | ErrorObjectWithCode {
   const data = getData();
 
   // Check for duplicate email
   const duplicateEmail = userWithEmailExists(email);
   if (duplicateEmail !== undefined) {
-    return { error: 'User with given email already exists' };
+    return returnError('User with given email already exists');
   }
 
   // Check for invalid email
   if (!validator.isEmail(email)) {
-    return { error: 'invalid email' };
+    return returnError('invalid email');
   }
 
   // Check for invalid first name
   if (validName(nameFirst)) {
-    return { error: 'Invalid first name' };
+    return returnError('Invalid first name');
   }
 
   if (nameFirst.length < userNameMinLength || nameFirst.length > userNameMaxLength) {
-    return { error: 'nameFirst does not satisfy length requirements' };
+    return returnError('nameFirst does not satisfy length requirements');
   }
 
   // Check for invalid last name
   if (validName(nameLast)) {
-    return { error: 'invalid last name' };
+    return returnError('invalid last name');
   }
 
   if (nameLast.length < userNameMinLength || nameLast.length > userNameMaxLength) {
-    return { error: 'nameLast does not satisfy length requirements' };
+    return returnError('nameLast does not satisfy length requirements');
   }
 
   // Check for invalid password
   if (password.length < userPasswordMinLength) {
-    return { error: 'password is less than 8 characters' };
+    return returnError('password is less than 8 characters');
   }
 
   if (!hasLetterAndNumber(password)) {
-    return { error: 'password must contain at least one letter and at least one number' };
+    return returnError('password must contain at least one letter and at least one number');
   }
 
   const newUserId = generateNewUserId();
@@ -120,14 +132,15 @@ export function adminAuthRegister(email: string, password: string, nameFirst: st
  *
  * @returns {{sessionId: string}} sessionId - the user's unique identification string
  */
-export function adminAuthLogin(email: string, password: string): TokenType | ErrorObject {
+export function adminAuthLogin(email: string, password: string): TokenType | ErrorObjectWithCode {
   const user = userWithEmailExists(email);
   if (!user) {
-    return { error: 'user doesn\'t exist' };
+    return returnError('user doesn\'t exist');
   }
+
   if (user.password !== password) {
     user.numFailedPasswordsSinceLastLogin++;
-    return { error: 'incorrect password' };
+    return returnError('incorrect password');
   }
 
   const sessionId: string = nanoid();
@@ -150,8 +163,7 @@ export function adminAuthLogout(sessionId: string): ErrorObjectWithCode | Record
     return returnError('User ID not found', 401);
   }
 
-  const filteredArray = user.sessions.filter(sessions => { return sessions !== sessionId; });
-  user.sessions = filteredArray;
+  user.sessions = user.sessions.filter(sessions => { return sessions !== sessionId; });
 
   return {};
 }
@@ -177,10 +189,10 @@ export function adminAuthLogout(sessionId: string): ErrorObjectWithCode | Record
  *   }} - an object containing key information about the user queried.
 */
 
-export function adminUserDetails(sessionId: string): AdminUserDetailsReturn | ErrorObject {
+export function adminUserDetails(sessionId: string): AdminUserDetailsReturn | ErrorObjectWithCode {
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
-    return { error: 'User ID not found' };
+    return returnError('User ID not found', 401);
   }
 
   return {
@@ -189,6 +201,8 @@ export function adminUserDetails(sessionId: string): AdminUserDetailsReturn | Er
       name: `${user.nameFirst} ${user.nameLast}`,
       email: user.email,
       numSuccessfulLogins: user.numSuccessfulLogins,
+      password: user.password,
+      previousPasswords: user.previousPasswords,
       numFailedPasswordsSinceLastLogin: user.numFailedPasswordsSinceLastLogin,
     }
   };
@@ -205,40 +219,43 @@ export function adminUserDetails(sessionId: string): AdminUserDetailsReturn | Er
  *
  * @return {} - an empty object
 */
-export function adminUserDetailsUpdate(sessionId: string, email: string, nameFirst: string, nameLast: string): ErrorObjectWithCode | Record<string, never> {
+export function adminUserDetailsUpdate(
+  sessionId: string,
+  email: string,
+  nameFirst: string,
+  nameLast: string
+): ErrorObjectWithCode | Record<string, never> {
   const userToEdit = fetchUserFromSessionId(sessionId);
   if (!userToEdit) {
     return returnError('User ID not found', 401);
   }
 
   if (validator.isEmail(email) === false) {
-    return returnError('Invalid email', 400);
+    return returnError('Invalid email');
   }
 
   // Check for invalid first name
   if (validName(nameFirst)) {
-    return returnError('Invalid first name', 400);
+    return returnError('Invalid first name');
   }
   if (nameFirst.length < userNameMinLength || nameFirst.length > userNameMaxLength) {
-    return returnError('First name does not satisfy length requirements', 400);
+    return returnError('First name does not satisfy length requirements');
   }
 
   // Check for invalid last name
   if (validName(nameLast)) {
-    return returnError('Invalid last name', 400);
+    return returnError('Invalid last name');
   }
   if (nameLast.length < userNameMinLength || nameLast.length > userNameMaxLength) {
-    return returnError('Last name does not satisfy length requirements', 400);
+    return returnError('Last name does not satisfy length requirements');
   }
 
   // get userId from sessionId
   // loop through datastore userIds. if a user has the same email and a different userId, email already registered
 
-  const data = getData();
-  for (const user of data.users) {
-    if (user.email === email && user.authUserId !== userToEdit.authUserId) {
-      return returnError('Email already registered', 400);
-    }
+  const registered = getData().users.find(user => user.email === email && user.authUserId !== userToEdit.authUserId);
+  if (registered !== undefined) {
+    return returnError('Email already registered');
   }
 
   userToEdit.email = email;
@@ -258,55 +275,40 @@ export function adminUserDetailsUpdate(sessionId: string, email: string, nameFir
  * @return {} - an empty object
 */
 
-export function adminUserPasswordUpdate(sessionId: string, oldPassword: string, newPassword: string): ErrorObject | Record<string, never> {
+export function adminUserPasswordUpdate(
+  token: string,
+  oldPassword: string,
+  newPassword: string
+): ErrorObjectWithCode | Record<string, never> {
   // check sessionId exists
-  const user = fetchUserFromSessionId(sessionId);
+  const user = fetchUserFromSessionId(token);
   if (!user) {
-    return {
-      error: 'User ID not found',
-      statusCode: 401
-    };
+    return returnError('User Id not found', 401);
   }
 
   // check oldPassword is correct
   if (oldPassword !== user.password) {
-    return {
-      error: 'Old password is not correct',
-      statusCode: 400
-    };
+    return returnError('Old password is not correct');
   }
+
   // check oldPassword and newPassword match exactly
   if (oldPassword === newPassword) {
-    return {
-      error: 'New password is the same as old password',
-      statusCode: 400
-    };
+    return returnError('New password is the same as old password');
   }
 
   // check newPassword has not previously been used
-  for (const prevPassword of user.previousPasswords) {
-    if (prevPassword === newPassword) {
-      return {
-        error: 'Password has been used before',
-        statusCode: 400
-      };
-    }
+  if (user.previousPasswords.find(password => password === newPassword)) {
+    return returnError('Password has been used before');
   }
 
   // check newPassword is at least 8 characters
   if (newPassword.length < userPasswordMinLength) {
-    return {
-      error: 'Password is less than 8 characters',
-      statusCode: 400
-    };
+    return returnError('Password is less than 8 characters');
   }
 
   // check newPassword is at least 1 letter and 1 number
   if (!hasLetterAndNumber(newPassword)) {
-    return {
-      error: 'Password must contain at least one letter and at least one number',
-      statusCode: 400
-    };
+    return returnError('Password must contain at least one letter and at least one number');
   }
 
   // update password if no errors

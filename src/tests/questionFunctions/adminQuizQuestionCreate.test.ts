@@ -1,9 +1,9 @@
 import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, errorCode, clear } from '../wrapper';
-import { adminQuizQuestionCreateArgument } from '../../quiz';
+import { QuestionType } from '../../dataStore';
 
 let token: string;
 let quizId: number;
-let questionBody: adminQuizQuestionCreateArgument;
+let questionBody: QuestionType;
 
 beforeEach(() => {
   clear();
