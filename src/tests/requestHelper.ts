@@ -5,7 +5,7 @@ const SERVER_URL = `${url}:${port}`;
 // Return type of returnHelper() function.
 interface RequestHelperReturnType {
   statusCode: number;
-  jsonBody?: Record<string, any>;
+  jsonBody?: Record<string, never>;
   error?: string;
 }
 
