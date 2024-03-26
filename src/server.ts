@@ -29,6 +29,7 @@ import {
   adminQuizQuestionMove,
   adminQuizTrashList,
   adminQuizRestore,
+  adminQuizTrashEmpty,
   adminQuizChangeOwner,
   adminQuizQuestionDuplicate,
   adminQuizQuestionDelete
@@ -187,6 +188,19 @@ app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
   const token = req.body.token as string;
   const quizId = parseInt(req.params.quizid);
   const result = adminQuizRestore(token, quizId);
+  if ('errorCode' in result) {
+    return res.status(result.errorCode).json(result.errorObject);
+  }
+  save();
+  res.json(result);
+});
+
+// adminQuizTrashEmpty Route
+app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
+  const token = req.query.token as string;
+  const quizIdsString = req.query.quizIds as string;
+  const quizIds = JSON.parse(quizIdsString) as number[];
+  const result = adminQuizTrashEmpty(token, quizIds);
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
