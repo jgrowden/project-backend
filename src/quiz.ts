@@ -8,7 +8,6 @@ import {
   generateNewQuestionId,
   currentTime,
   returnError,
-  ErrorObject,
   ErrorObjectWithCode
 } from './helper';
 
@@ -69,26 +68,27 @@ const answersLenMax = 30;
  *
  * @returns {} - an empty object
 */
-export function adminQuizDescriptionUpdate(sessionId: string, quizId: number, description: string): ErrorObject | Record<string, never> {
+export function adminQuizDescriptionUpdate(sessionId: string, quizId: number, description: string): ErrorObjectWithCode | Record<string, never> {
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
-    return { error: 'User ID not found' };
+    return returnError('Invalid token', 401);
   }
 
   const quiz = fetchQuizFromQuizId(quizId);
   if (!quiz) {
-    return { error: 'Quiz ID not found' };
+    return returnError('Invalid quiz', 403);
   }
 
-  if (!user.userQuizzes.includes(quizId)) {
-    return { error: 'Quiz not owned by user' };
+  if (quiz.ownerId !== user.authUserId) {
+    return returnError('Invalid quiz ownership', 403);
   }
 
   if (description.length > quizDescriptionMaxLength) {
-    return { error: 'Quiz description should be less than 100 characters' };
+    return returnError('Quiz description should be less than 100 characters', 400);
   }
 
   quiz.description = description;
+  quiz.timeLastEdited = currentTime();
 
   return {};
 }
@@ -131,7 +131,7 @@ export function adminQuizNameUpdate(sessionId: string, quizId: number, name: str
   }
 
   quiz.name = name;
-  quiz.timeLastEdited = currentTime()
+  quiz.timeLastEdited = currentTime();
 
   return {};
 }
