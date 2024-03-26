@@ -4,120 +4,41 @@ import { QuestionType } from '../../dataStore';
 let token: string;
 let quizId: number;
 let questionId: number;
-const questionBody: QuestionType = {
-  question: 'Who\'s the strongest?',
-  duration: 5,
-  points: 6,
-  answers: [
-    {
-      answer: 'Luffy',
-      correct: false,
-    },
-    {
-      answer: 'Shanks',
-      correct: false,
-    },
-    {
-      answer: 'Blackbeard',
-      correct: false,
-    },
-    {
-      answer: 'God Usopp',
-      correct: true,
-    },
-  ],
-};
+let questionBody: QuestionType;
 beforeEach(() => {
   clear();
   const user = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
   token = user.jsonBody.token as string;
   const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
   quizId = quiz.jsonBody.quizId as number;
+  questionBody = {
+    question: 'Who\'s the strongest?',
+    duration: 5,
+    points: 6,
+    answers: [
+      {
+        answer: 'Luffy',
+        correct: false,
+      },
+      {
+        answer: 'Shanks',
+        correct: false,
+      },
+      {
+        answer: 'Blackbeard',
+        correct: false,
+      },
+      {
+        answer: 'God Usopp',
+        correct: true,
+      },
+    ],
+  };
   const question = requestQuizQuestionCreate(token, quizId, questionBody);
   questionId = question.jsonBody.questionId as number;
 });
 
 describe('Testing Question Update', () => {
-  describe('Testing success case', () => {
-    const updateQuestionBody: QuestionType = {
-      question: 'Who has the longest nose?',
-      duration: 5,
-      points: 9,
-      answers: [
-        {
-          answer: 'Luffy',
-          correct: false,
-        },
-        {
-          answer: 'Shanks',
-          correct: false,
-        },
-        {
-          answer: 'Blackbeard',
-          correct: false,
-        },
-        {
-          answer: 'God Usopp',
-          correct: true,
-        },
-      ],
-    };
-
-    test('Successful question update:', () => {
-      expect(requestQuestionUpdate(token, quizId, questionId, updateQuestionBody))
-        .toStrictEqual({
-          statusCode: 200,
-          jsonBody: {}
-        });
-      const timeEdited = ~~(Date.now() / 1000);
-      const quizInfo = requestQuizInfo(token, quizId);
-      const quizTimeEdited = quizInfo.jsonBody.timeLastEdited;
-      expect(requestQuizInfo(token, quizId)).toStrictEqual({
-        statusCode: 200,
-        jsonBody: {
-          quizId: quizId,
-          name: 'Quiz Name',
-          timeCreated: expect.any(Number),
-          timeLastEdited: expect.any(Number),
-          description: 'Quiz Description',
-          numQuestions: 1,
-          questions: [
-            {
-              questionId: questionId,
-              question: 'Who has the longest nose?',
-              duration: 5,
-              points: 9,
-              answers: [
-                {
-                  answer: 'Luffy',
-                  colour: expect.any(String),
-                  correct: false,
-                },
-                {
-                  answer: 'Shanks',
-                  colour: expect.any(String),
-                  correct: false,
-                },
-                {
-                  answer: 'Blackbeard',
-                  colour: expect.any(String),
-                  correct: false,
-                },
-                {
-                  answer: 'God Usopp',
-                  colour: expect.any(String),
-                  correct: true,
-                },
-              ],
-            },
-          ],
-          duration: 10,
-        }
-      });
-      expect(timeEdited).toBeGreaterThanOrEqual(quizTimeEdited);
-      expect(timeEdited).toBeLessThanOrEqual(quizTimeEdited + 1);
-    });
-  });
   describe('Testing error cases', () => {
     let newQuestionBody: QuestionType;
     beforeEach(() => {
@@ -219,6 +140,85 @@ describe('Testing Question Update', () => {
       newQuestionBody.answers[3].correct = false;
       expect(requestQuestionUpdate(token, quizId, questionId, newQuestionBody))
         .toStrictEqual(errorCode(400));
+    });
+  });
+  describe('Testing success case', () => {
+    const updateQuestionBody: QuestionType = {
+      question: 'Who has the longest nose?',
+      duration: 5,
+      points: 9,
+      answers: [
+        {
+          answer: 'Luffy',
+          correct: false,
+        },
+        {
+          answer: 'Shanks',
+          correct: false,
+        },
+        {
+          answer: 'Blackbeard',
+          correct: false,
+        },
+        {
+          answer: 'God Usopp',
+          correct: true,
+        },
+      ],
+    };
+    test('Successful question update:', () => {
+      expect(requestQuestionUpdate(token, quizId, questionId, updateQuestionBody))
+        .toStrictEqual({
+          statusCode: 200,
+          jsonBody: {}
+        });
+      const timeEdited = ~~(Date.now() / 1000);
+      const quizInfo = requestQuizInfo(token, quizId);
+      const quizTimeEdited = quizInfo.jsonBody.timeLastEdited;
+      expect(requestQuizInfo(token, quizId)).toStrictEqual({
+        statusCode: 200,
+        jsonBody: {
+          quizId: quizId,
+          name: 'Quiz Name',
+          timeCreated: expect.any(Number),
+          timeLastEdited: expect.any(Number),
+          description: 'Quiz Description',
+          numQuestions: 1,
+          questions: [
+            {
+              questionId: questionId,
+              question: 'Who has the longest nose?',
+              duration: 5,
+              points: 9,
+              answers: [
+                {
+                  answer: 'Luffy',
+                  colour: expect.any(String),
+                  correct: false,
+                },
+                {
+                  answer: 'Shanks',
+                  colour: expect.any(String),
+                  correct: false,
+                },
+                {
+                  answer: 'Blackbeard',
+                  colour: expect.any(String),
+                  correct: false,
+                },
+                {
+                  answer: 'God Usopp',
+                  colour: expect.any(String),
+                  correct: true,
+                },
+              ],
+            },
+          ],
+          duration: 10,
+        }
+      });
+      expect(timeEdited).toBeGreaterThanOrEqual(quizTimeEdited);
+      expect(timeEdited).toBeLessThanOrEqual(quizTimeEdited + 1);
     });
   });
 });
