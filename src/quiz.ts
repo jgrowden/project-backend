@@ -102,38 +102,36 @@ export function adminQuizDescriptionUpdate(sessionId: string, quizId: number, de
  *
  * @returns {} - an empty object
 */
-export function adminQuizNameUpdate(sessionId: string, quizId: number, name: string): ErrorObject | Record<string, never> {
+export function adminQuizNameUpdate(sessionId: string, quizId: number, name: string): ErrorObjectWithCode | Record<string, never> {
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
-    return { error: 'User ID not found' };
+    return returnError('Invalid token', 401);
   }
 
   const quiz = fetchQuizFromQuizId(quizId);
   if (!quiz) {
-    return { error: 'Quiz ID not found' };
+    return returnError('Invalid quiz', 403);
   }
 
-  if (!user.userQuizzes.includes(quizId)) {
-    return { error: 'Quiz not owned by user' };
+  if (quiz.ownerId !== user.authUserId) {
+    return returnError('Invalid quiz ownership', 403);
   }
 
   if (regex.test(name)) {
-    return { error: 'Invalid characters found in quiz name' };
+    return returnError('Invalid characters found in quiz name', 400);
   }
 
-  if (name.length < quizNameMinLength) {
-    return { error: 'invalid quiz name length: too short' };
+  if (name.length < quizNameMinLength || name.length > quizNameMaxLength) {
+    return returnError('Invalid quiz name length', 400);
   }
 
-  if (name.length > quizNameMaxLength) {
-    return { error: 'invalid quiz name length: too long' };
-  }
-
-  if (getData().quizzes.find(quiz => quiz.ownerId === user.authUserId && quiz.name === name)) {
-    return { error: 'Quiz name already taken' };
+  const data = getData();
+  if (data.quizzes.find(quiz => quiz.ownerId === user.authUserId && quiz.name === name)) {
+    return returnError('Quiz name already taken', 400);
   }
 
   quiz.name = name;
+  quiz.timeLastEdited = currentTime()
 
   return {};
 }
