@@ -131,6 +131,7 @@ export function adminQuizNameUpdate(sessionId: string, quizId: number, name: str
   }
 
   quiz.name = name;
+  quiz.timeLastEdited = currentTime()
 
   return {};
 }
