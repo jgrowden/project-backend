@@ -5,7 +5,7 @@ let token2: string;
 
 beforeEach(() => {
   clear();
-  token1 = requestAuthRegister('hayden.smith@unsw.edu.au', 'haydensmith123', 'Hayden', 'Smith').jsonBody.token;
+  token1 = requestAuthRegister('hayden.smith@unsw.edu.au', 'haydensmith123', 'Hayden', 'Smith').jsonBody.token as string;
 });
 
 describe('adminAuthLogout tests for POST /v1/admin/auth/logout', () => {
@@ -21,7 +21,7 @@ describe('adminAuthLogout tests for POST /v1/admin/auth/logout', () => {
   test('logout, followed by another login and logout', () => {
     expect(requestAuthLogout(token1)).toStrictEqual({ statusCode: 200, jsonBody: {} });
     expect(requestAuthLogout(token1)).toStrictEqual(errorCode(401));
-    token2 = requestAuthLogin('hayden.smith@unsw.edu.au', 'haydensmith123').jsonBody.token;
+    token2 = requestAuthLogin('hayden.smith@unsw.edu.au', 'haydensmith123').jsonBody.token as string;
     expect(requestAuthLogout(token2)).toStrictEqual({ statusCode: 200, jsonBody: {} });
     expect(requestAuthLogout(token2)).toStrictEqual(errorCode(401));
   });

@@ -59,8 +59,8 @@ describe('Testing Quiz Description Update', () => {
           questions: []
         }
       });
-      expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited);
-      expect(timeEdited).toBeLessThanOrEqual(quizInfo.jsonBody.timeLastEdited + 1);
+      expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited as number);
+      expect(timeEdited).toBeLessThanOrEqual(quizInfo.jsonBody.timeLastEdited as number + 1);
     });
 
     test('Succesful name update, 0 length string', () => {
@@ -84,8 +84,8 @@ describe('Testing Quiz Description Update', () => {
           questions: []
         }
       });
-      expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited);
-      expect(timeEdited).toBeLessThanOrEqual(quizInfo.jsonBody.timeLastEdited + 1);
+      expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited as number);
+      expect(timeEdited).toBeLessThanOrEqual(quizInfo.jsonBody.timeLastEdited as number + 1);
     });
     
     test('Succesful name update, 100 length string', () => {
@@ -109,8 +109,8 @@ describe('Testing Quiz Description Update', () => {
           questions: []
         }
       });
-      expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited);
-      expect(timeEdited).toBeLessThanOrEqual(quizInfo.jsonBody.timeLastEdited + 1);
+      expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited as number);
+      expect(timeEdited).toBeLessThanOrEqual(quizInfo.jsonBody.timeLastEdited as number + 1);
     });
   });
 });

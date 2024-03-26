@@ -31,9 +31,9 @@ beforeEach(() => {
     points: 4,
     answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
   };
-  questionId1 = requestQuizQuestionCreate(token, quizId, questionBody1).jsonBody.questionId;
-  questionId2 = requestQuizQuestionCreate(token, quizId, questionBody2).jsonBody.questionId;
-  questionId3 = requestQuizQuestionCreate(token, quizId, questionBody3).jsonBody.questionId;
+  questionId1 = requestQuizQuestionCreate(token, quizId, questionBody1).jsonBody.questionId as number;
+  questionId2 = requestQuizQuestionCreate(token, quizId, questionBody2).jsonBody.questionId as number;
+  questionId3 = requestQuizQuestionCreate(token, quizId, questionBody3).jsonBody.questionId as number;
 });
 
 describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
@@ -192,7 +192,7 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
       points: 4,
       answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
     };
-    const newQuestionId = requestQuizQuestionCreate(newToken, newQuizId, newQuestionBody).jsonBody.questionId;
+    const newQuestionId = requestQuizQuestionCreate(newToken, newQuizId, newQuestionBody).jsonBody.questionId as number;
     expect(requestQuizQuestionMove(token, newQuizId, newQuestionId, 0)).toStrictEqual(errorCode(403));
   });
 });
