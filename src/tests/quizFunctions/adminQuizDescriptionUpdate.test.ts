@@ -1,9 +1,8 @@
-/* eslint-disable */
 import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizDescriptionUpdate, clear, errorCode } from '../wrapper';
 
 let token: string;
 let quizId: number;
-let description: string = "New Quiz Description";
+const description = 'New Quiz Description';
 
 beforeEach(() => {
   clear();
@@ -43,12 +42,12 @@ describe('Testing Quiz Description Update', () => {
         .toStrictEqual({
           statusCode: 200,
           jsonBody: {}
-        })
+        });
       const timeEdited = ~~(Date.now() / 1000);
       const quizInfo = requestQuizInfo(token, quizId);
       expect(quizInfo).toStrictEqual({
         statusCode: 200,
-        jsonBody: { 
+        jsonBody: {
           quizId: quizId,
           name: 'Quiz Name',
           timeCreated: expect.any(Number),
@@ -68,12 +67,12 @@ describe('Testing Quiz Description Update', () => {
         .toStrictEqual({
           statusCode: 200,
           jsonBody: {}
-        })
+        });
       const timeEdited = ~~(Date.now() / 1000);
       const quizInfo = requestQuizInfo(token, quizId);
       expect(quizInfo).toStrictEqual({
         statusCode: 200,
-        jsonBody: { 
+        jsonBody: {
           quizId: quizId,
           name: 'Quiz Name',
           timeCreated: expect.any(Number),
@@ -87,18 +86,18 @@ describe('Testing Quiz Description Update', () => {
       expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited as number);
       expect(timeEdited).toBeLessThanOrEqual(quizInfo.jsonBody.timeLastEdited as number + 1);
     });
-    
+
     test('Succesful name update, 100 length string', () => {
       expect(requestQuizDescriptionUpdate(token, quizId, '0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789'))
         .toStrictEqual({
           statusCode: 200,
           jsonBody: {}
-        })
+        });
       const timeEdited = ~~(Date.now() / 1000);
       const quizInfo = requestQuizInfo(token, quizId);
       expect(quizInfo).toStrictEqual({
         statusCode: 200,
-        jsonBody: { 
+        jsonBody: {
           quizId: quizId,
           name: 'Quiz Name',
           timeCreated: expect.any(Number),
