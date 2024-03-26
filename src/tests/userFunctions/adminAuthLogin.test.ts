@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestAuthLogin, clear, ERROR } from '../wrapper';
+import { requestAuthRegister, requestAuthLogin, clear, errorCode } from '../wrapper';
 
 beforeEach(() => {
   clear();
@@ -17,11 +17,11 @@ describe('Testing adminAuthLogin', () => {
 
   test('Test unsuccessful login with non-existent email', () => {
     expect(requestAuthLogin('killua@gmail.com', 'k1loWatt'))
-      .toStrictEqual({ statusCode: 400, jsonBody: ERROR });
+      .toStrictEqual(errorCode(400));
   });
 
   test('Test unsuccessful login with valid email, incorrect password', () => {
     expect(requestAuthLogin('gon.freecs@gmail.com', 'F1rstComesR0ck!'))
-      .toStrictEqual({ statusCode: 400, jsonBody: ERROR });
+      .toStrictEqual(errorCode(400));
   });
 });

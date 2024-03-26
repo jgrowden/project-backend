@@ -57,8 +57,11 @@ export const currentTime = (): number => {
   return Math.floor(Date.now() / 1000);
 };
 
-export const returnError = (errorString: string, errorCode: number): ErrorObjectWithCode => {
+export const returnError = (errorString: string, errorCode?: number): ErrorObjectWithCode => {
   const err: ErrorString = { error: errorString };
+  if (errorCode === undefined) {
+    errorCode = 400;
+  }
   return {
     errorObject: err,
     errorCode: errorCode

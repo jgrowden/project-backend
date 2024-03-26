@@ -1,9 +1,9 @@
 import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, errorCode, clear } from '../wrapper';
-import { adminQuizQuestionCreateArgument } from '../../quiz';
+import { QuestionType } from '../../dataStore';
 
 let token: string;
 let quizId: number;
-let questionBody: adminQuizQuestionCreateArgument;
+let questionBody: QuestionType;
 
 beforeEach(() => {
   clear();
@@ -27,7 +27,6 @@ describe('Testing /v1/admin/quiz/{quizid}:', () => {
       statusCode: 200,
       jsonBody: {
         quizId: quizId,
-        ownerId: expect.any(Number),
         name: 'Quiz Name',
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),

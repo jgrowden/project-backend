@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestQuizCreate, clear, errorCode } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizInfo, clear, errorCode } from '../wrapper';
 
 let token: string;
 
@@ -10,9 +10,23 @@ beforeEach(() => {
 
 describe('Testing adminQuizCreate:', () => {
   test('Successful test.', () => {
-    expect(requestQuizCreate(token, 'Quiz Name', 'Quiz Description')).toStrictEqual({
+    const returnedQuiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
+    expect(returnedQuiz).toStrictEqual({
       statusCode: 200,
       jsonBody: { quizId: expect.any(Number) }
+    });
+    expect(requestQuizInfo(token, returnedQuiz.jsonBody.quizId)).toStrictEqual({
+      statusCode: 200,
+      jsonBody: {
+        quizId: returnedQuiz.jsonBody.quizId,
+        name: 'Quiz Name',
+        timeCreated: expect.any(Number),
+        timeLastEdited: expect.any(Number),
+        description: 'Quiz Description',
+        duration: 0,
+        numQuestions: 0,
+        questions: []
+      }
     });
   });
   test('Failed test: user does not exist', () => {
