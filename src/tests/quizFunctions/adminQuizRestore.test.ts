@@ -123,8 +123,8 @@ describe('Testing Quiz Restore', () => {
       });
 
       // Check that the timeLastEdited timestamp is updated
-      expect(timeEdited).toBeGreaterThanOrEqual(restoredQuizInfo.jsonBody.timeLastEdited);
-      expect(timeEdited).toBeLessThanOrEqual(restoredQuizInfo.jsonBody.timeLastEdited + 1);
+      expect(timeEdited).toBeGreaterThanOrEqual(restoredQuizInfo.jsonBody.timeLastEdited as number);
+      expect(timeEdited).toBeLessThanOrEqual(restoredQuizInfo.jsonBody.timeLastEdited as number + 1);
     });
   });
 });
