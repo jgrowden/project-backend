@@ -25,6 +25,17 @@ interface AdminQuizCreateReturn {
   quizId: number;
 }
 
+interface AdminQuizInfoReturn {
+  quizId: number;
+  name: string;
+  timeCreated: number;
+  timeLastEdited: number;
+  description: string;
+  numQuestions: number;
+  questions: QuestionType[];
+  duration: number;
+}
+
 interface AdminQuizQuestionCreateReturn {
   questionId: number;
 }
@@ -299,7 +310,7 @@ export function adminQuizTrashList(
 export function adminQuizInfo(
   sessionId: string,
   quizId: number
-): QuizType | ErrorObjectWithCode {
+): AdminQuizInfoReturn | ErrorObjectWithCode {
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
     return returnError('invalid user ID', 401);
@@ -314,7 +325,16 @@ export function adminQuizInfo(
     return returnError('you do not own this quiz', 403);
   }
 
-  return quiz;
+  return {
+    quizId: quiz.quizId,
+    name: quiz.name,
+    timeCreated: quiz.timeCreated,
+    timeLastEdited: quiz.timeLastEdited,
+    description: quiz.description,
+    numQuestions: quiz.numQuestions,
+    questions: quiz.questions,
+    duration: quiz.duration
+  };
 }
 
 /**
