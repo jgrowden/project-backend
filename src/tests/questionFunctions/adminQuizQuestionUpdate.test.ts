@@ -174,7 +174,7 @@ describe('Testing Question Update', () => {
         });
       const timeEdited = ~~(Date.now() / 1000);
       const quizInfo = requestQuizInfo(token, quizId);
-      const quizTimeEdited = quizInfo.jsonBody.timeLastEdited;
+      const quizTimeEdited = quizInfo.jsonBody.timeLastEdited as number;
       expect(requestQuizInfo(token, quizId)).toStrictEqual({
         statusCode: 200,
         jsonBody: {

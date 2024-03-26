@@ -1,9 +1,8 @@
-/* eslint-disable */
 import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizNameUpdate, clear, errorCode } from '../wrapper';
 
 let token: string;
 let quizId: number;
-let name: string = "New Quiz Name";
+const name = 'New Quiz Name';
 
 beforeEach(() => {
   clear();
@@ -19,7 +18,7 @@ describe('Testing Quiz Name Update', () => {
       expect(requestQuizNameUpdate('', quizId, name)).toStrictEqual(errorCode(401));
       expect(requestQuizNameUpdate(token + '1', quizId, name)).toStrictEqual(errorCode(401));
     });
-    
+
     test('Error 403: Valid token, invalid quizId', () => {
       expect(requestQuizNameUpdate(token, quizId + 1, name)).toStrictEqual(errorCode(403));
 
@@ -35,7 +34,7 @@ describe('Testing Quiz Name Update', () => {
       expect(requestQuizNameUpdate(token, quizId, '/!greatQUIZ>>'))
         .toStrictEqual(errorCode(400));
     });
-  
+
     test('Error 400: Quiz name length < 3 || Quiz Name Length > 30', () => {
       expect(requestQuizNameUpdate(token, quizId, 'ab'))
         .toStrictEqual(errorCode(400));
@@ -50,19 +49,19 @@ describe('Testing Quiz Name Update', () => {
         .toStrictEqual(errorCode(400));
     });
   });
-  
+
   describe('Testing success case', () => {
     test('Succesful name update', () => {
       expect(requestQuizNameUpdate(token, quizId, 'Succesful Name Update'))
         .toStrictEqual({
           statusCode: 200,
           jsonBody: {}
-        })
+        });
       const timeEdited = ~~(Date.now() / 1000);
       const quizInfo = requestQuizInfo(token, quizId);
       expect(quizInfo).toStrictEqual({
         statusCode: 200,
-        jsonBody: { 
+        jsonBody: {
           quizId: quizId,
           name: 'Succesful Name Update',
           timeCreated: expect.any(Number),
@@ -73,8 +72,8 @@ describe('Testing Quiz Name Update', () => {
           questions: []
         }
       });
-      expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited);
-      expect(timeEdited).toBeLessThanOrEqual(quizInfo.jsonBody.timeLastEdited + 1);
+      expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited as number);
+      expect(timeEdited).toBeLessThanOrEqual(quizInfo.jsonBody.timeLastEdited as number + 1);
     });
 
     test('Succesful name update, 3 character name', () => {
@@ -82,12 +81,12 @@ describe('Testing Quiz Name Update', () => {
         .toStrictEqual({
           statusCode: 200,
           jsonBody: {}
-        })
+        });
       const timeEdited = ~~(Date.now() / 1000);
       const quizInfo = requestQuizInfo(token, quizId);
       expect(quizInfo).toStrictEqual({
         statusCode: 200,
-        jsonBody: { 
+        jsonBody: {
           quizId: quizId,
           name: 'Abc',
           timeCreated: expect.any(Number),
@@ -98,8 +97,8 @@ describe('Testing Quiz Name Update', () => {
           questions: []
         }
       });
-      expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited);
-      expect(timeEdited).toBeLessThanOrEqual(quizInfo.jsonBody.timeLastEdited + 1);
+      expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited as number);
+      expect(timeEdited).toBeLessThanOrEqual(quizInfo.jsonBody.timeLastEdited as number + 1);
     });
 
     test('Succesful name update, 30 character name', () => {
@@ -107,12 +106,12 @@ describe('Testing Quiz Name Update', () => {
         .toStrictEqual({
           statusCode: 200,
           jsonBody: {}
-        })
+        });
       const timeEdited = ~~(Date.now() / 1000);
       const quizInfo = requestQuizInfo(token, quizId);
       expect(quizInfo).toStrictEqual({
         statusCode: 200,
-        jsonBody: { 
+        jsonBody: {
           quizId: quizId,
           name: 'ABCdefghijklmnopqrstuvwxyz1234',
           timeCreated: expect.any(Number),
@@ -123,8 +122,8 @@ describe('Testing Quiz Name Update', () => {
           questions: []
         }
       });
-      expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited);
-      expect(timeEdited).toBeLessThanOrEqual(quizInfo.jsonBody.timeLastEdited + 1);
+      expect(timeEdited).toBeGreaterThanOrEqual(quizInfo.jsonBody.timeLastEdited as number);
+      expect(timeEdited).toBeLessThanOrEqual(quizInfo.jsonBody.timeLastEdited as number + 1);
     });
   });
 });

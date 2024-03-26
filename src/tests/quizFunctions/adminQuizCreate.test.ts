@@ -15,7 +15,7 @@ describe('Testing adminQuizCreate:', () => {
       statusCode: 200,
       jsonBody: { quizId: expect.any(Number) }
     });
-    expect(requestQuizInfo(token, returnedQuiz.jsonBody.quizId)).toStrictEqual({
+    expect(requestQuizInfo(token, returnedQuiz.jsonBody.quizId as number)).toStrictEqual({
       statusCode: 200,
       jsonBody: {
         quizId: returnedQuiz.jsonBody.quizId,

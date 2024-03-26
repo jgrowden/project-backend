@@ -7,13 +7,13 @@ describe('adminUserDetailsUpdate http testing', () => {
 
   beforeEach(() => {
     clear();
-    user1Token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token;
-    user2Token = requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo').jsonBody.token;
+    user1Token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token as string;
+    user2Token = requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo').jsonBody.token as string;
   });
 
   test('invalid ID', () => {
     clear();
-    user1Token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token;
+    user1Token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token as string;
     expect(requestUserDetailsUpdate(user1Token + 1, 'test@email.com', 'John', 'Smith')).toStrictEqual(errorCode(401));
   });
 
