@@ -102,49 +102,32 @@ export function adminQuizDescriptionUpdate(sessionId: string, quizId: number, de
  *
  * @returns {} - an empty object
 */
-export function adminQuizNameUpdate(sessionId: string, quizId: number, name: string): ErrorObject | Record<string, never> {
+export function adminQuizNameUpdate(sessionId: string, quizId: number, name: string): ErrorObjectWithCode | Record<string, never> {
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
-    return {
-      error: 'Invalid token',
-      statusCode: 401,
-    };
+    return returnError('Invalid token', 401);
   }
 
   const quiz = fetchQuizFromQuizId(quizId);
   if (!quiz) {
-    return {
-      error: 'Invalid quizId',
-      statusCode: 403,
-    };
+    return returnError('Invalid quiz', 403);
   }
 
   if (quiz.ownerId !== user.authUserId) {
-    return {
-      error: 'Invalid quiz ownership',
-      statusCode: 403,
-    };
+    return returnError('Invalid quiz ownership', 403);
   }
 
   if (regex.test(name)) {
-    return {
-      error: 'Invalid characters found in quiz name',
-      statusCode: 400,
-    };
+    return returnError('Invalid characters found in quiz name', 400);
   }
 
   if (name.length < quizNameMinLength || name.length > quizNameMaxLength) {
-    return {
-      error: 'Invalid quiz name length',
-      statusCode: 400,
-    };
+    return returnError('Invalid quiz name length', 400);
   }
 
+  const data = getData();
   if (data.quizzes.find(quiz => quiz.ownerId === user.authUserId && quiz.name === name)) {
-    return {
-      error: 'Quiz name already taken',
-      statusCode: 400,
-    };
+    return returnError('Quiz name already taken', 400);
   }
 
   quiz.name = name;

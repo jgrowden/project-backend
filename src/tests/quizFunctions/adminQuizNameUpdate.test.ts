@@ -1,5 +1,5 @@
 /* eslint-disable */
-import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizNameUpdate, clear, ERROR, ERRORANDSTATUS } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizNameUpdate, clear, errorCode } from '../wrapper';
 
 let token: string;
 let quizId: number;
@@ -16,63 +16,38 @@ beforeEach(() => {
 describe('Testing Quiz Name Update', () => {
   describe('Testing error cases', () => {
     test('Error 401: Empty or invalid token', () => {
-      expect(requestQuizNameUpdate('', quizId, name)).toStrictEqual({
-        statusCode: 401,
-        jsonBody: ERRORANDSTATUS
-      });
-      expect(requestQuizNameUpdate(token + '1', quizId, name)).toStrictEqual({
-        statusCode: 401,
-        jsonBody: ERRORANDSTATUS
-      });
+      expect(requestQuizNameUpdate('', quizId, name)).toStrictEqual(errorCode(401));
+      expect(requestQuizNameUpdate(token + '1', quizId, name)).toStrictEqual(errorCode(401));
     });
     
     test('Error 403: Valid token, invalid quizId', () => {
-      expect(requestQuizNameUpdate(token, quizId + 1, name)).toStrictEqual({
-        statusCode: 403,
-        jsonBody: ERRORANDSTATUS
-      });
+      expect(requestQuizNameUpdate(token, quizId + 1, name)).toStrictEqual(errorCode(403));
 
       // Testing with valid quizId that the user does NOT own
       const newUser = requestAuthRegister('second.user@gmail.com', 's3c0nDUser', 'Second', 'User');
       const newToken = newUser.jsonBody.token as string;
       const newQuiz = requestQuizCreate(newToken, 'New Quiz', 'New Description');
       const newQuizId = newQuiz.jsonBody.quizId as number;
-      expect(requestQuizNameUpdate(token, newQuizId, name))
-        .toStrictEqual({
-        statusCode: 403,
-        jsonBody: ERRORANDSTATUS
-      });
+      expect(requestQuizNameUpdate(token, newQuizId, name)).toStrictEqual(errorCode(403));
     });
 
     test('Error 400: Name contains invalid characters', () => {
       expect(requestQuizNameUpdate(token, quizId, '/!greatQUIZ>>'))
-        .toStrictEqual({
-        statusCode: 400,
-        jsonBody: ERRORANDSTATUS
-      });
+        .toStrictEqual(errorCode(400));
     });
   
     test('Error 400: Quiz name length < 3 || Quiz Name Length > 30', () => {
       expect(requestQuizNameUpdate(token, quizId, 'ab'))
-        .toStrictEqual({
-        statusCode: 400,
-        jsonBody: ERRORANDSTATUS
-      });
+        .toStrictEqual(errorCode(400));
       expect(requestQuizNameUpdate(token, quizId, 'abcedfghijklmnopqrstuvwxyz12345'))
-        .toStrictEqual({
-        statusCode: 400,
-        jsonBody: ERRORANDSTATUS
-      });
+        .toStrictEqual(errorCode(400));
     });
 
     test('Error 400: Name already used by user for another quiz', () => {
       const newQuiz = requestQuizCreate(token, 'New Quiz', 'New Description');
       const newQuizId = newQuiz.jsonBody.quizId as number;
       expect(requestQuizNameUpdate(token, newQuizId, 'Quiz Name'))
-        .toStrictEqual({
-        statusCode: 400,
-        jsonBody: ERRORANDSTATUS
-      });
+        .toStrictEqual(errorCode(400));
     });
   });
   
@@ -90,7 +65,6 @@ describe('Testing Quiz Name Update', () => {
         jsonBody: { 
           quizId: quizId,
           name: 'Succesful Name Update',
-          ownerId: 0,
           timeCreated: expect.any(Number),
           timeLastEdited: expect.any(Number),
           description: 'Quiz Description',
@@ -116,7 +90,6 @@ describe('Testing Quiz Name Update', () => {
         jsonBody: { 
           quizId: quizId,
           name: 'Abc',
-          ownerId: 0,
           timeCreated: expect.any(Number),
           timeLastEdited: expect.any(Number),
           description: 'Quiz Description',
@@ -142,7 +115,6 @@ describe('Testing Quiz Name Update', () => {
         jsonBody: { 
           quizId: quizId,
           name: 'ABCdefghijklmnopqrstuvwxyz1234',
-          ownerId: 0,
           timeCreated: expect.any(Number),
           timeLastEdited: expect.any(Number),
           description: 'Quiz Description',

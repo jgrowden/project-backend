@@ -197,8 +197,8 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
   const { token, name } = req.body;
   const result = adminQuizNameUpdate(token, quizId, name);
-  if ('error' in result) {
-    return res.status(result.statusCode).json(result);
+  if ('errorCode' in result) {
+    return res.status(result.errorCode).json(result.errorObject);
   }
   save();
   res.json(result);
