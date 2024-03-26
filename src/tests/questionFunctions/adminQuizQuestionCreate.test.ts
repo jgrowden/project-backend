@@ -27,7 +27,6 @@ describe('Testing /v1/admin/quiz/{quizid}:', () => {
       statusCode: 200,
       jsonBody: {
         quizId: quizId,
-        ownerId: expect.any(Number),
         name: 'Quiz Name',
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),

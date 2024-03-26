@@ -20,7 +20,6 @@ describe('Testing adminQuizCreate:', () => {
       jsonBody: {
         quizId: returnedQuiz.jsonBody.quizId,
         name: 'Quiz Name',
-        ownerId: 0,
         timeCreated: expect.any(Number),
         timeLastEdited: expect.any(Number),
         description: 'Quiz Description',
