@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizDelete, requestQuizRestore, requestQuizTrashInfo, clear, errorCode } from '../wrapper';
 
 let token: string;
@@ -18,7 +17,7 @@ describe('Testing Quiz Restore', () => {
       expect(requestQuizRestore('', quizId)).toStrictEqual(errorCode(401));
       expect(requestQuizRestore(token + '1', quizId)).toStrictEqual(errorCode(401));
     });
-  
+
     test('Error 403: Valid token, invalid quizId', () => {
       expect(requestQuizRestore(token, quizId + 1)).toStrictEqual(errorCode(403));
 
@@ -32,8 +31,7 @@ describe('Testing Quiz Restore', () => {
 
     test('Error 400: Quiz name of restored quiz already used by another active quiz', () => {
       requestQuizDelete(token, quizId);
-      const newQuiz = requestQuizCreate(token, 'first quiz', 'new amazing quiz');
-      const newQuizId = newQuiz.jsonBody.quizId as number;
+      requestQuizCreate(token, 'first quiz', 'new amazing quiz');
       expect(requestQuizRestore(token, quizId)).toStrictEqual(errorCode(400));
     });
 

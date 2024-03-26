@@ -1,4 +1,3 @@
-/* eslint-disable */
 import { requestAuthRegister, requestQuizCreate, requestQuizDelete, requestQuizTrashInfo, requestQuizTrashEmpty, clear, errorCode } from '../wrapper';
 
 let token: string;
@@ -24,7 +23,7 @@ describe('Testing Quiz Trash Empty', () => {
       expect(requestQuizTrashEmpty('', [quizId1])).toStrictEqual(errorCode(401));
       expect(requestQuizTrashEmpty(token + '1', [quizId1])).toStrictEqual(errorCode(401));
     });
-  
+
     test('Error 403: User does not own one or more of the quizzes', () => {
       const otherUser = requestAuthRegister('other.user@unsw.edu.au', 'otheruser123', 'Other', 'User');
       const otherToken = otherUser.jsonBody.token as string;
@@ -42,7 +41,7 @@ describe('Testing Quiz Trash Empty', () => {
       requestQuizDelete(token, quizId1);
       requestQuizDelete(token, quizId2);
       requestQuizDelete(token, quizId3);
-  
+
       expect(requestQuizTrashEmpty(token, [quizId1, quizId2])).toStrictEqual({
         statusCode: 200,
         jsonBody: {},
