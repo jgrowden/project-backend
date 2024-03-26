@@ -37,6 +37,9 @@ export const requestUserDetailsUpdate = (token: string, email: string, nameFirst
 export const requestUserPasswordUpdate = (token: string, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v1/admin/user/password', { token, oldPassword, newPassword });
 
+export const requestQuizNameUpdate = (token: string, quizId: number, name: string) =>
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/name`, { token, quizId, name });
+
 export const requestQuestionUpdate = (token: string, quizId: number, questionId: number, questionBody: QuestionType) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { token, questionBody });
 
