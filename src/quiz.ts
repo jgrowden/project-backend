@@ -2,7 +2,6 @@ import { getData, UserType, QuestionType, QuizType } from './dataStore';
 import {
   fetchUserFromSessionId,
   fetchQuizFromQuizId,
-  fetchDeletedQuizFromQuizId,
   fetchQuestionFromQuestionId,
   generateNewQuizId,
   userWithEmailExists,
@@ -133,50 +132,6 @@ export function adminQuizNameUpdate(sessionId: string, quizId: number, name: str
 
   quiz.name = name;
   quiz.timeLastEdited = currentTime();
-
-  return {};
-}
-
-/**
- * Restore a quiz from trash.
- *
- * @param {string} sessionId - unique user identification string
- * @param {number} quizId - a quiz's unique identification number
- *
- * @returns {} - an empty object
-*/
-export function adminQuizRestore(sessionId: string, quizId: number): ErrorObjectWithCode | Record<string, never> {
-  const user = fetchUserFromSessionId(sessionId);
-  if (!user) {
-    return returnError('Invalid token', 401);
-  }
-
-  const deletedQuiz = fetchDeletedQuizFromQuizId(quizId);
-  if (!deletedQuiz) {
-    return returnError('Invalid quiz', 403);
-  }
-
-  if (deletedQuiz.ownerId !== user.authUserId) {
-    return returnError('Invalid quiz ownership', 403);
-  }
-
-  const quiz = fetchQuizFromQuizId(quizId);
-  if (quiz) {
-    return returnError('Quiz not in trash', 400);
-  }
-
-  const data = getData();
-  if (data.quizzes.find(quiz => quiz.ownerId === user.authUserId && quiz.name === deletedQuiz.name)) {
-    return returnError('Quiz name already taken', 400);
-  }
-
-  data.deletedQuizzes.splice(data.deletedQuizzes.indexOf(deletedQuiz), 1);
-
-  data.quizzes.push(deletedQuiz);
-
-  user.userQuizzes.push(quizId);
-
-  deletedQuiz.timeLastEdited = currentTime();
 
   return {};
 }

@@ -26,10 +26,6 @@ export const fetchQuizFromQuizId = (quizId: number): QuizType | undefined => {
   return getData().quizzes.find(quiz => quiz.quizId === quizId);
 };
 
-export const fetchDeletedQuizFromQuizId = (quizId: number): QuizType | undefined => {
-  return getData().deletedQuizzes.find(quiz => quiz.quizId === quizId);
-};
-
 export const fetchQuestionFromQuestionId = (quiz: QuizType, questionId: number): QuestionType | undefined => {
   return quiz.questions.find(question => question.questionId === questionId);
 };
