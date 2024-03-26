@@ -8,7 +8,6 @@ import {
   generateNewQuestionId,
   currentTime,
   returnError,
-  ErrorObject,
   ErrorObjectWithCode
 } from './helper';
 
@@ -89,6 +88,7 @@ export function adminQuizDescriptionUpdate(sessionId: string, quizId: number, de
   }
 
   quiz.description = description;
+  quiz.timeLastEdited = currentTime();
 
   return {};
 }
@@ -131,7 +131,7 @@ export function adminQuizNameUpdate(sessionId: string, quizId: number, name: str
   }
 
   quiz.name = name;
-  quiz.timeLastEdited = currentTime()
+  quiz.timeLastEdited = currentTime();
 
   return {};
 }
