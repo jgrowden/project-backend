@@ -17,16 +17,16 @@ export const requestQuizCreate = (token: string, name: string, description: stri
   requestHelper('POST', '/v1/admin/quiz', { token, name, description });
 
 export const requestQuizDelete = (token: string, quizId: number) =>
-  requestHelper('DELETE', `/v1/admin/quiz/${quizId}`, { token, quizId });
+  requestHelper('DELETE', `/v1/admin/quiz/${quizId}`, { token });
 
 export const requestQuizInfo = (token: string, quizId: number) =>
-  requestHelper('GET', `/v1/admin/quiz/${quizId}`, { token, quizId });
+  requestHelper('GET', `/v1/admin/quiz/${quizId}`, { token });
 
 export const requestQuizDescriptionUpdate = (token: string, quizId: number, description: string) =>
-  requestHelper('PUT', `/v1/admin/quiz/${quizId}/description`, { token, quizId, description });
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/description`, { token, description });
 
 export const requestQuizQuestionCreate = (token: string, quizId: number, questionBody: QuestionType) =>
-  requestHelper('POST', `/v1/admin/quiz/${quizId}/question`, { token, quizId, questionBody });
+  requestHelper('POST', `/v1/admin/quiz/${quizId}/question`, { token, questionBody });
 
 export const requestQuizTrashInfo = (token: string) =>
   requestHelper('GET', '/v1/admin/quiz/trash', { token });
@@ -47,7 +47,7 @@ export const requestUserPasswordUpdate = (token: string, oldPassword: string, ne
   requestHelper('PUT', '/v1/admin/user/password', { token, oldPassword, newPassword });
 
 export const requestQuizNameUpdate = (token: string, quizId: number, name: string) =>
-  requestHelper('PUT', `/v1/admin/quiz/${quizId}/name`, { token, quizId, name });
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/name`, { token, name });
 
 export const requestQuestionUpdate = (token: string, quizId: number, questionId: number, questionBody: QuestionType) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { token, questionBody });
@@ -62,7 +62,7 @@ export const requestQuizQuestionDuplicate = (token: string, quizId: number, ques
   requestHelper('POST', `/v1/admin/quiz/${quizId}/question/${questionId}/duplicate`, { token });
 
 export const requestQuizChangeOwner = (quizId: number, token: string, userEmail: string) =>
-  requestHelper('POST', `/v1/admin/quiz/${quizId}/transfer`, { token, quizId, userEmail });
+  requestHelper('POST', `/v1/admin/quiz/${quizId}/transfer`, { token, userEmail });
 
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 
