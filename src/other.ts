@@ -10,6 +10,7 @@ function clear() {
     quizzes: [],
     deletedQuizzes: []
   });
+  return {};
 }
 
 export { clear };
