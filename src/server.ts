@@ -60,7 +60,7 @@ const load = () => {
   }
 };
 const save = () => {
-  fs.writeFileSync('./tooHakData.json', JSON.stringify(getData()));
+  fs.writeFileSync('./toohakData.json', JSON.stringify(getData()));
 };
 
 // ====================================================================

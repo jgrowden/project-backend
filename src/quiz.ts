@@ -491,7 +491,7 @@ export function adminQuizQuestionCreate(
   });
   quiz.numQuestions++;
   quiz.duration += questionBody.duration;
-  quiz.timeLastEdited = Math.floor(Date.now() / 1000);
+  quiz.timeLastEdited = currentTime();
 
   return {
     questionId: newQuestionId
@@ -676,7 +676,7 @@ export function adminQuizQuestionMove(
 
   quiz.questions.splice(oldPosition, 1);
   quiz.questions.splice(newPosition, 0, oldElement);
-  quiz.timeLastEdited = Math.floor(Date.now() / 1000);
+  quiz.timeLastEdited = currentTime();
 
   return {};
 }
@@ -727,7 +727,7 @@ export function adminQuizQuestionDuplicate(
   quiz.questions.splice(oldPosition + 1, 0, newQuestion);
   quiz.numQuestions = quiz.questions.length;
   quiz.duration += newQuestion.duration;
-  quiz.timeLastEdited = Math.floor(Date.now() / 1000);
+  quiz.timeLastEdited = currentTime();
 
   return { newQuestionId: newQuestion.questionId };
 }
