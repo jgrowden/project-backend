@@ -22,10 +22,14 @@ import {
   adminQuizCreate,
   adminQuizRemove,
   adminQuizInfo,
+  adminQuizNameUpdate,
+  adminQuizDescriptionUpdate,
   adminQuizQuestionCreate,
   adminQuizQuestionUpdate,
   adminQuizQuestionMove,
   adminQuizTrashList,
+  adminQuizRestore,
+  adminQuizTrashEmpty,
   adminQuizChangeOwner,
   adminQuizQuestionDuplicate,
   adminQuizQuestionDelete
@@ -179,11 +183,60 @@ app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizRestore Route
+app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
+  const token = req.body.token as string;
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizRestore(token, quizId);
+  if ('errorCode' in result) {
+    return res.status(result.errorCode).json(result.errorObject);
+  }
+  save();
+  res.json(result);
+});
+
+// adminQuizTrashEmpty Route
+app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
+  const token = req.query.token as string;
+  const quizIdsString = req.query.quizIds as string;
+  const quizIds = JSON.parse(quizIdsString) as number[];
+  const result = adminQuizTrashEmpty(token, quizIds);
+  if ('errorCode' in result) {
+    return res.status(result.errorCode).json(result.errorObject);
+  }
+  save();
+  res.json(result);
+});
+
 // adminQuizInfo Route
 app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const token = req.query.token as string;
   const quizId = parseInt(req.params.quizid);
   const result = adminQuizInfo(token, quizId);
+  if ('errorCode' in result) {
+    return res.status(result.errorCode).json(result.errorObject);
+  }
+  save();
+  res.json(result);
+});
+
+// adminQuizNameUpdate Route
+app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const { token, name } = req.body;
+  const result = adminQuizNameUpdate(token, quizId, name);
+  if ('errorCode' in result) {
+    return res.status(result.errorCode).json(result.errorObject);
+  }
+  save();
+  res.json(result);
+});
+
+// adminQuizDescriptionUpdate Route
+app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
+  const quizId = parseInt(req.params.quizid);
+  const { token, description } = req.body;
+  const result = adminQuizDescriptionUpdate(token, quizId, description);
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }

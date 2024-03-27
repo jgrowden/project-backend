@@ -2,13 +2,13 @@ import { getData, UserType, QuestionType, QuizType } from './dataStore';
 import {
   fetchUserFromSessionId,
   fetchQuizFromQuizId,
+  fetchDeletedQuizFromQuizId,
   fetchQuestionFromQuestionId,
   generateNewQuizId,
   userWithEmailExists,
   generateNewQuestionId,
   currentTime,
   returnError,
-  ErrorObject,
   ErrorObjectWithCode
 } from './helper';
 
@@ -69,26 +69,27 @@ const answersLenMax = 30;
  *
  * @returns {} - an empty object
 */
-export function adminQuizDescriptionUpdate(sessionId: string, quizId: number, description: string): ErrorObject | Record<string, never> {
+export function adminQuizDescriptionUpdate(sessionId: string, quizId: number, description: string): ErrorObjectWithCode | Record<string, never> {
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
-    return { error: 'User ID not found' };
+    return returnError('Invalid token', 401);
   }
 
   const quiz = fetchQuizFromQuizId(quizId);
   if (!quiz) {
-    return { error: 'Quiz ID not found' };
+    return returnError('Invalid quiz', 403);
   }
 
-  if (!user.userQuizzes.includes(quizId)) {
-    return { error: 'Quiz not owned by user' };
+  if (quiz.ownerId !== user.authUserId) {
+    return returnError('Invalid quiz ownership', 403);
   }
 
   if (description.length > quizDescriptionMaxLength) {
-    return { error: 'Quiz description should be less than 100 characters' };
+    return returnError('Quiz description should be less than 100 characters', 400);
   }
 
   quiz.description = description;
+  quiz.timeLastEdited = currentTime();
 
   return {};
 }
@@ -102,38 +103,114 @@ export function adminQuizDescriptionUpdate(sessionId: string, quizId: number, de
  *
  * @returns {} - an empty object
 */
-export function adminQuizNameUpdate(sessionId: string, quizId: number, name: string): ErrorObject | Record<string, never> {
+export function adminQuizNameUpdate(sessionId: string, quizId: number, name: string): ErrorObjectWithCode | Record<string, never> {
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
-    return { error: 'User ID not found' };
+    return returnError('Invalid token', 401);
   }
 
   const quiz = fetchQuizFromQuizId(quizId);
   if (!quiz) {
-    return { error: 'Quiz ID not found' };
+    return returnError('Invalid quiz', 403);
   }
 
-  if (!user.userQuizzes.includes(quizId)) {
-    return { error: 'Quiz not owned by user' };
+  if (quiz.ownerId !== user.authUserId) {
+    return returnError('Invalid quiz ownership', 403);
   }
 
   if (regex.test(name)) {
-    return { error: 'Invalid characters found in quiz name' };
+    return returnError('Invalid characters found in quiz name', 400);
   }
 
-  if (name.length < quizNameMinLength) {
-    return { error: 'invalid quiz name length: too short' };
+  if (name.length < quizNameMinLength || name.length > quizNameMaxLength) {
+    return returnError('Invalid quiz name length', 400);
   }
 
-  if (name.length > quizNameMaxLength) {
-    return { error: 'invalid quiz name length: too long' };
-  }
-
-  if (getData().quizzes.find(quiz => quiz.ownerId === user.authUserId && quiz.name === name)) {
-    return { error: 'Quiz name already taken' };
+  const data = getData();
+  if (data.quizzes.find(quiz => quiz.ownerId === user.authUserId && quiz.name === name)) {
+    return returnError('Quiz name already taken', 400);
   }
 
   quiz.name = name;
+  quiz.timeLastEdited = currentTime();
+
+  return {};
+}
+
+/**
+ * Restore a quiz from trash.
+ *
+ * @param {string} sessionId - unique user identification string
+ * @param {number} quizId - a quiz's unique identification number
+ *
+ * @returns {} - an empty object
+*/
+export function adminQuizRestore(sessionId: string, quizId: number): ErrorObjectWithCode | Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    return returnError('Invalid token', 401);
+  }
+
+  const deletedQuiz = fetchDeletedQuizFromQuizId(quizId);
+  if (!deletedQuiz) {
+    return returnError('Invalid quiz', 403);
+  }
+
+  if (deletedQuiz.ownerId !== user.authUserId) {
+    return returnError('Invalid quiz ownership', 403);
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (quiz) {
+    return returnError('Quiz not in trash', 400);
+  }
+
+  const data = getData();
+  if (data.quizzes.find(quiz => quiz.ownerId === user.authUserId && quiz.name === deletedQuiz.name)) {
+    return returnError('Quiz name already taken', 400);
+  }
+
+  data.deletedQuizzes.splice(data.deletedQuizzes.indexOf(deletedQuiz), 1);
+
+  data.quizzes.push(deletedQuiz);
+
+  user.userQuizzes.push(quizId);
+
+  deletedQuiz.timeLastEdited = currentTime();
+
+  return {};
+}
+
+/**
+ * Permanently delete specific quizzes currently sitting in the trash
+ *
+ * @param {string} sessionId - unique user identification string
+ * @param {number[]} quizIds - array of quiz IDs to be permanently deleted
+ *
+ * @returns {} - an empty object
+*/
+export function adminQuizTrashEmpty(sessionId: string, quizIds: number[]): ErrorObjectWithCode | Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    return returnError('Invalid token', 401);
+  }
+
+  const data = getData();
+  const deletedQuizzes = data.deletedQuizzes;
+
+  for (const quizId of quizIds) {
+    const quiz = deletedQuizzes.find(quiz => quiz.quizId === quizId);
+    if (quiz && quiz.ownerId !== user.authUserId) {
+      return returnError('Invalid quiz ownership', 403);
+    }
+  }
+
+  const nonTrashedQuizIds = quizIds.filter(quizId => !deletedQuizzes.some(quiz => quiz.quizId === quizId));
+  if (nonTrashedQuizIds.length > 0) {
+    return returnError('One or more quizzes not in the trash', 400);
+  }
+
+  data.deletedQuizzes = deletedQuizzes.filter(quiz => !quizIds.includes(quiz.quizId));
 
   return {};
 }
