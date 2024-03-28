@@ -52,22 +52,55 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
             question: 'Question1?',
             duration: 3,
             points: 4,
-            answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
+            answers: [
+              {
+                answer: 'Answer!',
+                colour: expect.any(String),
+                correct: true
+              },
+              {
+                answer: 'Another Answer!',
+                colour: expect.any(String),
+                correct: true
+              }
+            ]
           },
           {
             questionId: expect.any(Number),
             question: 'Question1?',
             duration: 3,
             points: 4,
-            answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
+            answers: [
+              {
+                answer: 'Answer!',
+                colour: expect.any(String),
+                correct: true
+              },
+              {
+                answer: 'Another Answer!',
+                colour: expect.any(String),
+                correct: true
+              }
+            ]
           },
           {
             questionId: questionId2,
             question: 'Question2?',
             duration: 3,
             points: 4,
-            answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
-          }
+            answers: [
+              {
+                answer: 'Answer!',
+                colour: expect.any(String),
+                correct: true
+              },
+              {
+                answer: 'Another Answer!',
+                colour: expect.any(String),
+                correct: true
+              }
+            ]
+          },
         ]
       }
     });
@@ -93,28 +126,72 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
             question: 'Question1?',
             duration: 3,
             points: 4,
-            answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
+            answers: [
+              {
+                answer: 'Answer!',
+                colour: expect.any(String),
+                correct: true
+              },
+              {
+                answer: 'Another Answer!',
+                colour: expect.any(String),
+                correct: true
+              }
+            ]
           },
           {
             questionId: expect.any(Number),
             question: 'Question1?',
             duration: 3,
             points: 4,
-            answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
+            answers: [
+              {
+                answer: 'Answer!',
+                colour: expect.any(String),
+                correct: true
+              },
+              {
+                answer: 'Another Answer!',
+                colour: expect.any(String),
+                correct: true
+              }
+            ]
           },
           {
             questionId: questionId2,
             question: 'Question2?',
             duration: 3,
             points: 4,
-            answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
+            answers: [
+              {
+                answer: 'Answer!',
+                colour: expect.any(String),
+                correct: true
+              },
+              {
+                answer: 'Another Answer!',
+                colour: expect.any(String),
+                correct: true
+              }
+            ]
           },
           {
             questionId: expect.any(Number),
             question: 'Question2?',
             duration: 3,
             points: 4,
-            answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
+            answers: [
+              {
+                answer: 'Answer!',
+                colour: expect.any(String),
+                correct: true
+              },
+              {
+                answer: 'Another Answer!',
+                colour: expect.any(String),
+                correct: true
+              }
+            ]
           }
         ]
       }

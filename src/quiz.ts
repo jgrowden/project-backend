@@ -481,7 +481,11 @@ export function adminQuizQuestionCreate(
   }
 
   const newQuestionId = generateNewQuestionId();
-
+  const colours = [...QUESTION_COLOURS];
+  questionBody.answers = questionBody.answers.map(answer => {
+    answer.colour = setRandomColour(colours);
+    return answer;
+  });
   quiz.questions.push({
     questionId: newQuestionId,
     question: questionBody.question,
@@ -779,9 +783,9 @@ export function adminQuizQuestionDelete(
  * Pops the returned element from original array
  * @returns string
  */
-function setRandomColour(colours: string[]): string {
+const setRandomColour = (colours: string[]): string => {
   const colourIndex = ~~(Math.random() * colours.length);
   const colourToReturn = colours[colourIndex];
   colours.splice(colourIndex, 1);
   return colourToReturn;
-}
+};
