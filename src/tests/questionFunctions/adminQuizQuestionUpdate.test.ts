@@ -214,7 +214,7 @@ describe('Testing Question Update', () => {
               ],
             },
           ],
-          duration: 10,
+          duration: 5,
         }
       });
       expect(timeEdited).toBeGreaterThanOrEqual(quizTimeEdited);

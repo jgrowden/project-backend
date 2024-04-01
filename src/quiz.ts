@@ -48,7 +48,7 @@ const quizDescriptionMaxLength = 100;
 const quizNameMinLength = 3;
 const quizNameMaxLength = 30;
 const regex = /[^A-Za-z0-9 ]/;
-const QUESTION_COLOURS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
+const ANSWER_COLOURS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
 const INVALID_INDEX = -1;
 const questionLenMin = 5;
 const questionLenMax = 50;
@@ -481,7 +481,7 @@ export function adminQuizQuestionCreate(
   }
 
   const newQuestionId = generateNewQuestionId();
-  const colours = [...QUESTION_COLOURS];
+  const colours = [...ANSWER_COLOURS];
   questionBody.answers = questionBody.answers.map(answer => {
     answer.colour = setRandomColour(colours);
     return answer;
@@ -617,12 +617,12 @@ export function adminQuizQuestionUpdate(
   }
 
   // No errors, update question
-  quiz.duration += newQuestionBody.duration;
+  quiz.duration += newQuestionBody.duration - question.duration;
   question.question = newQuestionBody.question;
   question.duration = newQuestionBody.duration;
   question.points = newQuestionBody.points;
 
-  const colours = [...QUESTION_COLOURS];
+  const colours = [...ANSWER_COLOURS];
   const newAnswerBodies = newQuestionBody.answers.map(answer => {
     answer.colour = setRandomColour(colours);
     return answer;
