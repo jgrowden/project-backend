@@ -39,7 +39,18 @@ describe('Testing /v1/admin/quiz/{quizid}:', () => {
             question: 'Question?',
             duration: 3,
             points: 4,
-            answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
+            answers: [
+              {
+                answer: 'Answer!',
+                colour: expect.any(String),
+                correct: true
+              },
+              {
+                answer: 'Another Answer!',
+                colour: expect.any(String),
+                correct: true
+              }
+            ]
           }
         ]
       }
