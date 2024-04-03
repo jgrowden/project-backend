@@ -1,6 +1,7 @@
 import { getData, TokenType } from './dataStore';
 import validator from 'validator';
 import { nanoid } from 'nanoid';
+import { sha256 } from 'js-sha256';
 import {
   fetchUserFromSessionId,
   userWithEmailExists,
@@ -106,10 +107,11 @@ export function adminAuthRegister(
   const newUserId = generateNewUserId();
   const sessionId: string = nanoid();
   const sessions: string[] = [sessionId];
+  const passwordHash = sha256(password);
 
   data.users.push({
     email: email,
-    password: password,
+    password: passwordHash,
     nameFirst: nameFirst,
     nameLast: nameLast,
     authUserId: newUserId,
@@ -138,7 +140,7 @@ export function adminAuthLogin(email: string, password: string): TokenType | Err
     return returnError('user doesn\'t exist');
   }
 
-  if (user.password !== password) {
+  if (user.password !== sha256(password)) {
     user.numFailedPasswordsSinceLastLogin++;
     return returnError('incorrect password');
   }
@@ -287,7 +289,8 @@ export function adminUserPasswordUpdate(
   }
 
   // check oldPassword is correct
-  if (oldPassword !== user.password) {
+  const oldPasswordHash = sha256(oldPassword);
+  if (oldPasswordHash !== user.password) {
     return returnError('Old password is not correct');
   }
 
@@ -297,7 +300,8 @@ export function adminUserPasswordUpdate(
   }
 
   // check newPassword has not previously been used
-  if (user.previousPasswords.find(password => password === newPassword)) {
+  const newPasswordHash = sha256(newPassword);
+  if (user.previousPasswords.find(password => password === newPasswordHash)) {
     return returnError('Password has been used before');
   }
 
@@ -312,8 +316,8 @@ export function adminUserPasswordUpdate(
   }
 
   // update password if no errors
-  user.password = newPassword;
-  user.previousPasswords.push(oldPassword);
+  user.password = newPasswordHash;
+  user.previousPasswords.push(oldPasswordHash);
 
   return {};
 }
