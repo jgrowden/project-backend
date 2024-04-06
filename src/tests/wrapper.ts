@@ -10,6 +10,9 @@ export const requestAuthLogin = (email: string, password: string) =>
 export const requestAuthLogout = (token: string) =>
   requestHelper('POST', '/v1/admin/auth/logout', { token });
 
+export const requestAuthLogoutV2 = (token: string) =>
+  requestHelper('POST', '/v2/admin/auth/logout', {}, { token });
+
 export const requestQuizList = (token: string) =>
   requestHelper('GET', '/v1/admin/quiz/list', { token });
 
