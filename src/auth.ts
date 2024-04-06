@@ -15,8 +15,6 @@ interface AdminUserDetailsReturn {
     userId: number;
     name: string;
     email: string;
-    password: string;
-    previousPasswords: string[];
     numSuccessfulLogins: number;
     numFailedPasswordsSinceLastLogin: number;
   }
@@ -66,18 +64,15 @@ export function adminAuthRegister(
 ): TokenType | ErrorObjectWithCode {
   const data = getData();
 
-  // Check for duplicate email
   const duplicateEmail = userWithEmailExists(email);
   if (duplicateEmail !== undefined) {
     return returnError('User with given email already exists');
   }
 
-  // Check for invalid email
   if (!validator.isEmail(email)) {
     return returnError('invalid email');
   }
 
-  // Check for invalid first name
   if (validName(nameFirst)) {
     return returnError('Invalid first name');
   }
@@ -86,7 +81,6 @@ export function adminAuthRegister(
     return returnError('nameFirst does not satisfy length requirements');
   }
 
-  // Check for invalid last name
   if (validName(nameLast)) {
     return returnError('invalid last name');
   }
@@ -95,7 +89,6 @@ export function adminAuthRegister(
     return returnError('nameLast does not satisfy length requirements');
   }
 
-  // Check for invalid password
   if (password.length < userPasswordMinLength) {
     return returnError('password is less than 8 characters');
   }
@@ -203,8 +196,6 @@ export function adminUserDetails(sessionId: string): AdminUserDetailsReturn | Er
       name: `${user.nameFirst} ${user.nameLast}`,
       email: user.email,
       numSuccessfulLogins: user.numSuccessfulLogins,
-      password: user.password,
-      previousPasswords: user.previousPasswords,
       numFailedPasswordsSinceLastLogin: user.numFailedPasswordsSinceLastLogin,
     }
   };
@@ -236,7 +227,6 @@ export function adminUserDetailsUpdate(
     return returnError('Invalid email');
   }
 
-  // Check for invalid first name
   if (validName(nameFirst)) {
     return returnError('Invalid first name');
   }
@@ -244,7 +234,6 @@ export function adminUserDetailsUpdate(
     return returnError('First name does not satisfy length requirements');
   }
 
-  // Check for invalid last name
   if (validName(nameLast)) {
     return returnError('Invalid last name');
   }
@@ -253,7 +242,8 @@ export function adminUserDetailsUpdate(
   }
 
   // get userId from sessionId
-  // loop through datastore userIds. if a user has the same email and a different userId, email already registered
+  // loop through datastore userIds
+  // if a user has the same email and a different userId, email already registered
 
   const registered = getData().users.find(user => user.email === email && user.authUserId !== userToEdit.authUserId);
   if (registered !== undefined) {
@@ -282,40 +272,33 @@ export function adminUserPasswordUpdate(
   oldPassword: string,
   newPassword: string
 ): ErrorObjectWithCode | Record<string, never> {
-  // check sessionId exists
   const user = fetchUserFromSessionId(token);
   if (!user) {
     return returnError('User Id not found', 401);
   }
 
-  // check oldPassword is correct
   const oldPasswordHash = sha256(oldPassword);
   if (oldPasswordHash !== user.password) {
     return returnError('Old password is not correct');
   }
 
-  // check oldPassword and newPassword match exactly
   if (oldPassword === newPassword) {
     return returnError('New password is the same as old password');
   }
 
-  // check newPassword has not previously been used
   const newPasswordHash = sha256(newPassword);
   if (user.previousPasswords.find(password => password === newPasswordHash)) {
     return returnError('Password has been used before');
   }
 
-  // check newPassword is at least 8 characters
   if (newPassword.length < userPasswordMinLength) {
     return returnError('Password is less than 8 characters');
   }
 
-  // check newPassword is at least 1 letter and 1 number
   if (!hasLetterAndNumber(newPassword)) {
     return returnError('Password must contain at least one letter and at least one number');
   }
 
-  // update password if no errors
   user.password = newPasswordHash;
   user.previousPasswords.push(oldPasswordHash);
 

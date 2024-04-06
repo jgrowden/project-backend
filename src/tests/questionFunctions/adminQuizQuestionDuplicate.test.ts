@@ -54,11 +54,13 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
             points: 4,
             answers: [
               {
+                answerId: expect.any(Number),
                 answer: 'Answer!',
                 colour: expect.any(String),
                 correct: true
               },
               {
+                answerId: expect.any(Number),
                 answer: 'Another Answer!',
                 colour: expect.any(String),
                 correct: true
@@ -72,11 +74,13 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
             points: 4,
             answers: [
               {
+                answerId: expect.any(Number),
                 answer: 'Answer!',
                 colour: expect.any(String),
                 correct: true
               },
               {
+                answerId: expect.any(Number),
                 answer: 'Another Answer!',
                 colour: expect.any(String),
                 correct: true
@@ -90,11 +94,13 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
             points: 4,
             answers: [
               {
+                answerId: expect.any(Number),
                 answer: 'Answer!',
                 colour: expect.any(String),
                 correct: true
               },
               {
+                answerId: expect.any(Number),
                 answer: 'Another Answer!',
                 colour: expect.any(String),
                 correct: true
@@ -128,11 +134,13 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
             points: 4,
             answers: [
               {
+                answerId: expect.any(Number),
                 answer: 'Answer!',
                 colour: expect.any(String),
                 correct: true
               },
               {
+                answerId: expect.any(Number),
                 answer: 'Another Answer!',
                 colour: expect.any(String),
                 correct: true
@@ -146,11 +154,13 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
             points: 4,
             answers: [
               {
+                answerId: expect.any(Number),
                 answer: 'Answer!',
                 colour: expect.any(String),
                 correct: true
               },
               {
+                answerId: expect.any(Number),
                 answer: 'Another Answer!',
                 colour: expect.any(String),
                 correct: true
@@ -164,11 +174,13 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
             points: 4,
             answers: [
               {
+                answerId: expect.any(Number),
                 answer: 'Answer!',
                 colour: expect.any(String),
                 correct: true
               },
               {
+                answerId: expect.any(Number),
                 answer: 'Another Answer!',
                 colour: expect.any(String),
                 correct: true
@@ -182,11 +194,13 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
             points: 4,
             answers: [
               {
+                answerId: expect.any(Number),
                 answer: 'Answer!',
                 colour: expect.any(String),
                 correct: true
               },
               {
+                answerId: expect.any(Number),
                 answer: 'Another Answer!',
                 colour: expect.any(String),
                 correct: true
