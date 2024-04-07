@@ -192,21 +192,25 @@ describe('Testing Question Update', () => {
               points: 9,
               answers: [
                 {
+                  answerId: expect.any(Number),
                   answer: 'Luffy',
                   colour: expect.any(String),
                   correct: false,
                 },
                 {
+                  answerId: expect.any(Number),
                   answer: 'Shanks',
                   colour: expect.any(String),
                   correct: false,
                 },
                 {
+                  answerId: expect.any(Number),
                   answer: 'Blackbeard',
                   colour: expect.any(String),
                   correct: false,
                 },
                 {
+                  answerId: expect.any(Number),
                   answer: 'God Usopp',
                   colour: expect.any(String),
                   correct: true,
