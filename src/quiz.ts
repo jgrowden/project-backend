@@ -48,7 +48,7 @@ const quizDescriptionMaxLength = 100;
 const quizNameMinLength = 3;
 const quizNameMaxLength = 30;
 const regex = /[^A-Za-z0-9 ]/;
-const ANSWER_COLOURS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange'];
+const ANSWER_COLOURS = ['red', 'blue', 'green', 'yellow', 'purple', 'orange', 'brown'];
 const INVALID_INDEX = -1;
 const questionLenMin = 5;
 const questionLenMax = 50;
@@ -484,6 +484,7 @@ export function adminQuizQuestionCreate(
   const colours = [...ANSWER_COLOURS];
   questionBody.answers = questionBody.answers.map(answer => {
     answer.colour = setRandomColour(colours);
+    answer.answerId = setAnswerId();
     return answer;
   });
   quiz.questions.push({
@@ -599,8 +600,9 @@ export function adminQuizQuestionUpdate(
     return returnError('Question points must be between 1 and 10 (inclusive)');
   }
 
-  const invalidAnswer = newQuestionBody.answers.find(entry => entry.answer.length < 1 || entry.answer.length > 30);
-  if (invalidAnswer !== undefined) {
+  const invalidAnswer = newQuestionBody.answers.some(entry => entry.answer.length < answersLenMin ||
+    entry.answer.length > answersLenMax);
+  if (invalidAnswer) {
     return returnError('Invalid answer string length');
   }
 
@@ -612,7 +614,7 @@ export function adminQuizQuestionUpdate(
     return returnError('Question cannot have duplicate answers');
   }
 
-  if (newQuestionBody.answers.find(answer => answer.correct === true) === undefined) {
+  if (!newQuestionBody.answers.some(answer => answer.correct === true)) {
     return returnError('There are no correct answers');
   }
 
@@ -625,6 +627,7 @@ export function adminQuizQuestionUpdate(
   const colours = [...ANSWER_COLOURS];
   const newAnswerBodies = newQuestionBody.answers.map(answer => {
     answer.colour = setRandomColour(colours);
+    answer.answerId = setAnswerId();
     return answer;
   });
   question.answers = newAnswerBodies;
@@ -788,4 +791,8 @@ const setRandomColour = (colours: string[]): string => {
   const colourToReturn = colours[colourIndex];
   colours.splice(colourIndex, 1);
   return colourToReturn;
+};
+
+const setAnswerId = (): number => {
+  return ~~(Math.random() * 1000);
 };
