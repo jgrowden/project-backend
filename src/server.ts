@@ -150,6 +150,15 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizCreate route
+app.post('/v2/admin/quiz', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const { name, description } = req.body;
+  const result = adminQuizCreate(token, name, description);
+  save();
+  res.json(result);
+});
+
 // adminUserPasswordUpdate Route
 app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   const { token, oldPassword, newPassword } = req.body;

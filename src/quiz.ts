@@ -11,6 +11,7 @@ import {
   returnError,
   ErrorObjectWithCode
 } from './helper';
+import HTTPError from 'http-errors';
 
 interface AdminQuizListReturnElement {
   quizId: number;
@@ -306,6 +307,39 @@ export function adminQuizCreate(
 
   return { quizId: newQuizId };
 };
+
+export function adminQuizCreateV2 (
+  token: string,
+  name: string,
+  description: string
+): AdminQuizCreateReturn {
+  const user = fetchUserFromSessionId(sessionId);
+  if (user === undefined) throw HTTPError(401, 'User not found');
+  if (regex.test(name)) throw HTTPError(400, 'Invalid quiz name characters');
+  if (name.length < quizNameMinLength || name.length > quizNameMaxLength) throw HTTPError(400, 'Invalid quiz name length');
+  const duplicateName = user.userQuizzes.find(quizId => fetchQuizFromQuizId(quizId).name === name);
+  if (duplicateName !== undefined) throw HTTPError(400, 'Duplicate quiz name');
+  if (description.length > quizDescriptionMaxLength) throw HTTPError(400, 'Invalid quiz description length');
+
+  // Success!
+  const unixTime = currentTime();
+  const newQuizId = generateNewQuizId();
+  user.userQuizzes.push(newQuizId);
+  getData().quizzes.push({
+    ownerId: user.authUserId,
+    quizId: newQuizId,
+    name: name,
+    description: description,
+    timeCreated: unixTime,
+    timeLastEdited: unixTime,
+    numQuestions: 0,
+    questions: [],
+    quizSessions: [],
+    duration: 0,
+    thumbnailUrl: undefined
+  });
+  return { quizId: newQuizId };
+}
 /**
  * Given a particular quiz, permanently remove the quiz.
  *

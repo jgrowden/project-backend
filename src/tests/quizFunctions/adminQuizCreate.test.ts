@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizCreateV2, clear, errorCode } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizCreateV2, clear, errorCode } from '../wrapper';
 import HTTPError from 'http-errors';
 
 let token: string;
