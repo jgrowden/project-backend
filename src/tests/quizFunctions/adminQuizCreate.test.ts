@@ -1,14 +1,14 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizInfo, clear, errorCode } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizCreateV2, clear, errorCode } from '../wrapper';
+import HTTPError from 'http-errors';
 
 let token: string;
 
 beforeEach(() => {
   clear();
-  const { jsonBody } = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-  token = jsonBody.token as string;
+  token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token as string;
 });
 
-describe('Testing adminQuizCreate:', () => {
+describe('Tests for POST /v1/admin/quiz', () => {
   test('Successful test.', () => {
     const returnedQuiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
     expect(returnedQuiz).toStrictEqual({
@@ -48,5 +48,32 @@ describe('Testing adminQuizCreate:', () => {
   test('Failed test: quiz description is too long', () => {
     requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
     expect(requestQuizCreate(token, 'Quiz Name', 'A very, very, very, very, very, extraordinarily, tremendously, stupendously, ridiculously, anomolously, long description')).toStrictEqual(errorCode(400));
+  });
+});
+
+describe('Tests for POST /v2/admin/quiz', () => {
+  test('Successful test.', () => {
+    const returnedQuiz = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');
+    expect(returnedQuiz).toStrictEqual({ statusCode: 200, jsonBody: { quizId: expect.any(Number) } });
+  });
+  test('Failed test: user does not exist', () => {
+    expect(requestQuizCreateV2(token + 'a', 'Quiz Name', 'Quiz Description')).toStrictEqual(HTTPError[401]);
+  });
+  test('Failed test: invalid quiz name characters', () => {
+    expect(requestQuizCreateV2(token, '!nvalid Name', 'Quiz Description')).toStrictEqual(HTTPError[400]);
+  });
+  test('Failed test: quiz name is too short', () => {
+    expect(requestQuizCreateV2(token, 'iq', 'Quiz Description')).toStrictEqual(HTTPError[400]);
+  });
+  test('Failed test: quiz name is too long', () => {
+    expect(requestQuizCreateV2(token, 'A very long quiz name which is far too long', 'Quiz Description')).toStrictEqual(HTTPError[400]);
+  });
+  test('Failed test: duplicate quiz name', () => {
+    requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');
+    expect(requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description')).toStrictEqual(HTTPError[400]);
+  });
+  test('Failed test: quiz description is too long', () => {
+    requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');
+    expect(requestQuizCreateV2(token, 'Quiz Name', 'A very, very, very, very, very, extraordinarily, tremendously, stupendously, ridiculously, anomolously, long description')).toStrictEqual(HTTPError[400]);
   });
 });

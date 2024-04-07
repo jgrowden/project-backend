@@ -305,8 +305,7 @@ export function adminQuizCreate(
   });
 
   return { quizId: newQuizId };
-}
-
+};
 /**
  * Given a particular quiz, permanently remove the quiz.
  *

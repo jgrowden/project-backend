@@ -13,6 +13,10 @@ export interface UserType {
   sessions: string[];
 }
 
+export interface QuizSessionType {
+  sessionId: number;
+}
+
 export interface QuizType {
   ownerId?: number;
   quizId: number;
@@ -22,7 +26,9 @@ export interface QuizType {
   description: string;
   numQuestions?: number;
   questions?: QuestionType[];
+  quizSessions?: QuizSessionType[]; // Not needed for Info
   duration?: number;
+  thumbnailUrl?: string;
 }
 
 export interface AnswerType {
@@ -38,6 +44,7 @@ export interface QuestionType {
   duration: number;
   points: number;
   answers: AnswerType[];
+  thumbnailUrl: string;
 }
 
 export interface TokenType {
@@ -55,6 +62,25 @@ let data: DataType = {
   quizzes: [],
   deletedQuizzes: []
 };
+
+export enum SessionState {
+  LOBBY = 'LOBBY',
+  QUESTION_COUNTDOWN = 'QUESTION_COUNTDOWN',
+  QUESTIONS_OPEN = 'QUESTIONS_OPEN',
+  QUESTIONS_CLOSE = 'QUESTIONS_CLOSE',
+  ANSWER_SHOW = 'ANSWER_SHOW',
+  FINAL_RESULTS = 'FINAL_RESULTS',
+  END = 'END'
+}
+
+export enum SessionAction {
+  NEXT_QUESTION = 'NEXT_QUESTION',
+  SKIP_COUNTDOWN = 'SKIP_COUNTDOWN',
+  GO_TO_ANSWER = 'GO_TO_ANSWER',
+  GO_TO_FINAL_RESULTS = 'GO_TO_FINAL_RESULTS',
+  END = 'END'
+}
+
 
 // YOU SHOULD MODIFY THIS OBJECT ABOVE ONLY
 
@@ -83,3 +109,4 @@ export function getData() {
 export function setData(newData: DataType) {
   data = newData;
 }
+
