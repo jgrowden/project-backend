@@ -15,6 +15,7 @@ export interface UserType {
 
 export interface QuizSessionType {
   sessionId: number;
+  state: SessionState;
 }
 
 export interface QuizType {

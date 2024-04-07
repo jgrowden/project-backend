@@ -23,6 +23,7 @@ import {
   adminQuizList,
   adminQuizCreate,
   adminQuizRemove,
+  adminQuizRemoveV2,
   adminQuizInfo,
   adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
@@ -189,6 +190,15 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizRemoveV2 Route
+app.delete('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const quizId = parseInt(req.params.quizid as string);
+  const result = adminQuizRemoveV2(token, quizId);
   save();
   res.json(result);
 });
