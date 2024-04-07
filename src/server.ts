@@ -25,6 +25,7 @@ import {
   adminQuizRemove,
   adminQuizRemoveV2,
   adminQuizInfo,
+  adminQuizInfoV2,
   adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
   adminQuizQuestionCreate,
@@ -247,6 +248,15 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizInfoV2 Route
+app.get('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizInfoV2(token, quizId);
   save();
   res.json(result);
 });

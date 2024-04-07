@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizInfo, clear, errorCode, requestQuizCreateV2 } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizInfo, clear, errorCode, requestQuizCreateV2, requestQuizInfoV2 } from '../wrapper';
 import HTTPError from 'http-errors';
 
 let token: string;
@@ -50,9 +50,9 @@ describe('Testing GET /v2/admin/quiz/{quizid}:', () => {
     const quiz = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');
     quizId = quiz.jsonBody.quizId as number;
   });
-  
+
   test('Successful test.', () => {
-    const requestedInfo = requestQuizInfo(token, quizId);
+    const requestedInfo = requestQuizInfoV2(token, quizId);
     expect(requestedInfo).toStrictEqual({
       statusCode: 200,
       jsonBody: {
@@ -64,18 +64,18 @@ describe('Testing GET /v2/admin/quiz/{quizid}:', () => {
         numQuestions: 0,
         questions: [],
         duration: 0,
-        thumbnailUrl: undefined
+        thumbnailUrl: ''
       }
     });
   });
   test('Failed test: user does not exist.', () => {
-    expect(requestQuizInfo(token + 'a', quizId)).toThrow(HTTPError[401]);
+    expect(() => requestQuizInfoV2(token + 'a', quizId)).toThrow(HTTPError[401]);
   });
   test('Failed test: quiz does not exist.', () => {
-    expect(requestQuizInfo(token, quizId + 1)).toThrow(HTTPError[403]);
+    expect(() => requestQuizInfoV2(token, quizId + 1)).toThrow(HTTPError[403]);
   });
   test('Failed test: user provided does not own quiz.', () => {
     const otherToken = requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo').jsonBody.token as string;
-    expect(requestQuizInfo(otherToken, quizId)).toThrow(HTTPError[403]);
+    expect(() => requestQuizInfoV2(otherToken, quizId)).toThrow(HTTPError[403]);
   });
 });

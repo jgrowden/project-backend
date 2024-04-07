@@ -336,7 +336,7 @@ export function adminQuizCreateV2 (
     questions: [],
     quizSessions: [],
     duration: 0,
-    thumbnailUrl: undefined
+    thumbnailUrl: ''
   });
   return { quizId: newQuizId };
 }
@@ -465,6 +465,29 @@ export function adminQuizInfo(
     numQuestions: quiz.numQuestions,
     questions: quiz.questions,
     duration: quiz.duration
+  };
+}
+
+export function adminQuizInfoV2(
+  token: string,
+  quizId: number
+): QuizType {
+  const user = fetchUserFromSessionId(token);
+  if (!user) throw HTTPError(401, 'Invalid user id');
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) throw HTTPError(403, 'Invalid quiz id');
+  if (!user.userQuizzes.includes(quizId)) throw HTTPError(403, 'Invalid ownership status');
+
+  return {
+    quizId: quiz.quizId,
+    name: quiz.name,
+    timeCreated: quiz.timeCreated,
+    timeLastEdited: quiz.timeLastEdited,
+    description: quiz.description,
+    numQuestions: quiz.numQuestions,
+    questions: quiz.questions,
+    duration: quiz.duration,
+    thumbnailUrl: quiz.thumbnailUrl
   };
 }
 

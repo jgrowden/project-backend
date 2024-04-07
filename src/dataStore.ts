@@ -45,7 +45,7 @@ export interface QuestionType {
   duration: number;
   points: number;
   answers: AnswerType[];
-  thumbnailUrl: string;
+  thumbnailUrl?: string;
 }
 
 export interface TokenType {

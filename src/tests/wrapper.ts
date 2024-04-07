@@ -31,6 +31,9 @@ export const requestQuizDeleteV2 = (token: string, quizId: number) =>
 export const requestQuizInfo = (token: string, quizId: number) =>
   requestHelper('GET', `/v1/admin/quiz/${quizId}`, { token });
 
+export const requestQuizInfoV2 = (token: string, quizId: number) =>
+  requestHelper('GET', `/v2/admin/quiz/${quizId}`, {}, { token });
+
 export const requestQuizDescriptionUpdate = (token: string, quizId: number, description: string) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/description`, { token, description });
 
