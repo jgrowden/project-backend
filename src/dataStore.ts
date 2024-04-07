@@ -81,7 +81,6 @@ export enum SessionAction {
   END = 'END'
 }
 
-
 // YOU SHOULD MODIFY THIS OBJECT ABOVE ONLY
 
 // YOU SHOULDNT NEED TO MODIFY THE FUNCTIONS BELOW IN ITERATION 1
@@ -109,4 +108,3 @@ export function getData() {
 export function setData(newData: DataType) {
   data = newData;
 }
-

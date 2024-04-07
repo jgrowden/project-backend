@@ -16,11 +16,11 @@ export const requestAuthLogoutV2 = (token: string) =>
 export const requestQuizList = (token: string) =>
   requestHelper('GET', '/v1/admin/quiz/list', { token });
 
-export const requestQuizCreateV2 = (token: string, name: string, description: string) => 
-  requestHelper('POST', '/v2/admin/quiz', { name, description}, { token });
-
 export const requestQuizCreate = (token: string, name: string, description: string) =>
   requestHelper('POST', '/v1/admin/quiz', { token, name, description });
+
+export const requestQuizCreateV2 = (token: string, name: string, description: string) =>
+  requestHelper('POST', '/v2/admin/quiz', { name, description }, { token });
 
 export const requestQuizDelete = (token: string, quizId: number) =>
   requestHelper('DELETE', `/v1/admin/quiz/${quizId}`, { token });

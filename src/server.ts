@@ -34,7 +34,8 @@ import {
   adminQuizTrashEmpty,
   adminQuizChangeOwner,
   adminQuizQuestionDuplicate,
-  adminQuizQuestionDelete
+  adminQuizQuestionDelete,
+  adminQuizCreateV2
 } from './quiz';
 
 import { clear } from './other';
@@ -160,11 +161,11 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   res.json(result);
 });
 
-// adminQuizCreate route
+// adminQuizCreateV2 route
 app.post('/v2/admin/quiz', (req: Request, res: Response) => {
   const token = req.get('token') as string;
   const { name, description } = req.body;
-  const result = adminQuizCreate(token, name, description);
+  const result = adminQuizCreateV2(token, name, description);
   save();
   res.json(result);
 });
