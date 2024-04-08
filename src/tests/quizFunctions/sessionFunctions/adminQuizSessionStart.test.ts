@@ -1,4 +1,3 @@
-/*eslint-disable*/
 import HTTPError from 'http-errors';
 import {
   clear,
@@ -21,7 +20,7 @@ const SESSION = {
 };
 
 describe('quizSessionStart', () => {
-  let token, quizId, questionId;
+  let token, quizId, questionBody;
   beforeEach(() => {
     const user = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
     token = user.jsonBody.token as string;
@@ -50,8 +49,7 @@ describe('quizSessionStart', () => {
         },
       ],
     };
-    const question = requestQuizQuestionCreate(token, quizId, questionBody);
-    questionId = question.jsonBody.questionId as number;
+    requestQuizQuestionCreate(token, quizId, questionBody);
   });
   describe('error cases', () => {
     test('401, invalid/empty token', () => {
@@ -69,7 +67,7 @@ describe('quizSessionStart', () => {
 
     test('400, 10 sessions not in END state exist for quiz', () => {
       for (let i = 0; i < 10; i++) {
-        expect(requestQuizSessionStart(token, quiz, AUTOSTARTNUM)).toStrictEqual(SESSION);
+        expect(requestQuizSessionStart(token, quizId, AUTOSTARTNUM)).toStrictEqual(SESSION);
       }
       expect(() => requestQuizSessionStart(token, quizId, AUTOSTARTNUM)).toThrow(HTTPError[400]);
     });
@@ -90,5 +88,5 @@ describe('quizSessionStart', () => {
     test('successful quiz session start', () => {
       expect(requestQuizSessionStart(token, quizId, AUTOSTARTNUM)).toStrictEqual(SESSION);
     });
-  })
-})
+  });
+});
