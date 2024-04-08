@@ -13,6 +13,11 @@ export interface UserType {
   sessions: string[];
 }
 
+export interface QuizSessionType {
+  sessionId: number;
+  state: SessionState;
+}
+
 export interface QuizType {
   ownerId?: number;
   quizId: number;
@@ -22,9 +27,9 @@ export interface QuizType {
   description: string;
   numQuestions?: number;
   questions?: QuestionType[];
+  quizSessions?: QuizSessionType[]; // Not needed for Info
   duration?: number;
   thumbnailUrl?: string;
-  quizSessions?: QuizSessionType[];
 }
 
 export interface AnswerType {
@@ -41,10 +46,10 @@ export interface QuestionType {
   thumbnailUrl?: string;
   points: number;
   answers: AnswerType[];
-  // Below are for use in quiz sessions
   playersCorrectList?: string[];
   averageAnswerTime?: number;
   percentCorrect?: number;
+  thumbnailUrl?: string;
 }
 
 export interface QuizSessionType {
@@ -83,6 +88,24 @@ let data: DataType = {
   quizzes: [],
   deletedQuizzes: []
 };
+
+export enum SessionState {
+  LOBBY = 'LOBBY',
+  QUESTION_COUNTDOWN = 'QUESTION_COUNTDOWN',
+  QUESTIONS_OPEN = 'QUESTIONS_OPEN',
+  QUESTIONS_CLOSE = 'QUESTIONS_CLOSE',
+  ANSWER_SHOW = 'ANSWER_SHOW',
+  FINAL_RESULTS = 'FINAL_RESULTS',
+  END = 'END'
+}
+
+export enum SessionAction {
+  NEXT_QUESTION = 'NEXT_QUESTION',
+  SKIP_COUNTDOWN = 'SKIP_COUNTDOWN',
+  GO_TO_ANSWER = 'GO_TO_ANSWER',
+  GO_TO_FINAL_RESULTS = 'GO_TO_FINAL_RESULTS',
+  END = 'END'
+}
 
 // YOU SHOULD MODIFY THIS OBJECT ABOVE ONLY
 

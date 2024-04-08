@@ -10,23 +10,38 @@ export const requestAuthLogin = (email: string, password: string) =>
 export const requestAuthLogout = (token: string) =>
   requestHelper('POST', '/v1/admin/auth/logout', { token });
 
+export const requestAuthLogoutV2 = (token: string) =>
+  requestHelper('POST', '/v2/admin/auth/logout', {}, { token });
+
 export const requestQuizList = (token: string) =>
   requestHelper('GET', '/v1/admin/quiz/list', { token });
 
 export const requestQuizCreate = (token: string, name: string, description: string) =>
   requestHelper('POST', '/v1/admin/quiz', { token, name, description });
 
+export const requestQuizCreateV2 = (token: string, name: string, description: string) =>
+  requestHelper('POST', '/v2/admin/quiz', { name, description }, { token });
+
 export const requestQuizDelete = (token: string, quizId: number) =>
   requestHelper('DELETE', `/v1/admin/quiz/${quizId}`, { token });
 
+export const requestQuizDeleteV2 = (token: string, quizId: number) =>
+  requestHelper('DELETE', `/v2/admin/quiz/${quizId}`, {}, { token });
+
 export const requestQuizInfo = (token: string, quizId: number) =>
   requestHelper('GET', `/v1/admin/quiz/${quizId}`, { token });
+
+export const requestQuizInfoV2 = (token: string, quizId: number) =>
+  requestHelper('GET', `/v2/admin/quiz/${quizId}`, {}, { token });
 
 export const requestQuizDescriptionUpdate = (token: string, quizId: number, description: string) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/description`, { token, description });
 
 export const requestQuizQuestionCreate = (token: string, quizId: number, questionBody: QuestionType) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/question`, { token, questionBody });
+
+export const requestQuizQuestionCreateV2 = (token: string, quizId: number, questionBody: QuestionType) =>
+  requestHelper('POST', `/v2/admin/quiz/${quizId}/question`, { questionBody }, { token });
 
 export const requestQuizTrashInfo = (token: string) =>
   requestHelper('GET', '/v1/admin/quiz/trash', { token });

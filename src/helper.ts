@@ -33,23 +33,24 @@ export const userWithEmailExists = (email: string): UserType | undefined => {
   return getData().users.find(user => user.email === email);
 };
 
+// generates psudorandom numbers, max 524287 unique Ids
+const hash = (i: number): number => {
+  return ((((54787 * i) % 524287) + 524287) % 524287);
+};
+
 export const generateNewUserId = (): number => {
   const data = getData();
-  let newUserId = 0;
+  let newUserId = 2354;
   const userIds = data.users.map(user => user.authUserId);
-  while (userIds.includes(newUserId)) {
-    newUserId++;
-  }
+  while (userIds.includes(newUserId)) newUserId = hash(newUserId);
   return newUserId;
 };
 
 export const generateNewQuizId = (): number => {
   const data = getData();
-  let newQuizId = 0;
+  let newQuizId = 2354;
   const quizIds = data.quizzes.map(quiz => quiz.quizId);
-  while (quizIds.includes(newQuizId)) {
-    newQuizId++;
-  }
+  while (quizIds.includes(newQuizId)) newQuizId = hash(newQuizId);
   return newQuizId;
 };
 
