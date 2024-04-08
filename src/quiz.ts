@@ -308,7 +308,7 @@ export function adminQuizCreate(
   return { quizId: newQuizId };
 }
 
-export function adminQuizCreateV2 (
+export function adminQuizCreateV2(
   token: string,
   name: string,
   description: string
@@ -578,6 +578,96 @@ export function adminQuizQuestionCreate(
   return {
     questionId: newQuestionId
   };
+}
+
+export function adminQuizQuestionCreateV2(
+  sessionId: string,
+  quizId: number,
+  questionBody: QuestionType
+): AdminQuizQuestionCreateReturn {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    throw HTTPError(401, 'invalid user ID');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'invalid quiz ID');
+  }
+
+  if (!user.userQuizzes.includes(quizId)) {
+    throw HTTPError(403, 'you do not own this quiz');
+  }
+
+  if (questionBody.question.length < questionLenMin || questionBody.question.length > questionLenMax) {
+    throw HTTPError(400, 'Question must be between 5 and 50 characters long');
+  }
+
+  if (questionBody.answers.length < questionNumAnswersMin || questionBody.answers.length > questionNumAnswersMax) {
+    throw HTTPError(400, 'Invalid number of answers: there must be between 2 and 6 answers');
+  }
+
+  if (questionBody.duration <= 0) {
+    throw HTTPError(400, 'Question must have positive duration');
+  }
+
+  const questionLength = quiz.questions.reduce((pSum, question) => pSum + question.duration, 0);
+
+  if (questionLength + questionBody.duration > questionDurationMax) {
+    throw HTTPError(400, 'Quiz must have duration lower than 180');
+  }
+
+  if (questionBody.points < questionPointsMin || questionBody.points > questionPointsMax) {
+    throw HTTPError(400, 'Invalid quiz point count: question must have between 1 and 10 points');
+  }
+
+  if (questionBody.answers.find(entry => entry.answer.length < answersLenMin || entry.answer.length > answersLenMax) !== undefined) {
+    throw HTTPError(400, 'Invalid answer length: answers must be between 1 and 30 characters long');
+  }
+
+  // check for duplicate entries
+  const answer = questionBody.answers.map(entry => entry.answer);
+  const duplicates = answer.filter((entry, index) => answer.indexOf(entry) !== index);
+
+  if (duplicates.length !== 0) {
+    throw HTTPError(400, 'Question cannot have duplicate answers');
+  }
+
+  if (questionBody.answers.find(answer => answer.correct === true) === undefined) {
+    throw HTTPError(400, 'There are no correct answers');
+  }
+
+  // eslint-disable-next-line
+  if (/jpg$|jpeg$|png$/g.test(questionBody.thumbnailUrl) === false) {
+    throw HTTPError(400, 'ThumbnailURL does not end in jpg/jpeg/png');
+  }
+
+  // eslint-disable-next-line
+  if (/^http:\/\/|^https:\/\//g.test(questionBody.thumbnailUrl) === false) {
+    // eslint-disable-next-line
+    throw HTTPError(400, 'ThumbnailURL does not start with http:\/\/ or https:\/\/');
+  }
+
+  const newQuestionId = generateNewQuestionId();
+  const colours = [...ANSWER_COLOURS];
+  questionBody.answers = questionBody.answers.map(answer => {
+    answer.colour = setRandomColour(colours);
+    answer.answerId = setAnswerId();
+    return answer;
+  });
+  quiz.questions.push({
+    questionId: newQuestionId,
+    question: questionBody.question,
+    duration: questionBody.duration,
+    points: questionBody.points,
+    answers: questionBody.answers,
+    thumbnailUrl: questionBody.thumbnailUrl
+  });
+  quiz.numQuestions++;
+  quiz.duration += questionBody.duration;
+  quiz.timeLastEdited = currentTime();
+
+  return { questionId: newQuestionId };
 }
 
 export function adminQuizChangeOwner(

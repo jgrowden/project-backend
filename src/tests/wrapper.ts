@@ -40,6 +40,9 @@ export const requestQuizDescriptionUpdate = (token: string, quizId: number, desc
 export const requestQuizQuestionCreate = (token: string, quizId: number, questionBody: QuestionType) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/question`, { token, questionBody });
 
+export const requestQuizQuestionCreateV2 = (token: string, quizId: number, questionBody: QuestionType) =>
+  requestHelper('POST', `/v2/admin/quiz/${quizId}/question`, { questionBody }, { token });
+
 export const requestQuizTrashInfo = (token: string) =>
   requestHelper('GET', '/v1/admin/quiz/trash', { token });
 

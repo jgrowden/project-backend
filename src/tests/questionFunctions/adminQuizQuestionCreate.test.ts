@@ -1,5 +1,18 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, errorCode, clear } from '../wrapper';
+import {
+  requestAuthRegister,
+  requestQuizCreate,
+  requestQuizInfo,
+  requestQuizCreateV2,
+  requestQuizQuestionCreate,
+  requestQuizInfoV2,
+  requestQuizQuestionCreateV2,
+  errorCode,
+  clear
+} from '../wrapper';
+
 import { QuestionType } from '../../dataStore';
+
+import HTTPError from 'http-errors';
 
 let token: string;
 let quizId: number;
@@ -128,10 +141,11 @@ describe('Testing POST /v2/admin/quiz/{quizid}:', () => {
       question: 'Question?',
       duration: 3,
       points: 4,
+      thumbnailUrl: 'http://example.com/birb.jpg',
       answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
     };
   });
-  
+
   test('Successful test.', () => {
     const newQuestion = requestQuizQuestionCreateV2(token, quizId, questionBody);
     expect(newQuestion.jsonBody).toStrictEqual({ questionId: expect.any(Number) });
@@ -152,7 +166,7 @@ describe('Testing POST /v2/admin/quiz/{quizid}:', () => {
             question: 'Question?',
             duration: 3,
             points: 4,
-            thumbnailUrl: '',
+            thumbnailUrl: 'http://example.com/birb.jpg',
             answers: [
               {
                 answerId: expect.any(Number),
