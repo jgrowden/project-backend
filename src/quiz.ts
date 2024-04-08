@@ -9,7 +9,9 @@ import {
   generateNewQuestionId,
   currentTime,
   returnError,
-  ErrorObjectWithCode
+  ErrorObjectWithCode,
+  setRandomColour,
+  setAnswerId
 } from './helper';
 import HTTPError from 'http-errors';
 
@@ -302,7 +304,8 @@ export function adminQuizCreate(
     timeLastEdited: unixTime,
     numQuestions: 0,
     questions: [],
-    duration: 0
+    duration: 0,
+    quizSessions: [],
   });
 
   return { quizId: newQuizId };
@@ -813,19 +816,3 @@ export function adminQuizQuestionDelete(
 
   return {};
 }
-
-/**
- * Function returns random colour from an array of colours
- * Pops the returned element from original array
- * @returns string
- */
-const setRandomColour = (colours: string[]): string => {
-  const colourIndex = ~~(Math.random() * colours.length);
-  const colourToReturn = colours[colourIndex];
-  colours.splice(colourIndex, 1);
-  return colourToReturn;
-};
-
-const setAnswerId = (): number => {
-  return ~~(Math.random() * 1000);
-};

@@ -14,10 +14,6 @@ export interface ErrorString {
   error: string
 }
 
-export const fetchUserFromUserId = (authUserId: number): UserType | undefined => {
-  return getData().users.find(user => user.authUserId === authUserId);
-};
-
 export const fetchUserFromSessionId = (sessionId: string): UserType | undefined => {
   return getData().users.find(user => user.sessions.some(session => session === sessionId));
 };
@@ -86,4 +82,41 @@ export const generateNewQuestionId = (): number => {
     newQuestionId++;
   }
   return newQuestionId;
+};
+
+export const generateQuizSessionId = (): number => {
+  const data = getData();
+  let newQuizSessionId = 0;
+  const quizSessionIds = [];
+  for (const quiz of data.quizzes) {
+    for (const quizSession of quiz.quizSessions) {
+      quizSessionIds.push(quizSession.quizSessionId);
+    }
+  }
+  while (quizSessionIds.includes(newQuizSessionId)) {
+    newQuizSessionId++;
+  }
+  return newQuizSessionId;
+};
+
+/**
+ * Function returns random colour from an array of colours
+ * Pops the returned element from original array
+ * @returns string
+ */
+export const setRandomColour = (colours: string[]): string => {
+  const colourIndex = ~~(Math.random() * colours.length);
+  const colourToReturn = colours[colourIndex];
+  colours.splice(colourIndex, 1);
+  return colourToReturn;
+};
+
+/**
+ * Basic ID generation function
+ * Maximum of 6 answer Id's per question
+ * Collision highly unlikely
+ * @returns {number}
+ */
+export const setAnswerId = (): number => {
+  return ~~(Math.random() * 1000);
 };

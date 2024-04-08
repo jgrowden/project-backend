@@ -13,10 +13,6 @@ export interface UserType {
   sessions: string[];
 }
 
-export interface QuizSessionType {
-  sessionId: number;
-}
-
 export interface QuizType {
   ownerId?: number;
   quizId: number;
@@ -42,11 +38,37 @@ export interface QuestionType {
   questionId?: number;
   question: string;
   duration: number;
+  thumbnailUrl?: string;
   points: number;
   answers: AnswerType[];
   thumbnailUrl: string;
+  // Below are for use in quiz sessions
+  playersCorrectList?: string[];
+  averageAnswerTime?: number;
+  percentCorrect?: number;
 }
 
+export interface QuizSessionType {
+  state: string;
+  atQuestion: number;
+  players: PlayerType[];
+  quizSessionId: number;
+  autoStartNum: number;
+  messages: MessageType[];
+  metadata: QuizType;
+}
+
+export interface PlayerType {
+  playerName: string;
+  playerId: number;
+}
+
+export interface MessageType {
+  messageBody: string;
+  playerId: number;
+  playerName: string;
+  timeSent: number;
+}
 export interface TokenType {
   token: string;
 }

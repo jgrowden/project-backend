@@ -70,6 +70,9 @@ export const requestQuizQuestionDuplicate = (token: string, quizId: number, ques
 export const requestQuizChangeOwner = (quizId: number, token: string, userEmail: string) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/transfer`, { token, userEmail });
 
+export const requestQuizSessionStart = (token: string, quizId: number, autoStartNum: number) =>
+  requestHelper('POST', `/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
+
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 
 export const errorCode = (statusCode: number) => {
