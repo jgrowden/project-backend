@@ -54,7 +54,7 @@ export interface QuizSessionType {
   quizSessionId: number;
   autoStartNum: number;
   messages: MessageType[];
-  metaData: QuizType;
+  metadata: QuizType;
 }
 
 export interface PlayerType {
