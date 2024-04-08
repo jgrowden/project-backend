@@ -1,19 +1,18 @@
-import { 
-  errorCode, 
-  requestAuthRegister, 
-  requestQuizCreate, 
+import {
+  errorCode,
+  requestAuthRegister,
+  requestQuizCreate,
   requestQuizCreateV2,
-  requestQuizChangeOwner, 
+  requestQuizChangeOwner,
   requestQuizChangeOwnerV2,
-  clear, 
+  clear,
   requestQuizList
 } from '../../wrapper';
+import HTTPError from 'http-errors';
 
 let User1Token: string;
 let User2Token: string;
 let quiz1Id: number;
-
-
 
 describe('Testing POST /v1/admin/quiz/{quizid}/transfer', () => {
   beforeEach(() => {
@@ -121,6 +120,7 @@ describe('Testing POST /v2/admin/quiz/{quizid}/transfer', () => {
   test('Failing test: quizId is invalid', () => {
     expect(() => requestQuizChangeOwnerV2(quiz1Id + 1, User1Token, 'doffy@gmail.com')).toThrow(HTTPError[403]);
   });
+  // test for END state
   test('Failing test: user does not own quiz', () => {
     requestAuthRegister('president@unswunsociety.org.au', 'Passw0rd', 'No', 'Itsnotme');
     expect(() => requestQuizChangeOwnerV2(quiz1Id, User2Token, 'president@unswunsociety.org.au')).toThrow(HTTPError[403]);

@@ -36,6 +36,7 @@ import {
   adminQuizRestore,
   adminQuizTrashEmpty,
   adminQuizChangeOwner,
+  adminQuizChangeOwnerV2,
   adminQuizQuestionDuplicate,
   adminQuizQuestionDelete,
   adminQuizSessionStart,
@@ -317,6 +318,15 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+app.post('/v2/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const { userEmail } = req.body;
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizChangeOwnerV2(token, quizId, userEmail);
   save();
   res.json(result);
 });

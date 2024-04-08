@@ -13,11 +13,6 @@ export interface UserType {
   sessions: string[];
 }
 
-export interface QuizSessionType {
-  sessionId: number;
-  state: SessionState;
-}
-
 export interface QuizType {
   ownerId?: number;
   quizId: number;
