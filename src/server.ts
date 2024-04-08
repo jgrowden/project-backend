@@ -66,6 +66,7 @@ const load = () => {
     setData(JSON.parse(dataFile));
   }
 };
+
 const save = () => {
   fs.writeFileSync('./toohakData.json', JSON.stringify(getData()));
 };
