@@ -98,3 +98,25 @@ export const generateQuizSessionId = (): number => {
   }
   return newQuizSessionId;
 };
+
+/**
+ * Function returns random colour from an array of colours
+ * Pops the returned element from original array
+ * @returns string
+ */
+export const setRandomColour = (colours: string[]): string => {
+  const colourIndex = ~~(Math.random() * colours.length);
+  const colourToReturn = colours[colourIndex];
+  colours.splice(colourIndex, 1);
+  return colourToReturn;
+};
+
+/**
+ * Basic ID generation function
+ * Maximum of 6 answer Id's per question
+ * Collision highly unlikely
+ * @returns {number}
+ */
+export const setAnswerId = (): number => {
+  return ~~(Math.random() * 1000);
+};

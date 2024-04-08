@@ -41,10 +41,17 @@ export interface QuestionType {
   thumbnailUrl?: string;
   points: number;
   answers: AnswerType[];
+<<<<<<< HEAD
   playersCorrectList?: string[];
   averageAnswerTime?: number;
   percentCorrect?: number;
   thumbnailUrl?: string;
+=======
+  thumbnailUrl?: string;
+  playersCorrectList?: string[];
+  averageAnswerTime?: number;
+  percentCorrect?: number;
+>>>>>>> 8186a68219a42c9c925e62658eeb0a5c1e73f7a6
 }
 
 export interface QuizSessionType {

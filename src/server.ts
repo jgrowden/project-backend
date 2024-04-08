@@ -42,6 +42,9 @@ import {
   adminQuizSessionStart,
   adminQuizCreateV2
 } from './quiz';
+import {
+  adminQuizSessionStart
+} from './session';
 
 import { clear } from './other';
 // Set up web app
@@ -67,6 +70,7 @@ const load = () => {
     setData(JSON.parse(dataFile));
   }
 };
+
 const save = () => {
   fs.writeFileSync('./toohakData.json', JSON.stringify(getData()));
 };

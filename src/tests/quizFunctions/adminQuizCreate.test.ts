@@ -1,4 +1,14 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizCreateV2, clear, errorCode } from '../../wrapper';
+
+import {
+  requestAuthRegister,
+  requestQuizCreate,
+  requestQuizInfo,
+  requestQuizInfoV2,
+  requestQuizCreateV2,
+  clear,
+  errorCode
+} from '../wrapper';
+
 import HTTPError from 'http-errors';
 
 let token: string;
@@ -46,7 +56,6 @@ describe('Tests for POST /v1/admin/quiz', () => {
     expect(requestQuizCreate(token, 'Quiz Name', 'Quiz Description')).toStrictEqual(errorCode(400));
   });
   test('Failed test: quiz description is too long', () => {
-    requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
     expect(requestQuizCreate(token, 'Quiz Name', 'A very, very, very, very, very, extraordinarily, tremendously, stupendously, ridiculously, anomolously, long description')).toStrictEqual(errorCode(400));
   });
 });
@@ -55,6 +64,20 @@ describe('Tests for POST /v2/admin/quiz', () => {
   test('Successful test.', () => {
     const returnedQuiz = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');
     expect(returnedQuiz).toStrictEqual({ statusCode: 200, jsonBody: { quizId: expect.any(Number) } });
+    expect(requestQuizInfoV2(token, returnedQuiz.jsonBody.quizId as number)).toStrictEqual({
+      statusCode: 200,
+      jsonBody: {
+        quizId: returnedQuiz.jsonBody.quizId,
+        name: 'Quiz Name',
+        timeCreated: expect.any(Number),
+        timeLastEdited: expect.any(Number),
+        description: 'Quiz Description',
+        duration: 0,
+        numQuestions: 0,
+        questions: [],
+        thumbnailUrl: ''
+      }
+    });
   });
   test('Failed test: user does not exist', () => {
     expect(() => requestQuizCreateV2(token + 'a', 'Quiz Name', 'Quiz Description')).toThrow(HTTPError[401]);
