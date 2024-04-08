@@ -33,7 +33,8 @@ import {
   adminQuizTrashEmpty,
   adminQuizChangeOwner,
   adminQuizQuestionDuplicate,
-  adminQuizQuestionDelete
+  adminQuizQuestionDelete,
+  adminQuizSessionStart
 } from './quiz';
 
 import { clear } from './other';
@@ -316,6 +317,16 @@ app.delete('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Re
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizSessionStart Route
+app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const quizId = parseInt(req.params.quizid);
+  const { autoStartNum } = req.body;
+  const result = adminQuizSessionStart(token, quizId, autoStartNum);
   save();
   res.json(result);
 });

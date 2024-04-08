@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizList, clear, errorCode } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizList, clear, errorCode } from '../../wrapper';
 
 describe('adminQuizList', () => {
   beforeEach(() => {
