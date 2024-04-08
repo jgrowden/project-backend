@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizDelete, errorCode, clear } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizDelete, errorCode, clear } from '../../wrapper';
 
 let token: string;
 let quizId: number;
