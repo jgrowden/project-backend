@@ -830,7 +830,7 @@ export function adminQuizSessionStart(token: string, quizId: number, autoStartNu
   // Initialise extra question fields for use in session states
   const quizSessionId = generateQuizSessionId();
   const quizCopy = JSON.parse(JSON.stringify(quiz));
-  
+
   // Define type of questions to avoid typescript errors in map
   const questionCopy: QuestionType[] = JSON.parse(JSON.stringify(quiz.questions));
   quizCopy.questions = questionCopy.map(question => {
