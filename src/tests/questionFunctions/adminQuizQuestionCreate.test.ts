@@ -229,12 +229,6 @@ describe('Testing POST /v2/admin/quiz/{quizid}:', () => {
     questionBody.thumbnailUrl = 'example.com/birb.jpg';
     expect(() => requestQuizQuestionCreateV2(token, quizId, questionBody)).toThrow(HTTPError[400]);
   });
-
-
-
-
-
-
   test('Failed test: invalid user.', () => {
     token = token + 'a';
     expect(() => requestQuizQuestionCreateV2(token, quizId, questionBody)).toThrow(HTTPError[401]);
