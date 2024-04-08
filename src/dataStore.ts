@@ -23,6 +23,8 @@ export interface QuizType {
   numQuestions?: number;
   questions?: QuestionType[];
   duration?: number;
+  thumbnailUrl?: string;
+  quizSessions?: QuizSessionType[];
 }
 
 export interface AnswerType {
@@ -36,10 +38,36 @@ export interface QuestionType {
   questionId?: number;
   question: string;
   duration: number;
+  thumbnailUrl?: string;
   points: number;
   answers: AnswerType[];
+  // Below are for use in quiz sessions
+  playersCorrectList?: string[];
+  averageAnswerTime?: number;
+  percentCorrect?: number;
 }
 
+export interface QuizSessionType {
+  state: string;
+  atQuestion: number;
+  players: PlayerType[];
+  quizSessionId: number;
+  autoStartNum: number;
+  messages: MessageType[];
+  metaData: QuizType;
+}
+
+export interface PlayerType {
+  playerName: string;
+  playerId: number;
+}
+
+export interface MessageType {
+  messageBody: string;
+  playerId: number;
+  playerName: string;
+  timeSent: number;
+}
 export interface TokenType {
   token: string;
 }
