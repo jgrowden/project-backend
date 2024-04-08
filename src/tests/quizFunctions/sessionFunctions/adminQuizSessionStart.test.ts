@@ -12,7 +12,7 @@ import {
 beforeAll(() => {
   clear();
 });
-beforeEach(() => {
+afterEach(() => {
   clear();
 });
 const AUTOSTARTNUM = 10;
