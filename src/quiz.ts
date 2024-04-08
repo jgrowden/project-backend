@@ -782,6 +782,23 @@ export function adminQuizQuestionDelete(
 }
 
 /**
+ * Start a new session for a quiz
+ * This copies the quiz, so that any edits whilst a session is running
+ * do not affect active session
+ * @param {string} token
+ * @param {number} quizId
+ * @param {number} autoStartNum
+ * @returns {
+ *  sessionId: number
+ * }
+ */
+export function adminQuizSessionStart(token: string, quizId: number, autoStartNum: number) {
+  return {
+    sessionId: 0,
+  };
+}
+
+/**
  * Function returns random colour from an array of colours
  * Pops the returned element from original array
  * @returns string
@@ -793,6 +810,12 @@ const setRandomColour = (colours: string[]): string => {
   return colourToReturn;
 };
 
+/**
+ * Basic ID generation function
+ * Maximum of 6 answer Id's per question
+ * Collision highly unlikely
+ * @returns {number}
+ */
 const setAnswerId = (): number => {
   return ~~(Math.random() * 1000);
 };
