@@ -3,6 +3,7 @@ import HTTPError from 'http-errors';
 
 let token: string;
 let quizId: number;
+const AUTOSTARTNUM = 10;
 
 describe('Tests for DELETE /v1/admin/quiz/{quizid}:', () => {
   beforeEach(() => {
@@ -50,6 +51,9 @@ describe('Tests for DELETE /v2/admin/quiz/{quizid}:', () => {
   test('Failed test: user does not exist.', () => {
     expect(() => requestQuizDeleteV2(token + 'a', quizId)).toThrow(HTTPError[401]);
   });
+  test('Failed test: empty token.', () => {
+    expect(() => requestQuizDeleteV2('', quizId)).toThrow(HTTPError[401]);
+  });
   test('Failed test: quiz does not exist.', () => {
     expect(() => requestQuizDeleteV2(token, quizId + 1)).toThrow(HTTPError[403]);
   });
@@ -58,5 +62,8 @@ describe('Tests for DELETE /v2/admin/quiz/{quizid}:', () => {
     const otherToken = jsonBody.token as string;
     expect(() => requestQuizDeleteV2(otherToken, quizId)).toThrow(HTTPError[403]);
   });
-  // TO TEST: CHECK QUIZ.TS
+  test('Failed test: not all quiz sessions are in END state.', () => {
+    requestQuizSessionStart(token, quizId, AUTOSTARTNUM);
+    expect(() => requestQuizDeleteV2(otherToken, quizId)).toThrow(HTTPError[400]);
+  })
 });
