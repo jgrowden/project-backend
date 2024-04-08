@@ -13,6 +13,7 @@ import {
   setRandomColour,
   setAnswerId
 } from './helper';
+import HTTPError from 'http-errors';
 
 interface AdminQuizListReturnElement {
   quizId: number;

@@ -7,7 +7,7 @@ import {
   requestQuizChangeOwnerV2,
   clear,
   requestQuizList
-} from '../../wrapper';
+} from '../wrapper';
 import HTTPError from 'http-errors';
 
 let User1Token: string;
