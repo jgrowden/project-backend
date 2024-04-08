@@ -9,7 +9,9 @@ import {
   generateNewQuestionId,
   currentTime,
   returnError,
-  ErrorObjectWithCode
+  ErrorObjectWithCode,
+  setRandomColour,
+  setAnswerId
 } from './helper';
 import HTTPError from 'http-errors';
 
@@ -302,7 +304,8 @@ export function adminQuizCreate(
     timeLastEdited: unixTime,
     numQuestions: 0,
     questions: [],
-    duration: 0
+    duration: 0,
+    quizSessions: [],
   });
 
   return { quizId: newQuizId };
@@ -314,12 +317,26 @@ export function adminQuizCreateV2(
   description: string
 ): AdminQuizCreateReturn {
   const user = fetchUserFromSessionId(token);
-  if (!user) throw HTTPError(401, 'User not found');
-  if (regex.test(name)) throw HTTPError(400, 'Invalid quiz name characters');
-  if (name.length < quizNameMinLength || name.length > quizNameMaxLength) throw HTTPError(400, 'Invalid quiz name length');
+  if (!user) {
+    throw HTTPError(401, 'User not found');
+  }
+
+  if (regex.test(name)) {
+    throw HTTPError(400, 'Invalid quiz name characters');
+  }
+
+  if (name.length < quizNameMinLength || name.length > quizNameMaxLength) {
+    throw HTTPError(400, 'Invalid quiz name length');
+  }
+
   const duplicateName = user.userQuizzes.find(quizId => fetchQuizFromQuizId(quizId).name === name);
-  if (duplicateName !== undefined) throw HTTPError(400, 'Duplicate quiz name');
-  if (description.length > quizDescriptionMaxLength) throw HTTPError(400, 'Invalid quiz description length');
+  if (duplicateName !== undefined) {
+    throw HTTPError(400, 'Duplicate quiz name');
+  }
+
+  if (description.length > quizDescriptionMaxLength) {
+    throw HTTPError(400, 'Invalid quiz description length');
+  }
 
   // Success!
   const unixTime = currentTime();
@@ -379,14 +396,24 @@ export function adminQuizRemoveV2(
   quizId: number
 ): Record<string, never> {
   const user = fetchUserFromSessionId(token);
-  if (!user) throw HTTPError(401, 'Invalid user id');
+  if (!user) {
+    throw HTTPError(401, 'Invalid user id');
+  }
+
   const quiz = fetchQuizFromQuizId(quizId);
-  if (!quiz) throw HTTPError(403, 'Invalid quiz id');
-  if (!user.userQuizzes.includes(quizId)) throw HTTPError(403, 'Invalid ownership status');
+  if (!quiz) {
+    throw HTTPError(403, 'Invalid quiz id');
+  }
+
+  if (!user.userQuizzes.includes(quizId)) {
+    throw HTTPError(403, 'Invalid ownership status');
+  }
 
   // TO TEST
   const quizState = quiz.quizSessions.find(session => session.state !== 'END');
-  if (quizState) throw HTTPError(400, 'Some session is not in END state');
+  if (quizState) {
+    throw HTTPError(400, 'Some session is not in END state');
+  }
 
   const data = getData();
   data.deletedQuizzes.push(fetchQuizFromQuizId(quizId));
@@ -473,10 +500,18 @@ export function adminQuizInfoV2(
   quizId: number
 ): QuizType {
   const user = fetchUserFromSessionId(token);
-  if (!user) throw HTTPError(401, 'Invalid user id');
+  if (!user) {
+    throw HTTPError(401, 'Invalid user id');
+  }
+
   const quiz = fetchQuizFromQuizId(quizId);
-  if (!quiz) throw HTTPError(403, 'Invalid quiz id');
-  if (!user.userQuizzes.includes(quizId)) throw HTTPError(403, 'Invalid ownership status');
+  if (!quiz) {
+    throw HTTPError(403, 'Invalid quiz id');
+  }
+
+  if (!user.userQuizzes.includes(quizId)) {
+    throw HTTPError(403, 'Invalid ownership status');
+  }
 
   return {
     quizId: quiz.quizId,
@@ -947,19 +982,3 @@ export function adminQuizQuestionDelete(
 
   return {};
 }
-
-/**
- * Function returns random colour from an array of colours
- * Pops the returned element from original array
- * @returns string
- */
-const setRandomColour = (colours: string[]): string => {
-  const colourIndex = ~~(Math.random() * colours.length);
-  const colourToReturn = colours[colourIndex];
-  colours.splice(colourIndex, 1);
-  return colourToReturn;
-};
-
-const setAnswerId = (): number => {
-  return ~~(Math.random() * 1000);
-};
