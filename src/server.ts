@@ -39,7 +39,6 @@ import {
   adminQuizChangeOwnerV2,
   adminQuizQuestionDuplicate,
   adminQuizQuestionDelete,
-  adminQuizSessionStart,
   adminQuizCreateV2
 } from './quiz';
 import {

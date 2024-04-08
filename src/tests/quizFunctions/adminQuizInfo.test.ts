@@ -1,11 +1,11 @@
-import { 
-  requestAuthRegister, 
-  requestQuizCreate, 
-  requestQuizInfo, 
-  clear, 
-  errorCode, 
-  requestQuizCreateV2, 
-  requestQuizInfoV2 
+import {
+  requestAuthRegister,
+  requestQuizCreate,
+  requestQuizInfo,
+  clear,
+  errorCode,
+  requestQuizCreateV2,
+  requestQuizInfoV2
 } from '../wrapper';
 import HTTPError from 'http-errors';
 
