@@ -250,6 +250,18 @@ export function adminQuizList(sessionId: string): AdminQuizListReturn | ErrorObj
   return { quizzes: returnQuizzes };
 }
 
+export function adminQuizListV2(token: string): AdminQuizListReturn {
+  const user = fetchUserFromSessionId(token);
+
+  if (!user) {
+    throw HTTPError(401, 'Invalid user id');
+  }
+
+  const userQuizzes = user.userQuizzes.map(quizId => fetchQuizFromQuizId(quizId));
+  const returnQuizzes = userQuizzes.map(quiz => { return { quizId: quiz.quizId, name: quiz.name }; });
+  return { quizzes: returnQuizzes };
+}
+
 /**
  * Given basic details about a new quiz, create one for the logged in user.
  *

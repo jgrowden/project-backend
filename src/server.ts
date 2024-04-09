@@ -20,6 +20,7 @@ import {
 } from './auth';
 import {
   adminQuizList,
+  adminQuizListV2,
   adminQuizCreate,
   adminQuizRemove,
   adminQuizInfo,
@@ -136,6 +137,14 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizListV2 Route
+app.get('/v2/admin/quiz/list', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const result = adminQuizListV2(token);
   save();
   res.json(result);
 });

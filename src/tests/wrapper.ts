@@ -13,6 +13,9 @@ export const requestAuthLogout = (token: string) =>
 export const requestQuizList = (token: string) =>
   requestHelper('GET', '/v1/admin/quiz/list', { token });
 
+export const requestQuizListV2 = (token: string) =>
+  requestHelper('GET', '/v2/admin/quiz/list', {}, { token });
+
 export const requestQuizCreate = (token: string, name: string, description: string) =>
   requestHelper('POST', '/v1/admin/quiz', { token, name, description });
 
