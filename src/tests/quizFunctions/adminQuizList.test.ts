@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizList, requestQuizListV2, clear, errorCode } from '../../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizList, requestQuizListV2, clear, errorCode } from '../wrapper';
 import HTTPError from 'http-errors';
 
 describe('adminQuizList V1', () => {
@@ -164,7 +164,7 @@ describe('adminQuizList V2', () => {
     const user = requestAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
     const token = user.jsonBody.token as string;
     clear();
-    expect(requestQuizListV2(token))
+    expect(() => requestQuizListV2(token))
       .toThrow(HTTPError[401]);
   });
 });
