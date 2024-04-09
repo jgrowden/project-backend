@@ -1,4 +1,3 @@
-import HTTPError from 'http-errors';
 import { getData, UserType, QuestionType, QuizType } from './dataStore';
 import {
   fetchUserFromSessionId,
@@ -8,11 +7,13 @@ import {
   generateNewQuizId,
   userWithEmailExists,
   generateNewQuestionId,
-  generateQuizSessionId,
   currentTime,
   returnError,
-  ErrorObjectWithCode
+  ErrorObjectWithCode,
+  setRandomColour,
+  setAnswerId
 } from './helper';
+import HTTPError from 'http-errors';
 
 interface AdminQuizListReturnElement {
   quizId: number;
@@ -310,6 +311,38 @@ export function adminQuizCreate(
   return { quizId: newQuizId };
 }
 
+export function adminQuizCreateV2 (
+  token: string,
+  name: string,
+  description: string
+): AdminQuizCreateReturn {
+  const user = fetchUserFromSessionId(token);
+  if (!user) throw HTTPError(401, 'User not found');
+  if (regex.test(name)) throw HTTPError(400, 'Invalid quiz name characters');
+  if (name.length < quizNameMinLength || name.length > quizNameMaxLength) throw HTTPError(400, 'Invalid quiz name length');
+  const duplicateName = user.userQuizzes.find(quizId => fetchQuizFromQuizId(quizId).name === name);
+  if (duplicateName !== undefined) throw HTTPError(400, 'Duplicate quiz name');
+  if (description.length > quizDescriptionMaxLength) throw HTTPError(400, 'Invalid quiz description length');
+
+  // Success!
+  const unixTime = currentTime();
+  const newQuizId = generateNewQuizId();
+  user.userQuizzes.push(newQuizId);
+  getData().quizzes.push({
+    ownerId: user.authUserId,
+    quizId: newQuizId,
+    name: name,
+    description: description,
+    timeCreated: unixTime,
+    timeLastEdited: unixTime,
+    numQuestions: 0,
+    questions: [],
+    quizSessions: [],
+    duration: 0,
+    thumbnailUrl: undefined
+  });
+  return { quizId: newQuizId };
+}
 /**
  * Given a particular quiz, permanently remove the quiz.
  *
@@ -783,95 +816,3 @@ export function adminQuizQuestionDelete(
 
   return {};
 }
-
-/**
- * Start a new session for a quiz
- * This copies the quiz, so that any edits whilst a session is running
- * do not affect active session
- * @param {string} token
- * @param {number} quizId
- * @param {number} autoStartNum
- * @returns {
- *  sessionId: number
- * }
- */
-export function adminQuizSessionStart(token: string, quizId: number, autoStartNum: number) {
-  const user = fetchUserFromSessionId(token);
-  if (!user) {
-    throw HTTPError(401, 'invalid token');
-  }
-
-  const quiz = fetchQuizFromQuizId(quizId);
-  if (!quiz) {
-    const deletedQuiz = fetchDeletedQuizFromQuizId(quizId);
-    if (deletedQuiz && deletedQuiz.ownerId === user.authUserId) {
-      throw HTTPError(400, 'quiz is in trash');
-    } else {
-      throw HTTPError(403, 'invalid quizId');
-    }
-  }
-
-  if (quiz.ownerId !== user.authUserId) {
-    throw HTTPError(403, 'invalid quiz ownership');
-  }
-  if (autoStartNum > 50) {
-    throw HTTPError(400, 'autoStartNum > 50');
-  }
-
-  const activeSessions = quiz.quizSessions.filter(session => session.state !== 'END');
-  if (activeSessions.length >= 10) {
-    throw HTTPError(400, 'maximum amount of active sessions reached');
-  }
-  if (quiz.questions.length === 0) {
-    throw HTTPError(400, 'quiz has no questions');
-  }
-
-  // Copy quiz
-  // Initialise extra question fields for use in session states
-  const quizSessionId = generateQuizSessionId();
-  const quizCopy = JSON.parse(JSON.stringify(quiz));
-
-  // Define type of questions to avoid typescript errors in map
-  const questionCopy: QuestionType[] = JSON.parse(JSON.stringify(quiz.questions));
-  quizCopy.questions = questionCopy.map(question => {
-    question.playersCorrectList = [];
-    question.averageAnswerTime = 0;
-    question.percentCorrect = 0;
-    return question;
-  });
-
-  quiz.quizSessions.push({
-    state: 'LOBBY',
-    atQuestion: 0,
-    players: [],
-    quizSessionId: quizSessionId,
-    autoStartNum: autoStartNum,
-    messages: [],
-    metadata: quizCopy
-  });
-  return {
-    sessionId: quizSessionId,
-  };
-}
-
-/**
- * Function returns random colour from an array of colours
- * Pops the returned element from original array
- * @returns string
- */
-const setRandomColour = (colours: string[]): string => {
-  const colourIndex = ~~(Math.random() * colours.length);
-  const colourToReturn = colours[colourIndex];
-  colours.splice(colourIndex, 1);
-  return colourToReturn;
-};
-
-/**
- * Basic ID generation function
- * Maximum of 6 answer Id's per question
- * Collision highly unlikely
- * @returns {number}
- */
-const setAnswerId = (): number => {
-  return ~~(Math.random() * 1000);
-};

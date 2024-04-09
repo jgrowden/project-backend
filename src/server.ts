@@ -35,8 +35,11 @@ import {
   adminQuizChangeOwner,
   adminQuizQuestionDuplicate,
   adminQuizQuestionDelete,
-  adminQuizSessionStart
+  adminQuizCreateV2,
 } from './quiz';
+import {
+  adminQuizSessionStart
+} from './session';
 
 import { clear } from './other';
 // Set up web app
@@ -157,6 +160,15 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizCreateV2 route
+app.post('/v2/admin/quiz', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const { name, description } = req.body;
+  const result = adminQuizCreateV2(token, name, description);
   save();
   res.json(result);
 });
