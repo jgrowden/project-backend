@@ -29,6 +29,7 @@ import {
   adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
   adminQuizQuestionCreate,
+  adminQuizQuestionCreateV2,
   adminQuizQuestionUpdate,
   adminQuizQuestionMove,
   adminQuizTrashList,
@@ -301,6 +302,17 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizQuestionCreateV2 Route
+app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const { questionBody } = req.body;
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizQuestionCreateV2(token, quizId, questionBody);
+  save();
+  res.json(result);
+});
+
+// adminQuizQuestionTransfer Route
 app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   const { token, userEmail } = req.body;
   const quizId = parseInt(req.params.quizid);
