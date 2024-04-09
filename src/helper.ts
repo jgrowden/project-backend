@@ -68,6 +68,26 @@ export const generateNewPlayerId = (sessionId: number): number => {
   return newPlayerId;
 }
 
+export const generateNewPlayerName = (): string => {
+  const letters = 'abcdefghijklmnopqrstuvwxyz';
+  const numbers = '0123456789';
+  let playerName = [];
+  let char;
+  for (let i = 0; i < 5; i++) {
+    char = letters.charAt(Math.floor(Math.random() * letters.length));
+    if (!playerName.includes()) {
+      playerName.push(char);
+    }
+  }
+  for (let i = 0; i < 3; i++) {
+    char = numbers.charAt(Math.floor(Math.random() * numbers.length));
+    if (!playerName.includes()) {
+      playerName.push(char);
+    }
+  }
+  return playerName.join('');
+}
+
 export const currentTime = (): number => {
   return Math.floor(Date.now() / 1000);
 };

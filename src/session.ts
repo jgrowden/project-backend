@@ -6,7 +6,8 @@ import {
   fetchDeletedQuizFromQuizId,
   generateQuizSessionId,
   fetchSessionFromSessionId,
-  generateNewPlayerId
+  generateNewPlayerId,
+  generateNewPlayerName
 } from './helper';
 
 /**
@@ -108,7 +109,7 @@ export function adminQuizSessionPlayerJoin(
   if (name === '') {/* 
     const letters = 'abcdefghijklmnopqrstuvwxyz';
     const numbers = '0123456789'; */
-    name = 'spagh377';
+    name = generateNewPlayerName;
   }
   let newPlayerId = generateNewPlayerId(sessionId);
   session.players.push({ playerId: newPlayerId, playerName: name });
