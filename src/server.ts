@@ -42,7 +42,8 @@ import {
   adminQuizCreateV2
 } from './quiz';
 import {
-  adminQuizSessionStart
+  adminQuizSessionStart,
+  adminQuizSessionPlayerJoin
 } from './session';
 
 import { clear } from './other';
@@ -392,6 +393,14 @@ app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) =
   const quizId = parseInt(req.params.quizid);
   const { autoStartNum } = req.body;
   const result = adminQuizSessionStart(token, quizId, autoStartNum);
+  save();
+  res.json(result);
+});
+
+//adminQuizSessionPlayerJoin Route
+app.post('/v1/player/join', (req: Request, res: Response) => {
+  const { sessionId, name } = req.body;
+  const result = adminQuizSessionPlayerJoin(sessionId, name);
   save();
   res.json(result);
 });

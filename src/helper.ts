@@ -33,6 +33,12 @@ export const userWithEmailExists = (email: string): UserType | undefined => {
   return getData().users.find(user => user.email === email);
 };
 
+export const fetchSessionFromSessionId = (sessionId: number): QuizSessionType | undefined => {
+  let quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(quizSession => quizSession.quizSessionId === sessionId));
+  if (quiz === undefined) return undefined;
+  return quiz.quizSessions.find(quizSession => quizSession.quizSessionId === sessionId);
+};
+
 // generates psudorandom numbers, max 524287 unique Ids
 const hash = (i: number): number => {
   return ((((54787 * i) % 524287) + 524287) % 524287);
@@ -40,7 +46,7 @@ const hash = (i: number): number => {
 
 export const generateNewUserId = (): number => {
   const data = getData();
-  let newUserId = 2354;
+  let newUserId = 2353;
   const userIds = data.users.map(user => user.authUserId);
   while (userIds.includes(newUserId)) newUserId = hash(newUserId);
   return newUserId;
@@ -53,6 +59,14 @@ export const generateNewQuizId = (): number => {
   while (quizIds.includes(newQuizId)) newQuizId = hash(newQuizId);
   return newQuizId;
 };
+
+export const generateNewPlayerId = (sessionId: number): number => {
+  let session = fetchSessionFromSessionId(sessionId);
+  let playerIds = session.players.map(player => player.playerId);
+  let newPlayerId = 2355;
+  while (playerIds.includes(newPlayerId)) newPlayerId = hash(newPlayerId);
+  return newPlayerId;
+}
 
 export const currentTime = (): number => {
   return Math.floor(Date.now() / 1000);
