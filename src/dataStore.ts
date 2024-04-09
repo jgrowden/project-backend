@@ -38,23 +38,36 @@ export interface QuestionType {
   questionId?: number;
   question: string;
   duration: number;
-  thumbnailUrl?: string;
   points: number;
   answers: AnswerType[];
-  playersCorrectList?: string[];
-  averageAnswerTime?: number;
-  percentCorrect?: number;
   thumbnailUrl?: string;
+}
+
+export interface PlayerAnswerType {
+  playerName: string;
+  answerTimes: number;
+  answerIds: number[];
+}
+
+export interface QuestionAnswerType {
+  playersCorrectList: string[];
+  averageAnswerTime: number; // let total = 0; playerAnswers.reduce((total, answer) => total + answer.answerTimes, 0); averageAnswerTime = total / playerAnswers.length;
+  questionPosition: number; // the question referred to by atQuestion
+  percentCorrect?: number;
+  questionStartTime: number;
+  playerAnswers: PlayerAnswerType[];
 }
 
 export interface QuizSessionType {
   state: string;
-  atQuestion: number;
+  atQuestion: number; // 0-indexed: metadata.questions[0] is the first question 
   players: PlayerType[];
   quizSessionId: number;
   autoStartNum: number;
   messages: MessageType[];
+  collectedAnswers: QuestionAnswerType[]; // stores ALL answers in a single array
   metadata: QuizType;
+  timeoutId: ReturnType<typeof setTimeout>;
 }
 
 export interface PlayerType {
