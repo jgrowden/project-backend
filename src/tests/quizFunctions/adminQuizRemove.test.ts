@@ -1,17 +1,28 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizDelete, errorCode, clear } from '../wrapper';
+import {
+  requestAuthRegister,
+  requestQuizCreate,
+  requestQuizCreateV2,
+  requestQuizDelete,
+  requestQuizDeleteV2,
+  // requestQuizSessionStart,
+  errorCode,
+  clear
+} from '../wrapper';
+import HTTPError from 'http-errors';
 
 let token: string;
 let quizId: number;
+// const AUTOSTARTNUM = 10;
 
-beforeEach(() => {
-  clear();
-  const user = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-  token = user.jsonBody.token as string;
-  const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
-  quizId = quiz.jsonBody.quizId as number;
-});
+describe('Tests for DELETE /v1/admin/quiz/{quizid}:', () => {
+  beforeEach(() => {
+    clear();
+    const user = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
+    token = user.jsonBody.token as string;
+    const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
+    quizId = quiz.jsonBody.quizId as number;
+  });
 
-describe('Testing /v1/admin/quiz/{quizid}:', () => {
   test('Successful test.', () => {
     expect(requestQuizDelete(token, quizId)).toStrictEqual({
       statusCode: 200,
@@ -29,4 +40,45 @@ describe('Testing /v1/admin/quiz/{quizid}:', () => {
     const otherToken = jsonBody.token as string;
     expect(requestQuizDelete(otherToken, quizId)).toStrictEqual(errorCode(403));
   });
+});
+
+describe('Tests for DELETE /v2/admin/quiz/{quizid}:', () => {
+  beforeEach(() => {
+    clear();
+    const user = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
+    token = user.jsonBody.token as string;
+    const quiz = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');
+    quizId = quiz.jsonBody.quizId as number;
+  });
+
+  test('Successful test.', () => {
+    expect(requestQuizDeleteV2(token, quizId)).toStrictEqual({
+      statusCode: 200,
+      jsonBody: {}
+    });
+  });
+  test('Failed test: user does not exist.', () => {
+    expect(() => requestQuizDeleteV2(token + 'a', quizId)).toThrow(HTTPError[401]);
+  });
+  test('Failed test: empty token.', () => {
+    expect(() => requestQuizDeleteV2('', quizId)).toThrow(HTTPError[401]);
+  });
+  test('Failed test: quiz does not exist.', () => {
+    expect(() => requestQuizDeleteV2(token, quizId + 1)).toThrow(HTTPError[403]);
+  });
+  test('Failed test: user provided does not own quiz.', () => {
+    const { jsonBody } = requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo');
+    const otherToken = jsonBody.token as string;
+    expect(() => requestQuizDeleteV2(otherToken, quizId)).toThrow(HTTPError[403]);
+  });
+  /* test('Failed test: not all quiz sessions are in END state.', () => {
+    requestQuizQuestionCreate(token, quizId, {
+      question: 'How tall am I?',
+      duration: 5,
+      points: 4,
+      answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
+    });
+    requestQuizSessionStart(token, quizId, AUTOSTARTNUM);
+    expect(() => requestQuizDeleteV2(token, quizId)).toThrow(HTTPError[400]);
+  }) */
 });

@@ -377,6 +377,27 @@ export function adminQuizRemove(
   return {};
 }
 
+export function adminQuizRemoveV2(
+  token: string,
+  quizId: number
+): Record<string, never> {
+  const user = fetchUserFromSessionId(token);
+  if (!user) throw HTTPError(401, 'Invalid user id');
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) throw HTTPError(403, 'Invalid quiz id');
+  if (!user.userQuizzes.includes(quizId)) throw HTTPError(403, 'Invalid ownership status');
+
+  // TO TEST
+  const quizState = quiz.quizSessions.find(session => session.state !== 'END');
+  if (quizState) throw HTTPError(400, 'Some session is not in END state');
+
+  const data = getData();
+  data.deletedQuizzes.push(fetchQuizFromQuizId(quizId));
+  user.userQuizzes.splice(user.userQuizzes.indexOf(quizId), 1);
+  data.quizzes.splice(data.quizzes.indexOf(quiz), 1);
+  return {};
+}
+
 /**
  * Returns a list with details of a user's deleted quizzes
  *
