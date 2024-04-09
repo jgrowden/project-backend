@@ -2,6 +2,7 @@ import { getData, TokenType } from './dataStore';
 import validator from 'validator';
 import { nanoid } from 'nanoid';
 import { sha256 } from 'js-sha256';
+import HTTPError from 'http-errors';
 import {
   fetchUserFromSessionId,
   userWithEmailExists,
@@ -156,6 +157,17 @@ export function adminAuthLogout(sessionId: string): ErrorObjectWithCode | Record
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
     return returnError('User ID not found', 401);
+  }
+
+  user.sessions = user.sessions.filter(sessions => { return sessions !== sessionId; });
+
+  return {};
+}
+
+export function adminAuthLogoutV2(sessionId: string): Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    throw HTTPError(401, 'User ID not found');
   }
 
   user.sessions = user.sessions.filter(sessions => { return sessions !== sessionId; });

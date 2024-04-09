@@ -16,26 +16,34 @@ import {
   adminUserDetails,
   adminUserPasswordUpdate,
   adminUserDetailsUpdate,
-  adminAuthLogout
+  adminAuthLogout,
+  adminAuthLogoutV2
 } from './auth';
 import {
   adminQuizList,
   adminQuizCreate,
   adminQuizRemove,
+  adminQuizRemoveV2,
   adminQuizInfo,
+  adminQuizInfoV2,
   adminQuizNameUpdate,
   adminQuizDescriptionUpdate,
   adminQuizQuestionCreate,
+  adminQuizQuestionCreateV2,
   adminQuizQuestionUpdate,
   adminQuizQuestionMove,
   adminQuizTrashList,
   adminQuizRestore,
   adminQuizTrashEmpty,
   adminQuizChangeOwner,
+  adminQuizChangeOwnerV2,
   adminQuizQuestionDuplicate,
   adminQuizQuestionDelete,
-  adminQuizSessionStart
+  adminQuizCreateV2
 } from './quiz';
+import {
+  adminQuizSessionStart
+} from './session';
 
 import { clear } from './other';
 // Set up web app
@@ -61,6 +69,7 @@ const load = () => {
     setData(JSON.parse(dataFile));
   }
 };
+
 const save = () => {
   fs.writeFileSync('./toohakData.json', JSON.stringify(getData()));
 };
@@ -103,6 +112,15 @@ app.post('/v1/admin/auth/logout', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminAuthLogout Route
+app.post('/v2/admin/auth/logout', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+
+  const result = adminAuthLogoutV2(token);
   save();
   res.json(result);
 });
@@ -151,6 +169,15 @@ app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizCreateV2 route
+app.post('/v2/admin/quiz', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const { name, description } = req.body;
+  const result = adminQuizCreateV2(token, name, description);
+  save();
+  res.json(result);
+});
+
 // adminUserPasswordUpdate Route
 app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   const { token, oldPassword, newPassword } = req.body;
@@ -170,6 +197,15 @@ app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizRemoveV2 Route
+app.delete('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const quizId = parseInt(req.params.quizid as string);
+  const result = adminQuizRemoveV2(token, quizId);
   save();
   res.json(result);
 });
@@ -222,6 +258,15 @@ app.get('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizInfoV2 Route
+app.get('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizInfoV2(token, quizId);
+  save();
+  res.json(result);
+});
+
 // adminQuizNameUpdate Route
 app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
@@ -258,6 +303,17 @@ app.post('/v1/admin/quiz/:quizid/question', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizQuestionCreateV2 Route
+app.post('/v2/admin/quiz/:quizid/question', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const { questionBody } = req.body;
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizQuestionCreateV2(token, quizId, questionBody);
+  save();
+  res.json(result);
+});
+
+// adminQuizQuestionTransfer Route
 app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   const { token, userEmail } = req.body;
   const quizId = parseInt(req.params.quizid);
@@ -265,6 +321,15 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+app.post('/v2/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const { userEmail } = req.body;
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizChangeOwnerV2(token, quizId, userEmail);
   save();
   res.json(result);
 });
