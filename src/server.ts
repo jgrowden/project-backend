@@ -15,6 +15,7 @@ import {
   adminAuthLogin,
   adminUserDetails,
   adminUserPasswordUpdate,
+  adminUserPasswordUpdateV2,
   adminUserDetailsUpdate,
   adminAuthLogout,
   adminAuthLogoutV2
@@ -185,6 +186,15 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminUserPasswordUpdateV2 Route
+app.put('/v2/admin/user/password', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const { oldPassword, newPassword } = req.body;
+  const result = adminUserPasswordUpdateV2(token, oldPassword, newPassword);
   save();
   res.json(result);
 });

@@ -316,3 +316,41 @@ export function adminUserPasswordUpdate(
 
   return {};
 }
+
+export function adminUserPasswordUpdateV2(
+  token: string,
+  oldPassword: string,
+  newPassword: string
+): Record<string, never> {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'User Id not found');
+  }
+
+  const oldPasswordHash = sha256(oldPassword);
+  if (oldPasswordHash !== user.password) {
+    throw HTTPError(400, 'Old password is not correct');
+  }
+
+  if (oldPassword === newPassword) {
+    throw HTTPError(400, 'New password is the same as old password');
+  }
+
+  const newPasswordHash = sha256(newPassword);
+  if (user.previousPasswords.find(password => password === newPasswordHash)) {
+    throw HTTPError(400, 'Password has been used before');
+  }
+
+  if (newPassword.length < userPasswordMinLength) {
+    throw HTTPError(400, 'Password is less than 8 characters');
+  }
+
+  if (!hasLetterAndNumber(newPassword)) {
+    throw HTTPError(400, 'Password must contain at least one letter and at least one number');
+  }
+
+  user.password = newPasswordHash;
+  user.previousPasswords.push(oldPasswordHash);
+
+  return {};
+}
