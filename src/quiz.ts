@@ -1,4 +1,3 @@
-import HTTPError from 'http-errors';
 import { getData, UserType, QuestionType, QuizType } from './dataStore';
 import {
   fetchUserFromSessionId,
@@ -8,11 +7,13 @@ import {
   generateNewQuizId,
   userWithEmailExists,
   generateNewQuestionId,
-  generateQuizSessionId,
   currentTime,
   returnError,
-  ErrorObjectWithCode
+  ErrorObjectWithCode,
+  setRandomColour,
+  setAnswerId
 } from './helper';
+import HTTPError from 'http-errors';
 
 interface AdminQuizListReturnElement {
   quizId: number;
@@ -322,6 +323,52 @@ export function adminQuizCreate(
   return { quizId: newQuizId };
 }
 
+export function adminQuizCreateV2(
+  token: string,
+  name: string,
+  description: string
+): AdminQuizCreateReturn {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'User not found');
+  }
+
+  if (regex.test(name)) {
+    throw HTTPError(400, 'Invalid quiz name characters');
+  }
+
+  if (name.length < quizNameMinLength || name.length > quizNameMaxLength) {
+    throw HTTPError(400, 'Invalid quiz name length');
+  }
+
+  const duplicateName = user.userQuizzes.find(quizId => fetchQuizFromQuizId(quizId).name === name);
+  if (duplicateName !== undefined) {
+    throw HTTPError(400, 'Duplicate quiz name');
+  }
+
+  if (description.length > quizDescriptionMaxLength) {
+    throw HTTPError(400, 'Invalid quiz description length');
+  }
+
+  // Success!
+  const unixTime = currentTime();
+  const newQuizId = generateNewQuizId();
+  user.userQuizzes.push(newQuizId);
+  getData().quizzes.push({
+    ownerId: user.authUserId,
+    quizId: newQuizId,
+    name: name,
+    description: description,
+    timeCreated: unixTime,
+    timeLastEdited: unixTime,
+    numQuestions: 0,
+    questions: [],
+    quizSessions: [],
+    duration: 0,
+    thumbnailUrl: ''
+  });
+  return { quizId: newQuizId };
+}
 /**
  * Given a particular quiz, permanently remove the quiz.
  *
@@ -353,6 +400,37 @@ export function adminQuizRemove(
   user.userQuizzes.splice(user.userQuizzes.indexOf(quizId), 1);
   data.quizzes.splice(data.quizzes.indexOf(quiz), 1);
 
+  return {};
+}
+
+export function adminQuizRemoveV2(
+  token: string,
+  quizId: number
+): Record<string, never> {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'Invalid user id');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Invalid quiz id');
+  }
+
+  if (!user.userQuizzes.includes(quizId)) {
+    throw HTTPError(403, 'Invalid ownership status');
+  }
+
+  // TO TEST
+  const quizState = quiz.quizSessions.find(session => session.state !== 'END');
+  if (quizState) {
+    throw HTTPError(400, 'Some session is not in END state');
+  }
+
+  const data = getData();
+  data.deletedQuizzes.push(fetchQuizFromQuizId(quizId));
+  user.userQuizzes.splice(user.userQuizzes.indexOf(quizId), 1);
+  data.quizzes.splice(data.quizzes.indexOf(quiz), 1);
   return {};
 }
 
@@ -426,6 +504,37 @@ export function adminQuizInfo(
     numQuestions: quiz.numQuestions,
     questions: quiz.questions,
     duration: quiz.duration
+  };
+}
+
+export function adminQuizInfoV2(
+  token: string,
+  quizId: number
+): QuizType {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'Invalid user id');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Invalid quiz id');
+  }
+
+  if (!user.userQuizzes.includes(quizId)) {
+    throw HTTPError(403, 'Invalid ownership status');
+  }
+
+  return {
+    quizId: quiz.quizId,
+    name: quiz.name,
+    timeCreated: quiz.timeCreated,
+    timeLastEdited: quiz.timeLastEdited,
+    description: quiz.description,
+    numQuestions: quiz.numQuestions,
+    questions: quiz.questions,
+    duration: quiz.duration,
+    thumbnailUrl: quiz.thumbnailUrl
   };
 }
 
@@ -518,6 +627,96 @@ export function adminQuizQuestionCreate(
   };
 }
 
+export function adminQuizQuestionCreateV2(
+  sessionId: string,
+  quizId: number,
+  questionBody: QuestionType
+): AdminQuizQuestionCreateReturn {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    throw HTTPError(401, 'invalid user ID');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'invalid quiz ID');
+  }
+
+  if (!user.userQuizzes.includes(quizId)) {
+    throw HTTPError(403, 'you do not own this quiz');
+  }
+
+  if (questionBody.question.length < questionLenMin || questionBody.question.length > questionLenMax) {
+    throw HTTPError(400, 'Question must be between 5 and 50 characters long');
+  }
+
+  if (questionBody.answers.length < questionNumAnswersMin || questionBody.answers.length > questionNumAnswersMax) {
+    throw HTTPError(400, 'Invalid number of answers: there must be between 2 and 6 answers');
+  }
+
+  if (questionBody.duration <= 0) {
+    throw HTTPError(400, 'Question must have positive duration');
+  }
+
+  const questionLength = quiz.questions.reduce((pSum, question) => pSum + question.duration, 0);
+
+  if (questionLength + questionBody.duration > questionDurationMax) {
+    throw HTTPError(400, 'Quiz must have duration lower than 180');
+  }
+
+  if (questionBody.points < questionPointsMin || questionBody.points > questionPointsMax) {
+    throw HTTPError(400, 'Invalid quiz point count: question must have between 1 and 10 points');
+  }
+
+  if (questionBody.answers.find(entry => entry.answer.length < answersLenMin || entry.answer.length > answersLenMax) !== undefined) {
+    throw HTTPError(400, 'Invalid answer length: answers must be between 1 and 30 characters long');
+  }
+
+  // check for duplicate entries
+  const answer = questionBody.answers.map(entry => entry.answer);
+  const duplicates = answer.filter((entry, index) => answer.indexOf(entry) !== index);
+
+  if (duplicates.length !== 0) {
+    throw HTTPError(400, 'Question cannot have duplicate answers');
+  }
+
+  if (questionBody.answers.find(answer => answer.correct === true) === undefined) {
+    throw HTTPError(400, 'There are no correct answers');
+  }
+
+  // eslint-disable-next-line
+  if (/jpg$|jpeg$|png$/g.test(questionBody.thumbnailUrl) === false) {
+    throw HTTPError(400, 'ThumbnailURL does not end in jpg/jpeg/png');
+  }
+
+  // eslint-disable-next-line
+  if (/^http:\/\/|^https:\/\//g.test(questionBody.thumbnailUrl) === false) {
+    // eslint-disable-next-line
+    throw HTTPError(400, 'ThumbnailURL does not start with http:\/\/ or https:\/\/');
+  }
+
+  const newQuestionId = generateNewQuestionId();
+  const colours = [...ANSWER_COLOURS];
+  questionBody.answers = questionBody.answers.map(answer => {
+    answer.colour = setRandomColour(colours);
+    answer.answerId = setAnswerId();
+    return answer;
+  });
+  quiz.questions.push({
+    questionId: newQuestionId,
+    question: questionBody.question,
+    duration: questionBody.duration,
+    points: questionBody.points,
+    answers: questionBody.answers,
+    thumbnailUrl: questionBody.thumbnailUrl
+  });
+  quiz.numQuestions++;
+  quiz.duration += questionBody.duration;
+  quiz.timeLastEdited = currentTime();
+
+  return { questionId: newQuestionId };
+}
+
 export function adminQuizChangeOwner(
   sessionId: string,
   quizId: number,
@@ -550,6 +749,49 @@ export function adminQuizChangeOwner(
   if (quizNames.indexOf(fetchQuizFromQuizId(quizId).name) !== -1) {
     return returnError('Quiz name is a duplicate of a quiz the other user currently owns');
   }
+
+  quiz.ownerId = userWithEmailExist.authUserId;
+  user.userQuizzes.splice(user.userQuizzes.indexOf(quizId), 1);
+  userWithEmailExist.userQuizzes.push(quizId);
+
+  return {};
+}
+
+export function adminQuizChangeOwnerV2(
+  sessionId: string,
+  quizId: number,
+  userEmail: string
+): Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    throw HTTPError(401, 'invalid user ID');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'invalid quiz ID');
+  }
+
+  if (!user.userQuizzes.includes(quizId)) {
+    throw HTTPError(403, 'you do not own this quiz');
+  }
+
+  if (fetchUserFromSessionId(sessionId).email === userEmail) {
+    throw HTTPError(400, 'Email provided is the same as the logged in user');
+  }
+
+  const userWithEmailExist = userWithEmailExists(userEmail);
+  if (!userWithEmailExist) {
+    throw HTTPError(400, 'User email does not exist');
+  }
+
+  const quizNames = userWithEmailExist.userQuizzes.map(quizIds => fetchQuizFromQuizId(quizIds).name);
+  if (quizNames.indexOf(fetchQuizFromQuizId(quizId).name) !== -1) {
+    throw HTTPError(400, 'Quiz name is a duplicate of a quiz the other user currently owns');
+  }
+
+  const quizState = quiz.quizSessions.find(session => session.state !== 'END');
+  if (quizState) throw HTTPError(400, 'Some session is not in END state');
 
   quiz.ownerId = userWithEmailExist.authUserId;
   user.userQuizzes.splice(user.userQuizzes.indexOf(quizId), 1);
@@ -795,95 +1037,3 @@ export function adminQuizQuestionDelete(
 
   return {};
 }
-
-/**
- * Start a new session for a quiz
- * This copies the quiz, so that any edits whilst a session is running
- * do not affect active session
- * @param {string} token
- * @param {number} quizId
- * @param {number} autoStartNum
- * @returns {
- *  sessionId: number
- * }
- */
-export function adminQuizSessionStart(token: string, quizId: number, autoStartNum: number) {
-  const user = fetchUserFromSessionId(token);
-  if (!user) {
-    throw HTTPError(401, 'invalid token');
-  }
-
-  const quiz = fetchQuizFromQuizId(quizId);
-  if (!quiz) {
-    const deletedQuiz = fetchDeletedQuizFromQuizId(quizId);
-    if (deletedQuiz && deletedQuiz.ownerId === user.authUserId) {
-      throw HTTPError(400, 'quiz is in trash');
-    } else {
-      throw HTTPError(403, 'invalid quizId');
-    }
-  }
-
-  if (quiz.ownerId !== user.authUserId) {
-    throw HTTPError(403, 'invalid quiz ownership');
-  }
-  if (autoStartNum > 50) {
-    throw HTTPError(400, 'autoStartNum > 50');
-  }
-
-  const activeSessions = quiz.quizSessions.filter(session => session.state !== 'END');
-  if (activeSessions.length >= 10) {
-    throw HTTPError(400, 'maximum amount of active sessions reached');
-  }
-  if (quiz.questions.length === 0) {
-    throw HTTPError(400, 'quiz has no questions');
-  }
-
-  // Copy quiz
-  // Initialise extra question fields for use in session states
-  const quizSessionId = generateQuizSessionId();
-  const quizCopy = JSON.parse(JSON.stringify(quiz));
-
-  // Define type of questions to avoid typescript errors in map
-  const questionCopy: QuestionType[] = JSON.parse(JSON.stringify(quiz.questions));
-  quizCopy.questions = questionCopy.map(question => {
-    question.playersCorrectList = [];
-    question.averageAnswerTime = 0;
-    question.percentCorrect = 0;
-    return question;
-  });
-
-  quiz.quizSessions.push({
-    state: 'LOBBY',
-    atQuestion: 0,
-    players: [],
-    quizSessionId: quizSessionId,
-    autoStartNum: autoStartNum,
-    messages: [],
-    metadata: quizCopy
-  });
-  return {
-    sessionId: quizSessionId,
-  };
-}
-
-/**
- * Function returns random colour from an array of colours
- * Pops the returned element from original array
- * @returns string
- */
-const setRandomColour = (colours: string[]): string => {
-  const colourIndex = ~~(Math.random() * colours.length);
-  const colourToReturn = colours[colourIndex];
-  colours.splice(colourIndex, 1);
-  return colourToReturn;
-};
-
-/**
- * Basic ID generation function
- * Maximum of 6 answer Id's per question
- * Collision highly unlikely
- * @returns {number}
- */
-const setAnswerId = (): number => {
-  return ~~(Math.random() * 1000);
-};
