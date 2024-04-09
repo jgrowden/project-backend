@@ -745,6 +745,49 @@ export function adminQuizChangeOwner(
   return {};
 }
 
+export function adminQuizChangeOwnerV2(
+  sessionId: string,
+  quizId: number,
+  userEmail: string
+): Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    throw HTTPError(401, 'invalid user ID');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'invalid quiz ID');
+  }
+
+  if (!user.userQuizzes.includes(quizId)) {
+    throw HTTPError(403, 'you do not own this quiz');
+  }
+
+  if (fetchUserFromSessionId(sessionId).email === userEmail) {
+    throw HTTPError(400, 'Email provided is the same as the logged in user');
+  }
+
+  const userWithEmailExist = userWithEmailExists(userEmail);
+  if (!userWithEmailExist) {
+    throw HTTPError(400, 'User email does not exist');
+  }
+
+  const quizNames = userWithEmailExist.userQuizzes.map(quizIds => fetchQuizFromQuizId(quizIds).name);
+  if (quizNames.indexOf(fetchQuizFromQuizId(quizId).name) !== -1) {
+    throw HTTPError(400, 'Quiz name is a duplicate of a quiz the other user currently owns');
+  }
+
+  const quizState = quiz.quizSessions.find(session => session.state !== 'END');
+  if (quizState) throw HTTPError(400, 'Some session is not in END state');
+
+  quiz.ownerId = userWithEmailExist.authUserId;
+  user.userQuizzes.splice(user.userQuizzes.indexOf(quizId), 1);
+  userWithEmailExist.userQuizzes.push(quizId);
+
+  return {};
+}
+
 /**
  * Update the relevant details of a particular question within a quiz.
  * When this route is called, the last edited time is updated,

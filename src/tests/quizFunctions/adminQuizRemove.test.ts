@@ -9,6 +9,7 @@ import {
   errorCode,
   clear
 } from '../wrapper';
+
 import HTTPError from 'http-errors';
 
 let token: string;

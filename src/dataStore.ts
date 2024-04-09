@@ -41,10 +41,10 @@ export interface QuestionType {
   thumbnailUrl?: string;
   points: number;
   answers: AnswerType[];
-  thumbnailUrl?: string;
   playersCorrectList?: string[];
   averageAnswerTime?: number;
   percentCorrect?: number;
+  thumbnailUrl?: string;
 }
 
 export interface QuizSessionType {
