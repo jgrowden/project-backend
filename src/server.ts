@@ -32,6 +32,7 @@ import {
   adminQuizQuestionCreateV2,
   adminQuizQuestionUpdate,
   adminQuizQuestionMove,
+  adminQuizQuestionMoveV2,
   adminQuizTrashList,
   adminQuizRestore,
   adminQuizTrashEmpty,
@@ -359,6 +360,21 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: 
   save();
   res.json(result);
 });
+
+// adminQuizQuestionMoveV2 Route
+app.put('/v2/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const { newPosition } = req.body;
+  const result = adminQuizQuestionMove(token, quizId, questionId, newPosition);
+  if ('errorCode' in result) {
+    return res.status(result.errorCode).json(result.errorObject);
+  }
+  save();
+  res.json(result);
+});
+
 
 // adminQuizQuestionDuplicate Route
 app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {

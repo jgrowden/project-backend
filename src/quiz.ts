@@ -933,6 +933,49 @@ export function adminQuizQuestionMove(
   return {};
 }
 
+export function adminQuizQuestionMoveV2(
+  token: string,
+  quizId: number,
+  questionId: number,
+  newPosition: number
+): Record<string, never> {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'Invalid token');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Invalid quizId');
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'Invalid quiz ownership');
+  }
+
+  const question = fetchQuestionFromQuestionId(quiz, questionId);
+  if (!question) {
+    throw HTTPError(400, 'Invalid questionId');
+  }
+
+  if (newPosition < 0 || newPosition >= (quiz.questions.length)) {
+    throw HTTPError(400, 'Invalid new position');
+  }
+
+  if (quiz.questions[newPosition].questionId === questionId) {
+    throw HTTPError(400, 'Question is already in the new position');
+  }
+
+  const oldElement = quiz.questions.find(question => question.questionId === questionId);
+  const oldPosition = quiz.questions.indexOf(oldElement);
+
+  quiz.questions.splice(oldPosition, 1);
+  quiz.questions.splice(newPosition, 0, oldElement);
+  quiz.timeLastEdited = currentTime();
+
+  return {};
+}
+
 /**
  * A particular question gets duplicated to immediately after where the source question is
  * When this route is called, the timeLastEdited is updated
