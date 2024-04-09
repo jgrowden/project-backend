@@ -14,10 +14,6 @@ export interface ErrorString {
   error: string
 }
 
-export const fetchUserFromUserId = (authUserId: number): UserType | undefined => {
-  return getData().users.find(user => user.authUserId === authUserId);
-};
-
 export const fetchUserFromSessionId = (sessionId: string): UserType | undefined => {
   return getData().users.find(user => user.sessions.some(session => session === sessionId));
 };
@@ -85,4 +81,19 @@ export const generateNewQuestionId = (): number => {
     newQuestionId++;
   }
   return newQuestionId;
+};
+
+export const generateQuizSessionId = (): number => {
+  const data = getData();
+  let newQuizSessionId = 0;
+  const quizSessionIds = [];
+  for (const quiz of data.quizzes) {
+    for (const quizSession of quiz.quizSessions) {
+      quizSessionIds.push(quizSession.quizSessionId);
+    }
+  }
+  while (quizSessionIds.includes(newQuizSessionId)) {
+    newQuizSessionId++;
+  }
+  return newQuizSessionId;
 };

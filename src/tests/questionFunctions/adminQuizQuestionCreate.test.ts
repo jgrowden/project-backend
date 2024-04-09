@@ -41,11 +41,13 @@ describe('Testing /v1/admin/quiz/{quizid}:', () => {
             points: 4,
             answers: [
               {
+                answerId: expect.any(Number),
                 answer: 'Answer!',
                 colour: expect.any(String),
                 correct: true
               },
               {
+                answerId: expect.any(Number),
                 answer: 'Another Answer!',
                 colour: expect.any(String),
                 correct: true
