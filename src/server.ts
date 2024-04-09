@@ -38,6 +38,7 @@ import {
   adminQuizChangeOwner,
   adminQuizChangeOwnerV2,
   adminQuizQuestionDuplicate,
+  adminQuizQuestionDuplicateV2,
   adminQuizQuestionDelete,
   adminQuizCreateV2
 } from './quiz';
@@ -369,6 +370,16 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizQuestionDuplicateV2 Route
+app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const result = adminQuizQuestionDuplicateV2(token, quizId, questionId);
   save();
   res.json(result);
 });
