@@ -41,8 +41,7 @@ export interface QuestionType {
   thumbnailUrl?: string;
   points: number;
   answers: AnswerType[];
-  thumbnailUrl: string;
-  // Below are for use in quiz sessions
+  thumbnailUrl?: string;
   playersCorrectList?: string[];
   averageAnswerTime?: number;
   percentCorrect?: number;

@@ -2,7 +2,7 @@ import {
   requestAuthRegister,
   requestQuizCreate,
   requestQuizInfo,
-  // requestQuizInfoV2,
+  requestQuizInfoV2,
   requestQuizCreateV2,
   clear,
   errorCode
@@ -64,7 +64,7 @@ describe('Tests for POST /v2/admin/quiz', () => {
   test('Successful test.', () => {
     const returnedQuiz = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');
     expect(returnedQuiz).toStrictEqual({ statusCode: 200, jsonBody: { quizId: expect.any(Number) } });
-    /* expect(requestQuizInfoV2(token, returnedQuiz.jsonBody.quizId as number)).toStrictEqual({
+    expect(requestQuizInfoV2(token, returnedQuiz.jsonBody.quizId as number)).toStrictEqual({
       statusCode: 200,
       jsonBody: {
         quizId: returnedQuiz.jsonBody.quizId,
@@ -77,7 +77,7 @@ describe('Tests for POST /v2/admin/quiz', () => {
         questions: [],
         thumbnailUrl: ''
       }
-    }); */
+    });
   });
   test('Failed test: user does not exist', () => {
     expect(() => requestQuizCreateV2(token + 'a', 'Quiz Name', 'Quiz Description')).toThrow(HTTPError[401]);
