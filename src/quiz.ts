@@ -25,7 +25,7 @@ interface AdminQuizListReturn {
   quizzes: AdminQuizListReturnElement[];
 }
 
-interface AdminQuizCreateReturn {
+export interface AdminQuizCreateReturn {
   quizId: number;
 }
 
