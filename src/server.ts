@@ -31,6 +31,7 @@ import {
   adminQuizQuestionCreate,
   adminQuizQuestionCreateV2,
   adminQuizQuestionUpdate,
+  adminQuizQuestionUpdateV2,
   adminQuizQuestionMove,
   adminQuizTrashList,
   adminQuizRestore,
@@ -325,6 +326,7 @@ app.post('/v1/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizQuestionTransferV2 Route
 app.post('/v2/admin/quiz/:quizid/transfer', (req: Request, res: Response) => {
   const token = req.get('token') as string;
   const { userEmail } = req.body;
@@ -343,6 +345,17 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Respo
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizQuestionUpdateV2 Route
+app.put('/v2/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const { questionBody } = req.body;
+  const result = adminQuizQuestionUpdateV2(token, quizId, questionId, questionBody);
   save();
   res.json(result);
 });

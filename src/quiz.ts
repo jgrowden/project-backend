@@ -680,7 +680,7 @@ export function adminQuizQuestionCreateV2(
   // eslint-disable-next-line
   if (/^http:\/\/|^https:\/\//g.test(questionBody.thumbnailUrl) === false) {
     // eslint-disable-next-line
-    throw HTTPError(400, 'ThumbnailURL does not start with http:\/\/ or https:\/\/');
+    throw HTTPError(400, 'ThumbnailURL does not start with http:// or https://');
   }
 
   const newQuestionId = generateNewQuestionId();
@@ -799,6 +799,90 @@ export function adminQuizChangeOwnerV2(
  * @returns {} - empty object | ErrorObject
  */
 export function adminQuizQuestionUpdate(
+  sessionId: string,
+  quizId: number,
+  questionId: number,
+  newQuestionBody: QuestionType
+): ErrorObjectWithCode | Record<string, never> {
+  const user: UserType | undefined = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    return returnError('Invalid token', 401);
+  }
+
+  const quiz: QuizType | undefined = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    return returnError('Invalid quizId', 403);
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    return returnError('Invalid quiz ownership', 403);
+  }
+
+  const question: QuestionType | undefined = fetchQuestionFromQuestionId(quiz, questionId);
+  if (!question) {
+    return returnError('Invalid questionId');
+  }
+
+  const questionLength = newQuestionBody.question.length;
+  if (questionLength < questionLenMin || questionLength > questionLenMax) {
+    return returnError('Invalid question string');
+  }
+
+  const answersArrayLength = newQuestionBody.answers.length;
+  if (answersArrayLength < questionNumAnswersMin || answersArrayLength > questionNumAnswersMax) {
+    return returnError('Invalid amount of answers');
+  }
+
+  if (newQuestionBody.duration <= 0) {
+    return returnError('Duration must be positive');
+  }
+
+  if (quiz.duration - question.duration + newQuestionBody.duration > questionDurationMax) {
+    return returnError('Quiz duration must not exceed 3 mins');
+  }
+
+  if (newQuestionBody.points < questionPointsMin || newQuestionBody.points > questionPointsMax) {
+    return returnError('Question points must be between 1 and 10 (inclusive)');
+  }
+
+  const invalidAnswer = newQuestionBody.answers.some(entry => entry.answer.length < answersLenMin ||
+    entry.answer.length > answersLenMax);
+  if (invalidAnswer) {
+    return returnError('Invalid answer string length');
+  }
+
+  // check for duplicate entries
+  const answer = newQuestionBody.answers.map(entry => entry.answer);
+  const duplicates = answer.filter((entry, index) => answer.indexOf(entry) !== index);
+
+  if (duplicates.length !== 0) {
+    return returnError('Question cannot have duplicate answers');
+  }
+
+  if (!newQuestionBody.answers.some(answer => answer.correct === true)) {
+    return returnError('There are no correct answers');
+  }
+
+  // No errors, update question
+  quiz.duration += newQuestionBody.duration - question.duration;
+  question.question = newQuestionBody.question;
+  question.duration = newQuestionBody.duration;
+  question.points = newQuestionBody.points;
+
+  const colours = [...ANSWER_COLOURS];
+  const newAnswerBodies = newQuestionBody.answers.map(answer => {
+    answer.colour = setRandomColour(colours);
+    answer.answerId = setAnswerId();
+    return answer;
+  });
+  question.answers = newAnswerBodies;
+  quiz.timeLastEdited = currentTime();
+
+  return {};
+}
+
+// V2 FUNCTION
+export function adminQuizQuestionUpdateV2(
   sessionId: string,
   quizId: number,
   questionId: number,
