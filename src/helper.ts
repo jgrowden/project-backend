@@ -151,17 +151,17 @@ export const updateState = (state: SessionState, action: SessionAction): Session
     }
   } else if (state === SessionState.QUESTION_COUNTDOWN) {
     if (action === SessionAction.SKIP_COUNTDOWN) {
-      return SessionState.QUESTIONS_OPEN;
+      return SessionState.QUESTION_OPEN;
     } else if (action === SessionAction.END) {
       return SessionState.END;
     }
-  } else if (state === SessionState.QUESTIONS_OPEN) {
+  } else if (state === SessionState.QUESTION_OPEN) {
     if (action === SessionAction.GO_TO_ANSWER) {
       return SessionState.ANSWER_SHOW;
     } else if (action === SessionAction.END) {
       return SessionState.END;
     }
-  } else if (state === SessionState.QUESTIONS_CLOSE) {
+  } else if (state === SessionState.QUESTION_CLOSE) {
     if (action === SessionAction.NEXT_QUESTION) {
       return SessionState.QUESTION_COUNTDOWN;
     } else if (action === SessionAction.GO_TO_ANSWER) {

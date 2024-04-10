@@ -65,7 +65,6 @@ export interface QuizSessionType {
   quizSessionId: number;
   autoStartNum: number;
   messages: MessageType[];
-  collectedAnswers: QuestionAnswerType[]; // stores ALL answers in a single array
   metadata: QuizType;
   playerAnswers: QuestionPlayerAnswersType[];
 }
@@ -107,8 +106,8 @@ let timeoutData: TimeoutDataType[] = [];
 export enum SessionState {
   LOBBY = 'LOBBY',
   QUESTION_COUNTDOWN = 'QUESTION_COUNTDOWN',
-  QUESTIONS_OPEN = 'QUESTIONS_OPEN',
-  QUESTIONS_CLOSE = 'QUESTIONS_CLOSE',
+  QUESTION_OPEN = 'QUESTION_OPEN',
+  QUESTION_CLOSE = 'QUESTION_CLOSE',
   ANSWER_SHOW = 'ANSWER_SHOW',
   FINAL_RESULTS = 'FINAL_RESULTS',
   END = 'END'
