@@ -98,7 +98,7 @@ let data: DataType = {
 
 export interface TimeoutDataType {
   timeoutId: ReturnType<typeof setTimeout>;
-  sesionId: number;
+  sessionId: number;
 }
 
 let timeoutData: TimeoutDataType[] = [];
@@ -153,6 +153,6 @@ export function setData(newData: DataType) {
   data = newData;
 }
 
-export function setTimeoutData(newTimeoutData: ReturnType<typeof setTimeout>[]) {
+export function setTimeoutData(newTimeoutData: TimeoutDataType[]) {
   timeoutData = newTimeoutData;
 }
