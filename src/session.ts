@@ -165,7 +165,7 @@ export function adminQuizSessionUpdate(
     getTimeoutData().push({
       timeoutId: timeoutId,
       sessionId: sessionId
-    })
+    });
   } else if (action === 'GO_TO_ANSWER') {
     // do nothing
   } else if (action === 'GO_TO_FINAL_RESULTS') {
