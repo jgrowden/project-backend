@@ -67,6 +67,9 @@ export const requestQuizNameUpdate = (token: string, quizId: number, name: strin
 export const requestQuestionUpdate = (token: string, quizId: number, questionId: number, questionBody: QuestionType) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { token, questionBody });
 
+export const requestQuestionUpdateV2 = (token: string, quizId: number, questionId: number, questionBody: QuestionType) =>
+  requestHelper('PUT', `/v2/admin/quiz/${quizId}/question/${questionId}`, { questionBody }, { token });
+
 export const requestQuestionDelete = (token: string, quizId: number, questionId: number) =>
   requestHelper('DELETE', `/v1/admin/quiz/${quizId}/question/${questionId}`, { token });
 
@@ -86,7 +89,10 @@ export const requestQuizSessionStart = (token: string, quizId: number, autoStart
   requestHelper('POST', `/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
 
 export const requestQuizSessionInfo = (token: string, quizId: number, sessionId: number) =>
-  requestHelper('POST', `/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
+  requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
+
+export const requestQuizSessionUpdate = (token: string, quizId: number, sessionId: number, action: string) =>
+  requestHelper('POST', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
 
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 
