@@ -9,9 +9,9 @@ import {
   requestQuizDelete,
   requestQuizSessionInfo,
   requestQuizInfo,
-  requestQuizQuestionCreateV2
+  requestQuizQuestionCreateV2,
+  requestQuizSessionUpdate
 } from '../wrapper';
-import { string } from 'yaml/dist/schema/common/string';
 
 beforeEach(() => {
   clear();
@@ -136,6 +136,58 @@ describe('adminQuizSessionInfo testing', () => {
     )
   });
   test('successfully get info an updated quiz', () => {
-    // to complete after merging master into branch
+    requestQuizSessionUpdate(token1, quizId1, sessionId, 'NEXT_QUESTION');
+    expect(requestQuizSessionInfo(token1, quizId1, sessionId)).toStrictEqual(
+      {
+        state: 'QUESTION_COUNTDOWN',
+        atQuestion: 1,
+        players: [],
+        metadata: {
+          quizId: quizId1,
+          name: 'Quiz Name',
+          timeCreated: expect.any(Number),
+          timeLastEdited: expect.any(Number),
+          description: 'Quiz Description',
+          numQuestions: 1,
+          questions: [
+            {
+              questionId: expect.any(Number),
+              question: 'Who is the imposter?',
+              duration: 10,
+              thumbnailUrl: '',
+              points: 10,
+              answers: [
+                {
+                  answerId: expect.any(Number),
+                  answer: 'Red',
+                  colour: expect.any(String),
+                  correct: false
+                },
+                {
+                  answerId: expect.any(Number),
+                  answer: 'Blue',
+                  colour: expect.any(String),
+                  correct: false
+                },
+                {
+                  answerId: expect.any(Number),
+                  answer: 'Green',
+                  colour: expect.any(String),
+                  correct: false
+                },
+                {
+                  answerId: expect.any(Number),
+                  answer: 'Orange',
+                  colour: expect.any(String),
+                  correct: true
+                }
+              ]
+            }
+          ],
+          duration: 10,
+          thumbnailUrl: ''
+        }
+      }
+    )
   });
 })
