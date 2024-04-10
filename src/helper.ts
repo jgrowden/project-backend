@@ -122,9 +122,6 @@ export const setAnswerId = (): number => {
 };
 
 export const isValidThumbnail = (thumbnail: string) => {
-  // if (thumbnail === '') {
-  //   return false;
-  // }
   if (!/\.(jpg|jpeg|png)$/i.test(thumbnail) || !/^https?:\/\//.test(thumbnail)) {
     return false;
   }
