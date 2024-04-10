@@ -43,7 +43,8 @@ import {
 } from './quiz';
 import {
   adminQuizSessionStart,
-  adminQuizSessionPlayerJoin
+  adminQuizSessionPlayerJoin,
+  adminQuizSessionPlayerAnswer
 } from './session';
 
 import { clear } from './other';
@@ -404,6 +405,15 @@ app.post('/v1/player/join', (req: Request, res: Response) => {
   save();
   res.json(result);
 });
+
+app.put(`/v1/player/:playerid/question/:questionposition/answer`, (req:Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const questionPosition = parseInt(req.params.questionposition);
+  const { answerIds } = req.body;
+  const result = adminQuizSessionPlayerAnswer(playerId, questionPosition, answerIds);
+  save();
+  res.json(result);
+})
 
 // clear Route
 app.delete('/v1/clear', (req: Request, res: Response) => {

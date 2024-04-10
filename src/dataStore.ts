@@ -41,13 +41,25 @@ export interface QuestionType {
   thumbnailUrl?: string;
   points: number;
   answers: AnswerType[];
-  playersCorrectList?: string[];
-  averageAnswerTime?: number;
-  percentCorrect?: number;
   thumbnailUrl?: string;
 }
 
-export interface QuizSessionType {
+export interface PlayerAnswerType { // answers
+  playerId: number;
+  answerIds: number[];
+  answerTime: number;
+}
+
+export interface QuestionPlayerAnswersType { // questionAnswers
+  questionPosition: number;
+  questionStartTime: number;
+  answers: PlayerAnswerType[];
+  // we can compute all other data via helper functions: TBD
+  // averageAnswerTime, percentageCorrect
+  // what happens when questions are resubmitted to average times?
+}
+
+export interface QuizSessionType { // session
   state: string;
   atQuestion: number;
   players: PlayerType[];
@@ -55,6 +67,7 @@ export interface QuizSessionType {
   autoStartNum: number;
   messages: MessageType[];
   metadata: QuizType;
+  playerAnswers: QuestionPlayerAnswersType[];
 }
 
 export interface PlayerType {
@@ -83,6 +96,8 @@ let data: DataType = {
   quizzes: [],
   deletedQuizzes: []
 };
+
+let timeoutData: ReturnType<typeof setTimeout>[]
 
 export enum SessionState {
   LOBBY = 'LOBBY',

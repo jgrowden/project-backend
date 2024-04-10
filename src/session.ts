@@ -1,5 +1,9 @@
 import HTTPError from 'http-errors';
-import { QuestionType } from './dataStore';
+import { 
+  QuestionType,
+  getData,
+  SessionState
+ } from './dataStore';
 import {
   fetchUserFromSessionId,
   fetchQuizFromQuizId,
@@ -7,7 +11,8 @@ import {
   generateQuizSessionId,
   fetchSessionFromSessionId,
   generateNewPlayerId,
-  generateNewPlayerName
+  generateNewPlayerName,
+  currentTime
 } from './helper';
 
 /**
@@ -116,3 +121,30 @@ export function adminQuizSessionPlayerJoin(
   return { playerId: newPlayerId };
 }
 
+export function adminQuizSessionPlayerAnswer(playerId: number, questionPosition: number, answerIds: number[]) {
+  // fetch quiz session from player id 
+  let quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.players.some(player => player.playerId === playerId)));
+  if (!quiz) throw HTTPError(400, 'Invalid player id');
+  let session = quiz.quizSessions.some(session => session.players.some(player => player.playerId === playerId));
+  if (session.metadata.questions.length < questionPosition || questionPosition < 1) throw HTTPError(400, 'Invalid quesiton number');
+  if (session.state !== SessionState.QUESTIONS_OPEN) throw HTTPError(400, 'Session is not in QUESTIONS_OPEN state');
+  if (answerIds.length <= 0) throw HTTPError(400, 'Less than 1 answerId submitted');
+  let validAnswerIdFlag = true;
+  let noDuplicateAnswerIdFlag = true;  
+  for (const answerId of answerIds) {
+    if (!session.metadata.questions[questionPosition].answers.some(answer => answer.answerId === answerId)) validAnswerIdFlag = false;
+    if (answerIds.filter(someAnswerId => someAnswerId === answerId).length !== 1) noDuplicateAnswerIdFlag = false;
+  }
+  if (!validAnswerIdFlag) throw HTTPError(400, 'Invalid answer Id');
+  if (!noDuplicateAnswerIdFlag) throw HTTPError(400, 'Duplicate answer Ids');
+
+  // according to the specification, the $N$th person who got all the correct answers gets a score of P/N.
+  let questionAnswers = session.playerAnswers.find(playerAnswer => playerAnswer.questionPosition === questionPosition);
+  questionAnswers.answers.push({
+    playerId: playerId,
+    answerIds: answerIds,
+    answerTime: currentTime()
+  });
+
+  return {};
+}
