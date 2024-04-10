@@ -130,7 +130,15 @@ export function adminQuizSessionUpdate(
       playerAnswers: [],
       questionStartTime: currentTime()
     });
-    const timeoutId = setTimeout(() => adminQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN'), 3000);
+    const timeoutId = setTimeout(() => {
+      adminQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN');
+      for (let i = 0; i < getTimeoutData().length; i++) {
+        if (getTimeoutData()[i].sessionId === sessionId) {
+          getTimeoutData().splice(i, 1);
+          break;
+        }
+      }
+    }, 3000);
     getTimeoutData().push({
       timeoutId: timeoutId,
       sessionId: sessionId
@@ -138,13 +146,26 @@ export function adminQuizSessionUpdate(
   } else if (action === 'SKIP_COUNTDOWN') {
     const timeoutData = getTimeoutData().find(data => data.sessionId === sessionId);
     clearTimeout(timeoutData.timeoutId);
-    session.state = 'QUESTION_CLOSE';
+    session.state = 'QUESTION_OPEN';
     for (let i = 0; i < getTimeoutData().length; i++) {
       if (getTimeoutData()[i].sessionId === sessionId) {
         getTimeoutData().splice(i, 1);
         break;
       }
     }
+    const timeoutId = setTimeout(() => {
+      session.state = 'QUESTION_CLOSE';
+      for (let i = 0; i < getTimeoutData().length; i++) {
+        if (getTimeoutData()[i].sessionId === sessionId) {
+          getTimeoutData().splice(i, 1);
+          break;
+        }
+      }
+    }, session.metadata.questions[session.atQuestion].duration * 1000);
+    getTimeoutData().push({
+      timeoutId: timeoutId,
+      sessionId: sessionId
+    })
   } else if (action === 'GO_TO_ANSWER') {
     // do nothing
   } else if (action === 'GO_TO_FINAL_RESULTS') {

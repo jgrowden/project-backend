@@ -67,6 +67,9 @@ export const requestQuizNameUpdate = (token: string, quizId: number, name: strin
 export const requestQuestionUpdate = (token: string, quizId: number, questionId: number, questionBody: QuestionType) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { token, questionBody });
 
+export const requestQuestionUpdateV2 = (token: string, quizId: number, questionId: number, questionBody: QuestionType) =>
+  requestHelper('PUT', `/v2/admin/quiz/${quizId}/question/${questionId}`, { questionBody }, { token });
+
 export const requestQuestionDelete = (token: string, quizId: number, questionId: number) =>
   requestHelper('DELETE', `/v1/admin/quiz/${quizId}/question/${questionId}`, { token });
 
