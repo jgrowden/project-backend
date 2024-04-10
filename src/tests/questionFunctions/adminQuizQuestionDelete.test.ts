@@ -27,7 +27,7 @@ beforeEach(() => {
   clear();
   const user = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
   token = user.jsonBody.token as string;
-})
+});
 
 describe('Testing Question Delete V1', () => {
   beforeEach(() => {
@@ -164,7 +164,7 @@ describe('Testing Question Delete V2', () => {
   });
   describe('Testing success case', () => {
     test('Succesful question deletion', () => {
-      expect(() => requestQuestionDeleteV2(token, quizId, questionId))
+      expect(requestQuestionDeleteV2(token, quizId, questionId))
         .toStrictEqual({
           statusCode: 200,
           jsonBody: {}
