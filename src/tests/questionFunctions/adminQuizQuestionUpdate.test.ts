@@ -1,6 +1,18 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizQuestionCreate, requestQuestionUpdate, clear, errorCode } from '../wrapper';
 import { QuestionType } from '../../dataStore';
 import HTTPError from 'http-errors';
+import {
+  requestAuthRegister,
+  requestQuizCreate,
+  requestQuizCreateV2,
+  requestQuizInfo,
+  requestQuizInfoV2,
+  requestQuizQuestionCreate,
+  requestQuizQuestionCreateV2,
+  requestQuestionUpdate,
+  requestQuestionUpdateV2,
+  clear,
+  errorCode
+} from '../wrapper';
 
 let token: string;
 let quizId: number;
@@ -8,38 +20,40 @@ let questionId: number;
 let questionBody: QuestionType;
 beforeEach(() => {
   clear();
-  const user = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
-  token = user.jsonBody.token as string;
-  const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
-  quizId = quiz.jsonBody.quizId as number;
-  questionBody = {
-    question: 'Who\'s the strongest?',
-    duration: 5,
-    points: 6,
-    answers: [
-      {
-        answer: 'Luffy',
-        correct: false,
-      },
-      {
-        answer: 'Shanks',
-        correct: false,
-      },
-      {
-        answer: 'Blackbeard',
-        correct: false,
-      },
-      {
-        answer: 'God Usopp',
-        correct: true,
-      },
-    ],
-  };
-  const question = requestQuizQuestionCreate(token, quizId, questionBody);
-  questionId = question.jsonBody.questionId as number;
 });
 
 describe('Testing Question Update V1', () => {
+  beforeEach(() => {
+    const user = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
+    token = user.jsonBody.token as string;
+    const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
+    quizId = quiz.jsonBody.quizId as number;
+    questionBody = {
+      question: 'Who\'s the strongest?',
+      duration: 5,
+      points: 6,
+      answers: [
+        {
+          answer: 'Luffy',
+          correct: false,
+        },
+        {
+          answer: 'Shanks',
+          correct: false,
+        },
+        {
+          answer: 'Blackbeard',
+          correct: false,
+        },
+        {
+          answer: 'God Usopp',
+          correct: true,
+        },
+      ],
+    };
+    const question = requestQuizQuestionCreate(token, quizId, questionBody);
+    questionId = question.jsonBody.questionId as number;
+  });
   describe('Testing error cases', () => {
     let newQuestionBody: QuestionType;
     beforeEach(() => {
@@ -229,11 +243,42 @@ describe('Testing Question Update V1', () => {
 });
 
 describe('Testing Question Update V2', () => {
+  beforeEach(() => {
+    const user = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
+    token = user.jsonBody.token as string;
+    const quiz = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');
+    quizId = quiz.jsonBody.quizId as number;
+    questionBody = {
+      question: 'Who\'s the strongest?',
+      duration: 5,
+      thumbnailUrl: 'https://theonepieceisreal.png',
+      points: 6,
+      answers: [
+        {
+          answer: 'Luffy',
+          correct: false,
+        },
+        {
+          answer: 'Shanks',
+          correct: false,
+        },
+        {
+          answer: 'Blackbeard',
+          correct: false,
+        },
+        {
+          answer: 'God Usopp',
+          correct: true,
+        },
+      ],
+    };
+    const question = requestQuizQuestionCreateV2(token, quizId, questionBody);
+    questionId = question.jsonBody.questionId as number;
+  });
   describe('Testing error cases', () => {
     let newQuestionBody: QuestionType;
     beforeEach(() => {
       newQuestionBody = JSON.parse(JSON.stringify(questionBody));
-      newQuestionBody.thumbnailUrl = 'https://theOnePieceIsReal.jpeg';
     });
     test('Error 401: Empty or invalid token', () => {
       expect(() => requestQuestionUpdateV2('', quizId, questionId, questionBody)).toThrow(HTTPError[401]);
@@ -241,7 +286,7 @@ describe('Testing Question Update V2', () => {
     });
 
     test('Error 403: Valid token, invalid quizId', () => {
-      expect(() => requestQuestionUpdateV2(token, quizId + 1, questionId, questionBody)).toStrictEqual(HTTPError[403]);
+      expect(() => requestQuestionUpdateV2(token, quizId + 1, questionId, questionBody)).toThrow(HTTPError[403]);
       // Testing with valid quizId that the user does NOT own
       const newUser = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
       const newToken = newUser.jsonBody.token as string;
@@ -250,21 +295,21 @@ describe('Testing Question Update V2', () => {
       const newQuestion = requestQuizQuestionCreate(newToken, newQuizId, questionBody);
       const newQuestionId = newQuestion.jsonBody.questionId as number;
       expect(() => requestQuestionUpdateV2(token, newQuizId, newQuestionId, questionBody))
-        .toStrictEqual(HTTPError[403]);
+        .toThrow(HTTPError[403]);
     });
 
     test('Error 400: Invalid questionId', () => {
       expect(() => requestQuestionUpdateV2(token, quizId, questionId + 1, questionBody))
-        .toStrictEqual(HTTPError[400]);
+        .toThrow(HTTPError[400]);
     });
 
     test('Error 400: Invalid question string', () => {
       newQuestionBody.question = 'Who?';
       expect(() => requestQuestionUpdateV2(token, quizId, questionId, newQuestionBody))
-        .toStrictEqual(HTTPError[400]);
+        .toThrow(HTTPError[400]);
       newQuestionBody.question = 'whooooooooooooooooooooooooooooooooooooooooooooooooo';
       expect(() => requestQuestionUpdateV2(token, quizId, questionId, newQuestionBody))
-        .toStrictEqual(HTTPError[400]);
+        .toThrow(HTTPError[400]);
     });
 
     test('Error 400: answers < 2 || answers > 6', () => {
@@ -274,7 +319,7 @@ describe('Testing Question Update V2', () => {
         correct: true
       });
       expect(() => requestQuestionUpdateV2(token, quizId, questionId, newQuestionBody))
-        .toStrictEqual(HTTPError[400]);
+        .toThrow(HTTPError[400]);
       newQuestionBody.answers = questionBody.answers;
       newQuestionBody.answers.push(
         {
@@ -291,46 +336,58 @@ describe('Testing Question Update V2', () => {
         }
       );
       expect(() => requestQuestionUpdateV2(token, quizId, questionId, newQuestionBody))
-        .toStrictEqual(HTTPError[400]);
+        .toThrow(HTTPError[400]);
     });
 
     test('Error 400: duration < 1 || totalDuration > 3 mins', () => {
       newQuestionBody.duration = -1;
       expect(() => requestQuestionUpdateV2(token, quizId, questionId, newQuestionBody))
-        .toStrictEqual(HTTPError[400]);
+        .toThrow(HTTPError[400]);
       newQuestionBody.duration = 181;
       expect(() => requestQuestionUpdateV2(token, quizId, questionId, newQuestionBody))
-        .toStrictEqual(HTTPError[400]);
+        .toThrow(HTTPError[400]);
     });
 
     test('Error 400: points < 1 || points > 10', () => {
       newQuestionBody.points = 0;
       expect(() => requestQuestionUpdateV2(token, quizId, questionId, newQuestionBody))
-        .toStrictEqual(HTTPError[400]);
+        .toThrow(HTTPError[400]);
       newQuestionBody.points = 11;
       expect(() => requestQuestionUpdateV2(token, quizId, questionId, newQuestionBody))
-        .toStrictEqual(HTTPError[400]);
+        .toThrow(HTTPError[400]);
     });
 
     test('Error 400: Question contains answer string with length < 1 || > 30', () => {
       newQuestionBody.answers[0].answer = '';
       expect(() => requestQuestionUpdateV2(token, quizId, questionId, newQuestionBody))
-        .toStrictEqual(HTTPError[400]);
+        .toThrow(HTTPError[400]);
       newQuestionBody.answers[0].answer = 'answerrrrrrrrrrrrrrrrrrrrrrrrrr';
       expect(() => requestQuestionUpdateV2(token, quizId, questionId, newQuestionBody))
-        .toStrictEqual(HTTPError[400]);
+        .toThrow(HTTPError[400]);
     });
 
     test('Error 400: Duplicate answer strings', () => {
       newQuestionBody.answers[0].answer = 'God Usopp';
       expect(() => requestQuestionUpdateV2(token, quizId, questionId, newQuestionBody))
-        .toStrictEqual(HTTPError[400]);
+        .toThrow(HTTPError[400]);
     });
 
     test('Error 400: No correct answers', () => {
       newQuestionBody.answers[3].correct = false;
       expect(() => requestQuestionUpdateV2(token, quizId, questionId, newQuestionBody))
-        .toStrictEqual(HTTPError[400]);
+        .toThrow(HTTPError[400]);
+    });
+
+    test('Error 400: Invalid thumbnailUrl', () => {
+      newQuestionBody.thumbnailUrl = '';
+      expect(() => requestQuestionUpdateV2(token, quizId, questionId, newQuestionBody))
+        .toThrow(HTTPError[400]);
+      newQuestionBody.thumbnailUrl = 'http://isThisValid.gif';
+      expect(() => requestQuestionUpdateV2(token, quizId, questionId, newQuestionBody))
+        .toThrow(HTTPError[400]);
+      newQuestionBody.thumbnailUrl = 'freeVbucksToday.com.png';
+      expect(() => requestQuestionUpdateV2(token, quizId, questionId, newQuestionBody))
+        .toThrow(HTTPError[400]);
     });
   });
   describe('Testing success case', () => {
@@ -365,7 +422,7 @@ describe('Testing Question Update V2', () => {
           jsonBody: {}
         });
       const timeEdited = ~~(Date.now() / 1000);
-      const quizInfo = requestQuizInfo(token, quizId);
+      const quizInfo = requestQuizInfoV2(token, quizId);
       const quizTimeEdited = quizInfo.jsonBody.timeLastEdited as number;
       expect(quizInfo).toStrictEqual({
         statusCode: 200,

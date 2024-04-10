@@ -120,3 +120,13 @@ export const setRandomColour = (colours: string[]): string => {
 export const setAnswerId = (): number => {
   return ~~(Math.random() * 1000);
 };
+
+export const isValidThumbnail = (thumbnail: string) => {
+  if (thumbnail === '') {
+    return false;
+  }
+  if (!/\.(jpg|jpeg|png)$/i.test(thumbnail) || !/^https?:\/\//.test(thumbnail)) {
+    return false;
+  }
+  return true;
+};

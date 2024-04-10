@@ -11,7 +11,8 @@ import {
   returnError,
   ErrorObjectWithCode,
   setRandomColour,
-  setAnswerId
+  setAnswerId,
+  isValidThumbnail
 } from './helper';
 import HTTPError from 'http-errors';
 
@@ -672,15 +673,8 @@ export function adminQuizQuestionCreateV2(
     throw HTTPError(400, 'There are no correct answers');
   }
 
-  // eslint-disable-next-line
-  if (/jpg$|jpeg$|png$/g.test(questionBody.thumbnailUrl) === false) {
-    throw HTTPError(400, 'ThumbnailURL does not end in jpg/jpeg/png');
-  }
-
-  // eslint-disable-next-line
-  if (/^http:\/\/|^https:\/\//g.test(questionBody.thumbnailUrl) === false) {
-    // eslint-disable-next-line
-    throw HTTPError(400, 'ThumbnailURL does not start with http:// or https://');
+  if (!isValidThumbnail(questionBody.thumbnailUrl)) {
+    throw HTTPError(400, 'thumbnail must start with http:// or https:// and have type jpg, jpeg or png');
   }
 
   const newQuestionId = generateNewQuestionId();
@@ -890,49 +884,49 @@ export function adminQuizQuestionUpdateV2(
 ): ErrorObjectWithCode | Record<string, never> {
   const user: UserType | undefined = fetchUserFromSessionId(sessionId);
   if (!user) {
-    return returnError('Invalid token', 401);
+    throw HTTPError(401, 'Invalid token');
   }
 
   const quiz: QuizType | undefined = fetchQuizFromQuizId(quizId);
   if (!quiz) {
-    return returnError('Invalid quizId', 403);
+    throw HTTPError(403, 'Invalid quizId');
   }
 
   if (quiz.ownerId !== user.authUserId) {
-    return returnError('Invalid quiz ownership', 403);
+    throw HTTPError(403, 'Invalid quiz ownership');
   }
 
   const question: QuestionType | undefined = fetchQuestionFromQuestionId(quiz, questionId);
   if (!question) {
-    return returnError('Invalid questionId');
+    throw HTTPError(400, 'Invalid questionId');
   }
 
   const questionLength = newQuestionBody.question.length;
   if (questionLength < questionLenMin || questionLength > questionLenMax) {
-    return returnError('Invalid question string');
+    throw HTTPError(400, 'Invalid question string');
   }
 
   const answersArrayLength = newQuestionBody.answers.length;
   if (answersArrayLength < questionNumAnswersMin || answersArrayLength > questionNumAnswersMax) {
-    return returnError('Invalid amount of answers');
+    throw HTTPError(400, 'Invalid amount of answers');
   }
 
   if (newQuestionBody.duration <= 0) {
-    return returnError('Duration must be positive');
+    throw HTTPError(400, 'Duration must be positive');
   }
 
   if (quiz.duration - question.duration + newQuestionBody.duration > questionDurationMax) {
-    return returnError('Quiz duration must not exceed 3 mins');
+    throw HTTPError(400, 'Quiz duration must not exceed 3 mins');
   }
 
   if (newQuestionBody.points < questionPointsMin || newQuestionBody.points > questionPointsMax) {
-    return returnError('Question points must be between 1 and 10 (inclusive)');
+    throw HTTPError(400, 'Question points must be between 1 and 10 (inclusive)');
   }
 
   const invalidAnswer = newQuestionBody.answers.some(entry => entry.answer.length < answersLenMin ||
     entry.answer.length > answersLenMax);
   if (invalidAnswer) {
-    return returnError('Invalid answer string length');
+    throw HTTPError(400, 'Invalid answer string length');
   }
 
   // check for duplicate entries
@@ -940,11 +934,14 @@ export function adminQuizQuestionUpdateV2(
   const duplicates = answer.filter((entry, index) => answer.indexOf(entry) !== index);
 
   if (duplicates.length !== 0) {
-    return returnError('Question cannot have duplicate answers');
+    throw HTTPError(400, 'Question cannot have duplicate answers');
   }
 
   if (!newQuestionBody.answers.some(answer => answer.correct === true)) {
-    return returnError('There are no correct answers');
+    throw HTTPError(400, 'There are no correct answers');
+  }
+  if (!isValidThumbnail(newQuestionBody.thumbnailUrl)) {
+    throw HTTPError(400, 'thumbnail must start with http:// or https:// and have type jpg, jpeg or png');
   }
 
   // No errors, update question
@@ -952,6 +949,7 @@ export function adminQuizQuestionUpdateV2(
   question.question = newQuestionBody.question;
   question.duration = newQuestionBody.duration;
   question.points = newQuestionBody.points;
+  question.thumbnailUrl = newQuestionBody.thumbnailUrl;
 
   const colours = [...ANSWER_COLOURS];
   const newAnswerBodies = newQuestionBody.answers.map(answer => {
