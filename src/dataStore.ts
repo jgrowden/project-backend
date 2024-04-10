@@ -67,7 +67,6 @@ export interface QuizSessionType {
   messages: MessageType[];
   collectedAnswers: QuestionAnswerType[]; // stores ALL answers in a single array
   metadata: QuizType;
-  timeoutId: ReturnType<typeof setTimeout>;
 }
 
 export interface PlayerType {
@@ -96,6 +95,13 @@ let data: DataType = {
   quizzes: [],
   deletedQuizzes: []
 };
+
+export interface TimeoutDataType {
+  timeoutId: ReturnType<typeof setTimeout>;
+  sesionId: number;
+}
+
+let timeoutData: TimeoutDataType[];
 
 export enum SessionState {
   LOBBY = 'LOBBY',
@@ -138,7 +144,15 @@ export function getData() {
   return data;
 }
 
+export function getTimeoutData() {
+  return timeoutData;
+}
+
 // Use set(newData) to pass in the entire data object, with modifications made
 export function setData(newData: DataType) {
   data = newData;
+}
+
+export function setTimeoutData(newTimeoutData: ReturnType<typeof setTimeout>[]) {
+  timeoutData = newTimeoutData;
 }

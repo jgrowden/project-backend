@@ -77,7 +77,6 @@ export function adminQuizSessionStart(token: string, quizId: number, autoStartNu
     autoStartNum: autoStartNum,
     messages: [],
     metadata: quizCopy,
-    timeoutId: undefined,
     collectedAnswers: []
   });
   return {
@@ -135,9 +134,21 @@ export function adminQuizSessionUpdate(
       playerAnswers: [],
       questionStartTime: currentTime()
     });
-    session.timeoutId = setTimeout(() => adminQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN'), 3000);
+    let timeoutId = setTimeout(() => adminQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN'), 3000);
+    getTimeoutData().push({
+      timeoutId: timeoutId,
+      sessionId: sessionId
+    });
   } else if (action === 'SKIP_COUNTDOWN') {
-    session.timeoutId = setTimeout(() => { session.state = 'QUESTION_CLOSE'}, session.metadata.questions[session.atQuestion].duration * 1000);
+    let timeoutData = getTimeoutData().find(data => data.sessionId === sessionId);
+    clearTimeout(timeoutData.timeoutId);
+    session.state = 'QUESTION_CLOSE';
+    for (let i = 0; i < getTimeoutData().length; i++) {
+      if (getTimeoutData()[i].sessionId === sessionId) {
+        getTimeoutData().splice(i, 1);
+        break;
+      }
+    }
   } else if (action === 'GO_TO_ANSWER') {
     // do nothing
   } else if (action === 'GO_TO_FINAL_RESULTS') {
