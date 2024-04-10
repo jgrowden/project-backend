@@ -44,7 +44,6 @@ export interface QuestionType {
   playersCorrectList?: string[];
   averageAnswerTime?: number;
   percentCorrect?: number;
-  thumbnailUrl?: string;
 }
 
 export interface QuizSessionType {
