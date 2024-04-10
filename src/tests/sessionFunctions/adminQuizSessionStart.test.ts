@@ -1,5 +1,5 @@
 import HTTPError from 'http-errors';
-import { QuestionType } from '../../../dataStore';
+import { QuestionType } from '../../dataStore';
 import {
   clear,
   requestAuthRegister,
@@ -7,7 +7,7 @@ import {
   requestQuizQuestionCreate,
   requestQuizSessionStart,
   requestQuizDelete,
-} from '../../wrapper';
+} from '../wrapper';
 
 beforeAll(() => {
   clear();
