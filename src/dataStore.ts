@@ -60,7 +60,7 @@ export interface QuestionAnswerType {
 
 export interface QuizSessionType {
   state: string;
-  atQuestion: number; // 0-indexed: metadata.questions[0] is the first question 
+  atQuestion: number; // 0-indexed: metadata.questions[0] is the first question
   players: PlayerType[];
   quizSessionId: number;
   autoStartNum: number;
@@ -101,7 +101,7 @@ export interface TimeoutDataType {
   sesionId: number;
 }
 
-let timeoutData: TimeoutDataType[];
+let timeoutData: TimeoutDataType[] = [];
 
 export enum SessionState {
   LOBBY = 'LOBBY',

@@ -1,11 +1,11 @@
-import { 
-  getData, 
-  UserType, 
-  QuizType, 
-  QuestionType, 
-  SessionState, 
+import {
+  getData,
+  UserType,
+  QuizType,
+  QuestionType,
+  SessionState,
   QuizSessionType,
-  SessionAction 
+  SessionAction
 } from './dataStore';
 
 export interface ErrorObject {
@@ -42,9 +42,9 @@ export const userWithEmailExists = (email: string): UserType | undefined => {
 };
 
 export const fetchSessionFromSessionId = (sessionId: number): QuizSessionType | undefined => {
-  let quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.quizSessionId === sessionId));
+  const quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.quizSessionId === sessionId));
   if (quiz === undefined) return undefined;
-  let session = quiz.quizSessions.find(quizSession => quizSession.quizSessionId === sessionId);
+  const session = quiz.quizSessions.find(quizSession => quizSession.quizSessionId === sessionId);
   return session;
 };
 
@@ -70,17 +70,17 @@ export const generateNewQuizId = (): number => {
 };
 
 export const generateNewPlayerId = (sessionId: number): number => {
-  let session = fetchSessionFromSessionId(sessionId);
-  let playerIds = session.players.map(player => player.playerId);
+  const session = fetchSessionFromSessionId(sessionId);
+  const playerIds = session.players.map(player => player.playerId);
   let newPlayerId = 2355;
   while (playerIds.includes(newPlayerId)) newPlayerId = hash(newPlayerId);
   return newPlayerId;
-}
+};
 
 export const generateNewPlayerName = (): string => {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
   const numbers = '0123456789';
-  let playerName: string[] = [];
+  const playerName: string[] = [];
   let char;
   for (let i = 0; i < 5; i++) {
     char = letters.charAt(Math.floor(Math.random() * letters.length));
@@ -95,7 +95,7 @@ export const generateNewPlayerName = (): string => {
     }
   }
   return playerName.join('');
-}
+};
 
 export const currentTime = (): number => {
   return Math.floor(Date.now() / 1000);
@@ -181,11 +181,11 @@ export const updateState = (state: SessionState, action: SessionAction): Session
     }
   } else if (state === SessionState.FINAL_RESULTS) {
     if (action === SessionAction.END) {
-      return SessionState.END;      
+      return SessionState.END;
     }
   } else if (state === SessionState.END) {
     // do nothing;
-  } 
+  }
   return undefined;
 };
 

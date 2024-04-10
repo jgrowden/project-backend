@@ -1,9 +1,10 @@
 import HTTPError from 'http-errors';
-import { 
+import {
   QuestionType,
   SessionAction,
-  SessionState
- } from './dataStore';
+  SessionState,
+  getTimeoutData
+} from './dataStore';
 import {
   fetchUserFromSessionId,
   fetchQuizFromQuizId,
@@ -16,7 +17,7 @@ import {
 
 export interface SessionIdType {
   sessionId: number;
-};
+}
 
 /**
  * Start a new session for a quiz
@@ -84,29 +85,24 @@ export function adminQuizSessionStart(token: string, quizId: number, autoStartNu
   };
 }
 
-interface playerIdType {
-  playerId: number;
-};
-
-
 export function adminQuizSessionUpdate(
   token: string,
   quizId: number,
   sessionId: number,
   action: string
 ): Record<string, never> {
-  let user = fetchUserFromSessionId(token);
+  const user = fetchUserFromSessionId(token);
   if (!user) {
     throw HTTPError(401, 'User not found');
   }
-  let quiz = fetchQuizFromQuizId(quizId);
+  const quiz = fetchQuizFromQuizId(quizId);
   if (!quiz) {
     throw HTTPError(403, 'Quiz not found');
   }
   if (quiz.ownerId !== user.authUserId) {
     throw HTTPError(403, 'User does not own quiz');
   }
-  let session = fetchSessionFromSessionId(sessionId);
+  const session = fetchSessionFromSessionId(sessionId);
   if (!session) {
     throw HTTPError(400, 'Session not found');
   }
@@ -118,7 +114,7 @@ export function adminQuizSessionUpdate(
     throw HTTPError(400, 'Action is not a valid enum');
   }
 
-  let newState = updateState(session.state as SessionState, action as SessionAction);
+  const newState = updateState(session.state as SessionState, action as SessionAction);
   if (!newState) {
     throw HTTPError(400, 'Action cannot be applied in current state');
   }
@@ -134,13 +130,13 @@ export function adminQuizSessionUpdate(
       playerAnswers: [],
       questionStartTime: currentTime()
     });
-    let timeoutId = setTimeout(() => adminQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN'), 3000);
+    const timeoutId = setTimeout(() => adminQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN'), 3000);
     getTimeoutData().push({
       timeoutId: timeoutId,
       sessionId: sessionId
     });
   } else if (action === 'SKIP_COUNTDOWN') {
-    let timeoutData = getTimeoutData().find(data => data.sessionId === sessionId);
+    const timeoutData = getTimeoutData().find(data => data.sessionId === sessionId);
     clearTimeout(timeoutData.timeoutId);
     session.state = 'QUESTION_CLOSE';
     for (let i = 0; i < getTimeoutData().length; i++) {
