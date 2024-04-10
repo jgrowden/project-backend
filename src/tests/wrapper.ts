@@ -67,6 +67,9 @@ export const requestQuizNameUpdate = (token: string, quizId: number, name: strin
 export const requestQuestionUpdate = (token: string, quizId: number, questionId: number, questionBody: QuestionType) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { token, questionBody });
 
+export const requestQuestionUpdateV2 = (token: string, quizId: number, questionId: number, questionBody: QuestionType) =>
+  requestHelper('PUT', `/v2/admin/quiz/${quizId}/question/${questionId}`, { questionBody }, { token });
+
 export const requestQuestionDelete = (token: string, quizId: number, questionId: number) =>
   requestHelper('DELETE', `/v1/admin/quiz/${quizId}/question/${questionId}`, { token });
 
@@ -85,8 +88,11 @@ export const requestQuizChangeOwnerV2 = (quizId: number, token: string, userEmai
 export const requestQuizSessionStart = (token: string, quizId: number, autoStartNum: number) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
 
-export const requestQuizSessionPlayerJoin = (sessionId: number, name: string) => 
-  requestHelper('POST', '/v1/player/join', { sessionId, name }, {}); 
+export const requestQuizSessionUpdate = (token: string, quizId: number, sessionId: number, action: string) =>
+  requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
+
+export const requestQuizSessionPlayerJoin = (sessionId: number, name: string) =>
+  requestHelper('POST', '/v1/player/join', { sessionId, name }, {});
 
 export const requestQuizSessionPlayerAnswer = (playerId: number, questionPosition: number, answerIds: number[]) => 
   requestHelper('PUT', `/v1/player/${playerId}/question/${questionPosition}/answer`, { answerIds }, {});

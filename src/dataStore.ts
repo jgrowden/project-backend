@@ -38,7 +38,6 @@ export interface QuestionType {
   questionId?: number;
   question: string;
   duration: number;
-  thumbnailUrl?: string;
   points: number;
   answers: AnswerType[];
   thumbnailUrl?: string;
@@ -59,13 +58,14 @@ export interface QuestionPlayerAnswersType { // questionAnswers
   // what happens when questions are resubmitted to average times?
 }
 
-export interface QuizSessionType { // session
+export interface QuizSessionType {
   state: string;
-  atQuestion: number;
+  atQuestion: number; // 0-indexed: metadata.questions[0] is the first question
   players: PlayerType[];
   quizSessionId: number;
   autoStartNum: number;
   messages: MessageType[];
+  collectedAnswers: QuestionAnswerType[]; // stores ALL answers in a single array
   metadata: QuizType;
   playerAnswers: QuestionPlayerAnswersType[];
 }
@@ -97,7 +97,12 @@ let data: DataType = {
   deletedQuizzes: []
 };
 
-let timeoutData: ReturnType<typeof setTimeout>[]
+export interface TimeoutDataType {
+  timeoutId: ReturnType<typeof setTimeout>;
+  sessionId: number;
+}
+
+let timeoutData: TimeoutDataType[] = [];
 
 export enum SessionState {
   LOBBY = 'LOBBY',
@@ -140,7 +145,15 @@ export function getData() {
   return data;
 }
 
+export function getTimeoutData() {
+  return timeoutData;
+}
+
 // Use set(newData) to pass in the entire data object, with modifications made
 export function setData(newData: DataType) {
   data = newData;
+}
+
+export function setTimeoutData(newTimeoutData: TimeoutDataType[]) {
+  timeoutData = newTimeoutData;
 }

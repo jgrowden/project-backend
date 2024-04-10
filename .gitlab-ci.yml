@@ -23,5 +23,11 @@ tests:
 linting:
   stage: checks
   script:
-  - npm run lint
-  - sleep 1
+    - npm run lint
+    - sleep 1
+
+typescript:
+  stage: checks
+  script:
+    - npm run tsc
+    - sleep 1

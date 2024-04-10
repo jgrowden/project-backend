@@ -1,4 +1,12 @@
-import { getData, UserType, QuizType, QuestionType } from './dataStore';
+import {
+  getData,
+  UserType,
+  QuizType,
+  QuestionType,
+  SessionState,
+  QuizSessionType,
+  SessionAction
+} from './dataStore';
 
 export interface ErrorObject {
   error: string;
@@ -34,9 +42,10 @@ export const userWithEmailExists = (email: string): UserType | undefined => {
 };
 
 export const fetchSessionFromSessionId = (sessionId: number): QuizSessionType | undefined => {
-  let quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(quizSession => quizSession.quizSessionId === sessionId));
+  const quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.quizSessionId === sessionId));
   if (quiz === undefined) return undefined;
-  return quiz.quizSessions.find(quizSession => quizSession.quizSessionId === sessionId);
+  const session = quiz.quizSessions.find(quizSession => quizSession.quizSessionId === sessionId);
+  return session;
 };
 
 // generates psudorandom numbers, max 524287 unique Ids
@@ -61,32 +70,32 @@ export const generateNewQuizId = (): number => {
 };
 
 export const generateNewPlayerId = (sessionId: number): number => {
-  let session = fetchSessionFromSessionId(sessionId);
-  let playerIds = session.players.map(player => player.playerId);
+  const session = fetchSessionFromSessionId(sessionId);
+  const playerIds = session.players.map(player => player.playerId);
   let newPlayerId = 2355;
   while (playerIds.includes(newPlayerId)) newPlayerId = hash(newPlayerId);
   return newPlayerId;
-}
+};
 
 export const generateNewPlayerName = (): string => {
   const letters = 'abcdefghijklmnopqrstuvwxyz';
   const numbers = '0123456789';
-  let playerName = [];
+  const playerName: string[] = [];
   let char;
   for (let i = 0; i < 5; i++) {
     char = letters.charAt(Math.floor(Math.random() * letters.length));
-    if (!playerName.includes()) {
+    if (!(playerName.includes(char))) {
       playerName.push(char);
     }
   }
   for (let i = 0; i < 3; i++) {
     char = numbers.charAt(Math.floor(Math.random() * numbers.length));
-    if (!playerName.includes()) {
+    if (!(playerName.includes(char))) {
       playerName.push(char);
     }
   }
   return playerName.join('');
-}
+};
 
 export const currentTime = (): number => {
   return Math.floor(Date.now() / 1000);
@@ -105,7 +114,7 @@ export const returnError = (errorString: string, errorCode?: number): ErrorObjec
 
 export const generateNewQuestionId = (): number => {
   const data = getData();
-  let newQuestionId = 0;
+  let newQuestionId = 2356;
   const QuestionIds = [];
   for (const quiz of data.quizzes) {
     for (const question of quiz.questions) {
@@ -113,14 +122,14 @@ export const generateNewQuestionId = (): number => {
     }
   }
   while (QuestionIds.includes(newQuestionId)) {
-    newQuestionId++;
+    newQuestionId = hash(newQuestionId);
   }
   return newQuestionId;
 };
 
 export const generateQuizSessionId = (): number => {
   const data = getData();
-  let newQuizSessionId = 0;
+  let newQuizSessionId = 2357;
   const quizSessionIds = [];
   for (const quiz of data.quizzes) {
     for (const quizSession of quiz.quizSessions) {
@@ -128,9 +137,56 @@ export const generateQuizSessionId = (): number => {
     }
   }
   while (quizSessionIds.includes(newQuizSessionId)) {
-    newQuizSessionId++;
+    newQuizSessionId = hash(newQuizSessionId);
   }
   return newQuizSessionId;
+};
+
+export const updateState = (state: SessionState, action: SessionAction): SessionState | undefined => {
+  if (state === SessionState.LOBBY) {
+    if (action === SessionAction.NEXT_QUESTION) {
+      return SessionState.QUESTION_COUNTDOWN;
+    } else if (action === SessionAction.END) {
+      return SessionState.END;
+    }
+  } else if (state === SessionState.QUESTION_COUNTDOWN) {
+    if (action === SessionAction.SKIP_COUNTDOWN) {
+      return SessionState.QUESTIONS_OPEN;
+    } else if (action === SessionAction.END) {
+      return SessionState.END;
+    }
+  } else if (state === SessionState.QUESTIONS_OPEN) {
+    if (action === SessionAction.GO_TO_ANSWER) {
+      return SessionState.ANSWER_SHOW;
+    } else if (action === SessionAction.END) {
+      return SessionState.END;
+    }
+  } else if (state === SessionState.QUESTIONS_CLOSE) {
+    if (action === SessionAction.NEXT_QUESTION) {
+      return SessionState.QUESTION_COUNTDOWN;
+    } else if (action === SessionAction.GO_TO_ANSWER) {
+      return SessionState.ANSWER_SHOW;
+    } else if (action === SessionAction.GO_TO_FINAL_RESULTS) {
+      return SessionState.FINAL_RESULTS;
+    } else if (action === SessionAction.END) {
+      return SessionState.END;
+    }
+  } else if (state === SessionState.ANSWER_SHOW) {
+    if (action === SessionAction.NEXT_QUESTION) {
+      return SessionState.QUESTION_COUNTDOWN;
+    } else if (action === SessionAction.GO_TO_FINAL_RESULTS) {
+      return SessionState.FINAL_RESULTS;
+    } else if (action === SessionAction.END) {
+      return SessionState.END;
+    }
+  } else if (state === SessionState.FINAL_RESULTS) {
+    if (action === SessionAction.END) {
+      return SessionState.END;
+    }
+  } else if (state === SessionState.END) {
+    // do nothing;
+  }
+  return undefined;
 };
 
 /**
@@ -153,4 +209,11 @@ export const setRandomColour = (colours: string[]): string => {
  */
 export const setAnswerId = (): number => {
   return ~~(Math.random() * 1000);
+};
+
+export const isValidThumbnail = (thumbnail: string) => {
+  if (!/\.(jpg|jpeg|png)$/i.test(thumbnail) || !/^https?:\/\//.test(thumbnail)) {
+    return false;
+  }
+  return true;
 };
