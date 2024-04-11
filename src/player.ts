@@ -17,12 +17,13 @@ export function playerQuestionPosition(playerId: number, questionPosition: numbe
   };
   if (questionPosition > quizSession.metadata.numQuestions) {
     throw HTTPError(400, 'Question position is not valid for the session this player is in');
-  }
-  if ((quizSession.atQuestion + 1) !== questionPosition) {
+  };
+  if (quizSession.atQuestion !== questionPosition) {
     throw HTTPError(400, 'Session is not currently on this question');
   };
   if (quizSession.state === 'LOBBY' || quizSession.state === 'QUESTION_COUNTDOWN' || quizSession.state === 'END') {
     throw HTTPError(400, 'Session is in LOBBY, QUESTION_COUNTDOWN, or END state');
-  } 
+  };
   return (quizSession.metadata.questions[questionPosition - 1]);
-}
+};
+

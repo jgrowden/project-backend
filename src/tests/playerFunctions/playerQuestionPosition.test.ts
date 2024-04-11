@@ -101,6 +101,7 @@ describe('Testing for GET /v1/player/{playerId}/question/{questionPosition}', ()
         ]
       }
     });
+    requestQuizSessionAnswer(token, quizId, sessionId, 'GO_TO_ANSWER');
     requestQuizSessionAnswer(token, quizId, sessionId, 'NEXT_QUESTION');
     requestQuizSessionAnswer(token, quizId, sessionId, 'SKIP_COUNTDOWN');
     expect(requestPlayerQuestionPosition(playerId1, 2)).toStrictEqual({
@@ -149,6 +150,7 @@ describe('Testing for GET /v1/player/{playerId}/question/{questionPosition}', ()
         ]
       }
     });
+    requestQuizSessionAnswer(token, quizId, sessionId, 'GO_TO_ANSWER');
     requestQuizSessionAnswer(token, quizId, sessionId, 'NEXT_QUESTION');
     requestQuizSessionAnswer(token, quizId, sessionId, 'SKIP_COUNTDOWN');
     expect(requestPlayerQuestionPosition(playerId1, 3)).toStrictEqual({
