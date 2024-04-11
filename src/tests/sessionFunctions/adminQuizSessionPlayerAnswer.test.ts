@@ -10,6 +10,10 @@ import {
   clear
 } from '../wrapper';
 
+import {
+  hash
+} from '../../helper'
+
 let token: string;
 let quizId: number;
 let sessionId: number;
@@ -32,7 +36,7 @@ beforeEach(() => {
   playerId = requestQuizSessionPlayerJoin(sessionId, 'John Smith').jsonBody.playerId as number;
   requestQuizSessionUpdate(token, quizId, sessionId, 'NEXT_QUESTION');
   requestQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN');
-  answerId = 1;
+  answerId = hash(3);
 });
 
 afterEach(() => {

@@ -88,12 +88,14 @@ export interface DataType {
   users: UserType[];
   quizzes: QuizType[];
   deletedQuizzes: QuizType[];
+  id: number;
 }
 
 let data: DataType = {
   users: [],
   quizzes: [],
-  deletedQuizzes: []
+  deletedQuizzes: [],
+  id: 0
 };
 
 export interface TimeoutDataType {
