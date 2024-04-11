@@ -1,8 +1,10 @@
 import HTTPError from 'http-errors';
 import {
   QuestionType,
+  QuizSessionType,
   SessionAction,
   SessionState,
+  getData,
   getTimeoutData
 } from './dataStore';
 import {
@@ -174,4 +176,37 @@ export function adminQuizSessionUpdate(
     session.atQuestion = 0;
   }
   return {};
+}
+
+export function adminQuizSessionResultsCSV(token: string, quizId: number, sessionId: number): string {
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!(quiz.quizSessions.find(session => session.quizSessionId === sessionId))) {
+    throw HTTPError(400);
+  }
+  const quizSession = fetchSessionFromSessionId(sessionId);
+  if (quizSession.state !== 'FINAL_RESULTS') {
+    throw HTTPError(400);
+  }
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401);
+  }
+  if (user.authUserId !== quizSession.metadata.ownerId) {
+    throw HTTPError(403);
+  }
+  let csvData: string[][] = [];
+  let header: string[] = [];
+  header.push('Player');
+  for(let i = 1; i <= quiz.numQuestions; i++) {
+    header.push(`question${i}score`);
+    header.push(`question${i}rank `);
+  }
+
+  let playerArray: string[];
+  csvData.push(header);
+  playerArray = [];
+  for (let i = 0; i < quizSession.players.length; i++) {
+    let player_array = [];
+    player_array.push(`${quizSession.players[i].playerName}`);
+  }
 }

@@ -6,6 +6,7 @@ import {
   requestQuizQuestionCreate,
   requestQuizSessionAnswer,
   requestQuizSessionPlayerJoin,
+  requestQuizSessionResultsCSV,
   clear
 } from '../wrapper';
 import { QuestionType } from '../../dataStore';
@@ -64,27 +65,27 @@ describe('Testing for GET /v1/admin/quiz/{quizid}/session/{sessionid}/results/cs
     requestQuizSessionAnswer(token, quizId, sessionId, 'SKIP_COUNTDOWN');
     requestQuizSessionAnswer(token, quizId, sessionId, 'GO_TO_ANSWER');
     requestQuizSessionAnswer(token, quizId, sessionId, 'GO_TO_FINAL_RESULTS');
-    expect(requestQuizSessionResultsCSV(quizId, sessionId, token).toStrictEqual(expect.any(String))
+    expect(requestQuizSessionResultsCSV(token, quizId, sessionId).toStrictEqual(expect.any(String));
     requestQuizSessionAnswer(token, quizId, sessionId, 'END');
   test('Fail: session Id does not refer to a valid session within this quiz', () => {
-    expect(() => requestQuizSessionResultsCSV(quizId, -1, token)).toThrow(HTTPError[400]);
+    expect(() => requestQuizSessionResultsCSV(token, quizId, -1)).toThrow(HTTPError[400]);
   });
   test('Fail: session is not in FINAL_RESULTS state', () => {
-    expect(() => requestQuizSessionResultsCSV(quizId, sessionId, token)).toThrow(HTTPError[400]);
+    expect(() => requestQuizSessionResultsCSV(token, quizId, sessionId)).toThrow(HTTPError[400]);
     requestQuizSessionAnswer(token, quizId, sessionId, 'NEXT_QUESTION');
-    expect(() => requestQuizSessionResultsCSV(quizId, sessionId, token)).toThrow(HTTPError[400]);
+    expect(() => requestQuizSessionResultsCSV(token, quizId, sessionId)).toThrow(HTTPError[400]);
     requestQuizSessionAnswer(token, quizId, sessionId, 'SKIP_COUNTDOWN');
-    expect(() => requestQuizSessionResultsCSV(quizId, sessionId, token)).toThrow(HTTPError[400]);
+    expect(() => requestQuizSessionResultsCSV(token, quizId, sessionId)).toThrow(HTTPError[400]);
     requestQuizSessionAnswer(token, quizId, sessionId, 'GO_TO_ANSWER');
-    expect(() => requestQuizSessionResultsCSV(quizId, sessionId, token)).toThrow(HTTPError[400]);
+    expect(() => requestQuizSessionResultsCSV(token, quizId, sessionId)).toThrow(HTTPError[400]);
     requestQuizSessionAnswer(token, quizId, sessionId, 'END');
-    expect(() => requestQuizSessionResultsCSV(quizId, sessionId, token)).toThrow(HTTPError[400]);
+    expect(() => requestQuizSessionResultsCSV(token, quizId, sessionId)).toThrow(HTTPError[400]);
   });
   test('Fail: Token is empty or invalid (does not refer to valid logged in user session)', () => {
-    expect(() => requestQuizSessionResultsCSV(-1, sessionId, token)).toThrow(HTTPError[401]);
+    expect(() => requestQuizSessionResultsCSV(token, -1, sessionId)).toThrow(HTTPError[401]);
   });
   test('Fail: Valid token is provided, but user is not an owner of this quiz', () => {
-    expect(() => requestQuizSessionResultsCSV(quizId, sessionId, anotherToken)).toThrow(HTTPError[403]);
+    expect(() => requestQuizSessionResultsCSV(anotherToken, quizId, sessionId)).toThrow(HTTPError[403]);
   });
   
   

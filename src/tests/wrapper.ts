@@ -95,10 +95,13 @@ export const requestQuizSessionAnswer = (token: string, quizId: number, sessionI
   requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
 
 export const requestPlayerQuestionPosition = (playerId: number, questionPosition: number) =>
-  requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}`, { playerId, questionPosition })
+  requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}`, { playerId, questionPosition }, {});
 
 export const requestPlayerStatus = (playerId: number) =>
-  requestHelper('GET', `/v1/player/${playerId}`, { playerId })
+  requestHelper('GET', `/v1/player/${playerId}`, { playerId }, {});
+
+export const requestQuizSessionResultsCSV = (token: string, quizId: number, sessionId: number) => 
+  requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}/results/csv`, { quizId, sessionId }, { token });
 
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 
