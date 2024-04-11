@@ -307,7 +307,6 @@ export function adminQuizCreate(
     questions: [],
     duration: 0,
     quizSessions: [],
-    thumbnailUrl: ''
   });
 
   return { quizId: newQuizId };

@@ -3,11 +3,11 @@ import { QuestionType } from '../../dataStore';
 import {
   clear,
   requestAuthRegister,
-  requestQuizCreate,
+  requestQuizCreateV2,
   requestQuizSessionStart,
   requestQuizSessionInfo,
   requestQuizSessionUpdate,
-  requestQuizQuestionCreateV2
+  requestQuizQuestionCreateV2,
 } from '../wrapper';
 
 beforeEach(() => {
@@ -33,8 +33,8 @@ describe('adminQuizSessionInfo testing', () => {
     token1 = user.jsonBody.token as string;
     token2 = user2.jsonBody.token as string;
 
-    const quiz1 = requestQuizCreate(token1, 'Quiz Name', 'Quiz Description');
-    const quiz2 = requestQuizCreate(token1, 'Second Quiz Name', 'Second Quiz Description');
+    const quiz1 = requestQuizCreateV2(token1, 'Quiz Name', 'Quiz Description');
+    const quiz2 = requestQuizCreateV2(token1, 'Second Quiz Name', 'Second Quiz Description');
     quizId1 = quiz1.jsonBody.quizId as number;
     quizId2 = quiz2.jsonBody.quizId as number;
 
