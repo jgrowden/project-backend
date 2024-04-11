@@ -4,6 +4,7 @@ import {
   requestQuizCreateV2,
   requestQuizSessionStart,
   requestQuizQuestionCreate,
+  requestQuizSessionAnswer
   requestQuizSessionPlayerJoin,
   requestQuizSessionPlayerQuestionPosition,
   clear
@@ -52,6 +53,8 @@ beforeEach(() => {
 
 describe('Testing for GET /v1/player/{playerId}/question/{questionPosition}', () => {
   test('Success', () => {
+    requestQuizSessionAnswer(token, quizId, sessionId, 'NEXT_QUESTION');
+    requestQuizSessionAnswer(token, quizId, sessionId, 'SKIP_COUNTDOWN');
     expect(requestQuizSessionPlayerQuestionPosition(playerId1, 1)).toStrictEqual({
       statusCode: 200,
       jsonBody: {
@@ -98,7 +101,8 @@ describe('Testing for GET /v1/player/{playerId}/question/{questionPosition}', ()
         ]
       }
     });
-    
+    requestQuizSessionAnswer(token, quizId, sessionId, 'NEXT_QUESTION');
+    requestQuizSessionAnswer(token, quizId, sessionId, 'SKIP_COUNTDOWN');
     expect(requestQuizSessionPlayerQuestionPosition(playerId1, 2)).toStrictEqual({
       statusCode: 200,
       jsonBody: {
@@ -145,6 +149,8 @@ describe('Testing for GET /v1/player/{playerId}/question/{questionPosition}', ()
         ]
       }
     });
+    requestQuizSessionAnswer(token, quizId, sessionId, 'NEXT_QUESTION');
+    requestQuizSessionAnswer(token, quizId, sessionId, 'SKIP_COUNTDOWN');
     expect(requestQuizSessionPlayerQuestionPosition(playerId1, 3)).toStrictEqual({
       statusCode: 200,
       jsonBody: {
@@ -196,12 +202,23 @@ describe('Testing for GET /v1/player/{playerId}/question/{questionPosition}', ()
     expect(() => requestQuizSessionPlayerQuestionPosition(-1, 1)).toThrow(HTTPError[400]);
   });
   test('Fail: question position is not valid for the session this player is in', () => {
+    requestQuizSessionAnswer(token, quizId, sessionId, 'NEXT_QUESTION');
     expect(() => requestQuizSessionPlayerQuestionPosition(playerId1, 4)).toThrow(HTTPError[400]);
   });
   test('Fail: session is not currently on this question', () => {
-
-  });
+    requestQuizSessionAnswer(token, quizId, sessionId, 'NEXT_QUESTION');
+    requestQuizSessionAnswer(token, quizId, sessionId, 'SKIP_COUNTDOWN');
+    expect(requestQuizSessionPlayerQuestionPosition(playerId1, 2)).toThrow(HTTPError[400]);
+    expect(requestQuizSessionPlayerQuestionPosition(playerId2, 2)).toThrow(HTTPError[400]);
   test('Fail: session is in LOBBY, QUESTION_COUNTDOWN or END state', () => {
-
+    expect(requestQuizSessionPlayerQuestionPosition(playerId1, 1)).toThrow(HTTPError[400]);
+    expect(requestQuizSessionPlayerQuestionPosition(playerId2, 1)).toThrow(HTTPError[400]);
+    requestQuizSessionAnswer(token, quizId, sessionId, 'NEXT_QUESTION');
+    expect(requestQuizSessionPlayerQuestionPosition(playerId1, 1)).toThrow(HTTPError[400]);
+    expect(requestQuizSessionPlayerQuestionPosition(playerId2, 1)).toThrow(HTTPError[400]);
+    requestQuizSessionAnswer(token, quizId, sessionId, 'SKIP_COUNTDOWN');
+    requestQuizSessionAnswer(token, quizId, sessionId, 'END');
+    expect(requestQuizSessionPlayerQuestionPosition(playerId1, 1)).toThrow(HTTPError[400]);
+    expect(requestQuizSessionPlayerQuestionPosition(playerId2, 1)).toThrow(HTTPError[400]);
   });
-})
+});
