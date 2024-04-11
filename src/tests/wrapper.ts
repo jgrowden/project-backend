@@ -92,7 +92,7 @@ export const requestQuizSessionInfo = (token: string, quizId: number, sessionId:
   requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
 
 export const requestQuizSessionUpdate = (token: string, quizId: number, sessionId: number, action: string) =>
-  requestHelper('POST', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
 
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 

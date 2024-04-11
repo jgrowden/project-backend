@@ -307,6 +307,7 @@ export function adminQuizCreate(
     questions: [],
     duration: 0,
     quizSessions: [],
+    thumbnailUrl: ''
   });
 
   return { quizId: newQuizId };
@@ -673,8 +674,10 @@ export function adminQuizQuestionCreateV2(
     throw HTTPError(400, 'There are no correct answers');
   }
 
-  if (!isValidThumbnail(questionBody.thumbnailUrl)) {
-    throw HTTPError(400, 'thumbnail must start with http:// or https:// and have type jpg, jpeg or png');
+  if (questionBody.thumbnailUrl !== undefined && questionBody.thumbnailUrl.length !== 0) {
+    if (!isValidThumbnail(questionBody.thumbnailUrl)) {
+      throw HTTPError(400, 'thumbnail must start with http:// or https:// and have type jpg, jpeg or png');
+    }
   }
 
   const newQuestionId = generateNewQuestionId();

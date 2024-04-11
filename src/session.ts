@@ -1,8 +1,10 @@
 import HTTPError from 'http-errors';
 import {
   QuestionType,
+  QuizSessionType,
   SessionAction,
   SessionState,
+  getData,
   getTimeoutData
 } from './dataStore';
 import {
@@ -174,4 +176,37 @@ export function adminQuizSessionUpdate(
     session.atQuestion = 0;
   }
   return {};
+}
+
+export function adminQuizSessionInfo (token: string, quizId: number, sessionId: number) {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'User not found');
+  }
+
+  let quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Quiz not found');
+  }
+
+  if (user.authUserId !== quiz.ownerId) {
+    throw HTTPError(403, 'User does not own this quiz');
+  }
+
+  for (const session of quiz.quizSessions) {
+    if (session.quizSessionId === sessionId) {
+      let metadata = JSON.parse(JSON.stringify(session.metadata));
+      delete metadata.ownerId;
+      delete metadata.quizSessions
+      return {
+        state: session.state,
+        atQuestion: session.atQuestion,
+        players: session.players,
+        metadata: metadata
+      };
+    }
+  }
+
+  throw HTTPError(400, 'Session not found');
+
 }
