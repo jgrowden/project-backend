@@ -10,6 +10,12 @@ export interface SessionIdType {
   sessionId: number;
 }
 
+export interface PlayerStatusReturn {
+  state: string;
+  numQuestions: number;
+  atQuestion: number;
+}
+
 export function playerQuestionPosition(playerId: number, questionPosition: number): QuestionType {
   const quizSession = fetchQuizSessionFromPlayerId(playerId);
   if (!quizSession) {
@@ -27,3 +33,14 @@ export function playerQuestionPosition(playerId: number, questionPosition: numbe
   return (quizSession.metadata.questions[questionPosition - 1]);
 };
 
+export function playerStatus(playerId: number): PlayerStatusReturn {
+  const quizSession = fetchQuizSessionFromPlayerId(playerId);
+  if (!quizSession) {
+    throw HTTPError(400, 'PlayerId does not exist');
+  };
+  return {
+    state: quizSession.state,
+    numQuestions: quizSession.metadata.numQuestions,
+    atQuestion: quizSession.atQuestion
+  };
+}

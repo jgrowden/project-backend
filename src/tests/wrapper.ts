@@ -97,6 +97,9 @@ export const requestQuizSessionAnswer = (token: string, quizId: number, sessionI
 export const requestPlayerQuestionPosition = (playerId: number, questionPosition: number) =>
   requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}`, { playerId, questionPosition })
 
+export const requestPlayerStatus = (playerId: number) =>
+  requestHelper('GET', `/v1/player/${playerId}`, { playerId })
+
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 
 export const errorCode = (statusCode: number) => {

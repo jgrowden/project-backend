@@ -48,7 +48,8 @@ import {
   adminQuizSessionUpdate
 } from './session';
 import {
-  playerQuestionPosition
+  playerQuestionPosition,
+  playerStatus
 } from './player';
 
 import { clear } from './other';
@@ -435,7 +436,7 @@ app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Respons
   res.json(result);
 });
 
-//adminQuizSessionPlayerQuestionPosition Route
+//playerQuestionPosition Route
 app.get('/v1/player/:playerid/question/:questionposition', (req: Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
   const questionPosition = parseInt(req.params.questionposition);
@@ -444,6 +445,13 @@ app.get('/v1/player/:playerid/question/:questionposition', (req: Request, res: R
   res.json(result);
 })
 
+//playerStatus Route
+app.get('/v1/player/:playerid', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const result = playerStatus(playerId);
+  save();
+  res.json(result);
+})
 
 // clear Route
 app.delete('/v1/clear', (req: Request, res: Response) => {
