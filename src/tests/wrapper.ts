@@ -91,6 +91,9 @@ export const requestQuizChangeOwnerV2 = (quizId: number, token: string, userEmai
 export const requestQuizSessionStart = (token: string, quizId: number, autoStartNum: number) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
 
+export const requestQuizSessionAnswer = (token: string, quizId: number, sessionId: number, action: string) =>
+  requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
+
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 
 export const errorCode = (statusCode: number) => {

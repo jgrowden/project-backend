@@ -44,7 +44,8 @@ import {
   adminQuizCreateV2
 } from './quiz';
 import {
-  adminQuizSessionStart
+  adminQuizSessionStart,
+  adminQuizSessionUpdate
 } from './session';
 
 import { clear } from './other';
@@ -420,6 +421,16 @@ app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) =
   res.json(result);
 });
 
+app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const action = req.query.action as string;
+  const quizId = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.params.sessionid);
+  const result = adminQuizSessionUpdate(token, quizId, sessionId, action);
+  save();
+  res.json(result);
+});
+
 // clear Route
 app.delete('/v1/clear', (req: Request, res: Response) => {
   const result = clear();
@@ -458,5 +469,6 @@ const server = app.listen(PORT, HOST, () => {
 // For coverage, handle Ctrl+C gracefully
 process.on('SIGINT', () => {
   save();
+  clear();
   server.close(() => console.log('Shutting down server gracefully.'));
 });
