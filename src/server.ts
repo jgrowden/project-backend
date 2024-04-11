@@ -40,6 +40,7 @@ import {
   adminQuizChangeOwnerV2,
   adminQuizQuestionDuplicate,
   adminQuizQuestionDelete,
+  adminQuizQuestionDeleteV2,
   adminQuizCreateV2
 } from './quiz';
 import {
@@ -397,6 +398,16 @@ app.delete('/v1/admin/quiz/:quizid/question/:questionid', (req: Request, res: Re
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizQuestionDeleteV2 Route
+app.delete('/v2/admin/quiz/:quizid/question/:questionid', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const result = adminQuizQuestionDeleteV2(token, quizId, questionId);
   save();
   res.json(result);
 });
