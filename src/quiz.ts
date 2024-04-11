@@ -881,7 +881,7 @@ export function adminQuizQuestionUpdateV2(
   quizId: number,
   questionId: number,
   newQuestionBody: QuestionType
-): ErrorObjectWithCode | Record<string, never> {
+): Record<string, never> {
   const user: UserType | undefined = fetchUserFromSessionId(sessionId);
   if (!user) {
     throw HTTPError(401, 'Invalid token');
@@ -1113,7 +1113,7 @@ export function adminQuizQuestionDeleteV2(
   token: string,
   quizId: number,
   questionId: number
-): ErrorObjectWithCode | Record<string, never> {
+): Record<string, never> {
   const user = fetchUserFromSessionId(token);
   if (!user) {
     throw HTTPError(401, 'Invalid token');
