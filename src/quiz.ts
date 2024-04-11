@@ -881,7 +881,7 @@ export function adminQuizQuestionUpdateV2(
   quizId: number,
   questionId: number,
   newQuestionBody: QuestionType
-): ErrorObjectWithCode | Record<string, never> {
+): Record<string, never> {
   const user: UserType | undefined = fetchUserFromSessionId(sessionId);
   if (!user) {
     throw HTTPError(401, 'Invalid token');
@@ -1075,11 +1075,11 @@ export function adminQuizQuestionDuplicate(
  * @returns
  */
 export function adminQuizQuestionDelete(
-  sessionId: string,
+  token: string,
   quizId: number,
   questionId: number
 ): ErrorObjectWithCode | Record<string, never> {
-  const user = fetchUserFromSessionId(sessionId);
+  const user = fetchUserFromSessionId(token);
   if (!user) {
     return returnError('Invalid token', 401);
   }
@@ -1096,6 +1096,47 @@ export function adminQuizQuestionDelete(
   const questionIndex = quiz.questions.findIndex(question => question.questionId === questionId);
   if (questionIndex === INVALID_INDEX) {
     return returnError('Invalid questionId');
+  }
+
+  // No errors, delete question from quiz
+  // No requirement in spec to change lastEdited, but will do anyway
+  quiz.numQuestions--;
+  quiz.duration -= quiz.questions[questionIndex].duration;
+  quiz.questions.splice(questionIndex, 1);
+  quiz.timeLastEdited = currentTime();
+
+  return {};
+}
+
+// V2 FUNCTION
+export function adminQuizQuestionDeleteV2(
+  token: string,
+  quizId: number,
+  questionId: number
+): Record<string, never> {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'Invalid token');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Invalid quizId');
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'Invalid quiz ownership');
+  }
+
+  // Finding the index rather than using the helper in order to make deleting more efficient
+  const questionIndex = quiz.questions.findIndex(question => question.questionId === questionId);
+  if (questionIndex === INVALID_INDEX) {
+    throw HTTPError(400, 'Invalid questionId');
+  }
+
+  // Check for any sessions not in END state
+  if (quiz.quizSessions.some(session => session.state !== 'END')) {
+    throw HTTPError(400, 'Cannot delete whilst a session is active');
   }
 
   // No errors, delete question from quiz
