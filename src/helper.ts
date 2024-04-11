@@ -54,10 +54,10 @@ export const hash = (i: number): number => {
 };
 
 const newId = (): number => {
-  let newUserId = hash(getData().id);
+  const newUserId = hash(getData().id);
   getData().id++;
   return newUserId;
-}
+};
 
 export const generateNewUserId = (): number => {
   return newId();

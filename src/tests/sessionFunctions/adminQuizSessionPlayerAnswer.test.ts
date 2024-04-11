@@ -12,7 +12,7 @@ import {
 
 import {
   hash
-} from '../../helper'
+} from '../../helper';
 
 let token: string;
 let quizId: number;

@@ -22,7 +22,7 @@ beforeEach(() => {
 
 afterEach(() => {
   clear();
-})
+});
 
 describe('Testing Quiz Restore', () => {
   describe('Testing error cases', () => {
