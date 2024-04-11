@@ -7,16 +7,15 @@ import {
   requestQuizSessionStart,
   requestQuizSessionInfo,
   requestQuizSessionUpdate,
-  requestQuizQuestionCreate,
   requestQuizQuestionCreateV2
 } from '../wrapper';
 
 beforeEach(() => {
   clear();
-})
+});
 afterEach(() => {
   clear();
-})
+});
 
 let quizId1: number;
 let quizId2: number;
@@ -25,11 +24,9 @@ let token2: string;
 let sessionId1: number;
 let sessionId2: number;
 let questionBody: QuestionType;
-let questionId1: number;
 const AUTOSTARTNUM = 10;
 
 describe('adminQuizSessionInfo testing', () => {
-
   beforeEach(() => {
     const user = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
     const user2 = requestAuthRegister('test@testmail.com', 'Password123', 'First', 'Last');
@@ -66,23 +63,27 @@ describe('adminQuizSessionInfo testing', () => {
       thumbnailUrl: 'http://sus.com/sus.jpg'
     };
 
-    questionId1 = requestQuizQuestionCreateV2(token1, quizId1, questionBody).jsonBody.questionId as number;
-
+    requestQuizQuestionCreateV2(token1, quizId1, questionBody).jsonBody.questionId as number;
     sessionId1 = requestQuizSessionStart(token1, quizId1, AUTOSTARTNUM).jsonBody.sessionId as number;
     sessionId2 = requestQuizSessionStart(token1, quizId1, AUTOSTARTNUM).jsonBody.sessionId as number;
-  })
+  });
 
-  test('Invalid tokens', () => {
+  test('invalid tokens', () => {
     expect(() => requestQuizSessionInfo('', quizId1, sessionId1)).toThrow(HTTPError[401]);
     expect(() => requestQuizSessionInfo(token1 + '1', quizId1, sessionId1)).toThrow(HTTPError[401]);
-  })
+  });
+  test('quiz not found', () => {
+    // this calculation has no integer solutions.
+    const uniqueQuizId = quizId1 * quizId1 + quizId2 * quizId2 + quizId1 + quizId2;
+    expect(() => requestQuizSessionInfo(token1, uniqueQuizId, sessionId1)).toThrow(HTTPError[403]);
+  });
   test('not an owner of the quiz', () => {
     expect(() => requestQuizSessionInfo(token2, quizId1, sessionId1)).toThrow(HTTPError[403]);
   });
   test('session does not exist for a quiz', () => {
     expect(() => requestQuizSessionInfo(token1, quizId2, sessionId1)).toThrow(HTTPError[400]);
   });
-  test('successfully get info of one quiz', () => {
+  test('successfully get info of two quizzes', () => {
     expect(requestQuizSessionInfo(token1, quizId1, sessionId1)).toStrictEqual(
       {
         statusCode: 200,
@@ -137,7 +138,63 @@ describe('adminQuizSessionInfo testing', () => {
           }
         }
       }
-    )
+    );
+
+    expect(requestQuizSessionInfo(token1, quizId1, sessionId2)).toStrictEqual(
+      {
+        statusCode: 200,
+        jsonBody: {
+          state: 'LOBBY',
+          atQuestion: 0,
+          players: [],
+          metadata: {
+            quizId: quizId1,
+            name: 'Quiz Name',
+            timeCreated: expect.any(Number),
+            timeLastEdited: expect.any(Number),
+            description: 'Quiz Description',
+            numQuestions: 1,
+            questions: [
+              {
+                questionId: expect.any(Number),
+                question: 'Who is the imposter?',
+                duration: 10,
+                thumbnailUrl: 'http://sus.com/sus.jpg',
+                points: 10,
+                answers: [
+                  {
+                    answerId: expect.any(Number),
+                    answer: 'Red',
+                    colour: expect.any(String),
+                    correct: false
+                  },
+                  {
+                    answerId: expect.any(Number),
+                    answer: 'Blue',
+                    colour: expect.any(String),
+                    correct: false
+                  },
+                  {
+                    answerId: expect.any(Number),
+                    answer: 'Green',
+                    colour: expect.any(String),
+                    correct: false
+                  },
+                  {
+                    answerId: expect.any(Number),
+                    answer: 'Orange',
+                    colour: expect.any(String),
+                    correct: true
+                  }
+                ]
+              }
+            ],
+            duration: 10,
+            thumbnailUrl: ''
+          }
+        }
+      }
+    );
   });
   test('successfully get info an updated quiz', () => {
     const action = 'NEXT_QUESTION';
@@ -199,6 +256,62 @@ describe('adminQuizSessionInfo testing', () => {
           }
         }
       }
-    )
+    );
+
+    expect(requestQuizSessionInfo(token1, quizId1, sessionId2)).toStrictEqual(
+      {
+        statusCode: 200,
+        jsonBody: {
+          state: 'LOBBY',
+          atQuestion: 0,
+          players: [],
+          metadata: {
+            quizId: quizId1,
+            name: 'Quiz Name',
+            timeCreated: expect.any(Number),
+            timeLastEdited: expect.any(Number),
+            description: 'Quiz Description',
+            numQuestions: 1,
+            questions: [
+              {
+                questionId: expect.any(Number),
+                question: 'Who is the imposter?',
+                duration: 10,
+                thumbnailUrl: 'http://sus.com/sus.jpg',
+                points: 10,
+                answers: [
+                  {
+                    answerId: expect.any(Number),
+                    answer: 'Red',
+                    colour: expect.any(String),
+                    correct: false
+                  },
+                  {
+                    answerId: expect.any(Number),
+                    answer: 'Blue',
+                    colour: expect.any(String),
+                    correct: false
+                  },
+                  {
+                    answerId: expect.any(Number),
+                    answer: 'Green',
+                    colour: expect.any(String),
+                    correct: false
+                  },
+                  {
+                    answerId: expect.any(Number),
+                    answer: 'Orange',
+                    colour: expect.any(String),
+                    correct: true
+                  }
+                ]
+              }
+            ],
+            duration: 10,
+            thumbnailUrl: ''
+          }
+        }
+      }
+    );
   });
-})
+});
