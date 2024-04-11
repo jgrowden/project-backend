@@ -94,7 +94,7 @@ export const requestQuizSessionStart = (token: string, quizId: number, autoStart
 export const requestQuizSessionAnswer = (token: string, quizId: number, sessionId: number, action: string) =>
   requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
 
-export const requestQuizPositionResults = (playerId: number, questionPosition: number) =>
+export const requestQuestionPositionResults = (playerId: number, questionPosition: number) =>
   requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}/results`, {}, {});
 
 export const clear = () => requestHelper('DELETE', '/v1/clear');
