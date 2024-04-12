@@ -1166,10 +1166,10 @@ export function adminQuizThumbnailUpdate(token: string, quizId: number, imgUrl: 
   if (!quiz) {
     throw HTTPError(403, 'invalid quizId');
   }
-  if (quiz.ownerId != user.authUserId) {
+  if (quiz.ownerId !== user.authUserId) {
     throw HTTPError(403, 'invalid quiz ownership');
   }
-  
+
   if (!imgUrl || imgUrl === '') {
     throw HTTPError(400, 'empty/undefined imgUrl');
   }
