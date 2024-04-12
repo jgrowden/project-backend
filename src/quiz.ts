@@ -1148,3 +1148,15 @@ export function adminQuizQuestionDeleteV2(
 
   return {};
 }
+
+/**
+ * Update the thumbnail for the quiz.
+ * When this route is called, the timeLastEdited is updated.
+ * @param {string} token
+ * @param {number} quizId
+ * @param {string} imgUrl
+ * @returns {}
+ */
+export function adminQuizThumbnailUpdate(token: string, quizId: number, imgUrl: string) {
+  return {};
+}

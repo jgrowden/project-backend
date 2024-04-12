@@ -41,7 +41,8 @@ import {
   adminQuizQuestionDuplicate,
   adminQuizQuestionDelete,
   adminQuizQuestionDeleteV2,
-  adminQuizCreateV2
+  adminQuizCreateV2,
+  adminQuizThumbnailUpdate
 } from './quiz';
 import {
   adminQuizSessionStart,
@@ -411,6 +412,16 @@ app.delete('/v2/admin/quiz/:quizid/question/:questionid', (req: Request, res: Re
   res.json(result);
 });
 
+// adminQuizThumbnailUpdate Route
+app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const quizId = parseInt(req.params.quizid);
+  const { imgUrl } = req.body;
+  const result = adminQuizThumbnailUpdate(token, quizId, imgUrl);
+  save();
+  res.json(result);
+});
+
 // adminQuizSessionStart Route
 app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) => {
   const token = req.header('token');
@@ -421,6 +432,7 @@ app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) =
   res.json(result);
 });
 
+// adminQuizSessionUpdate Route
 app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
   const token = req.header('token');
   const action = req.query.action as string;
