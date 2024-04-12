@@ -1123,7 +1123,6 @@ export function adminQuizQuestionDeleteV2(
   if (!quiz) {
     throw HTTPError(403, 'Invalid quizId');
   }
-
   if (quiz.ownerId !== user.authUserId) {
     throw HTTPError(403, 'Invalid quiz ownership');
   }
@@ -1158,5 +1157,26 @@ export function adminQuizQuestionDeleteV2(
  * @returns {}
  */
 export function adminQuizThumbnailUpdate(token: string, quizId: number, imgUrl: string) {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'empty/invalid token');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'invalid quizId');
+  }
+  if (quiz.ownerId != user.authUserId) {
+    throw HTTPError(403, 'invalid quiz ownership');
+  }
+  
+  if (!imgUrl || imgUrl === '') {
+    throw HTTPError(400, 'empty/undefined imgUrl');
+  }
+  if (!isValidThumbnail(imgUrl)) {
+    throw HTTPError(400, 'imgUrl must start with http:// or https:// and have type jpg, jpeg or png');
+  }
+
+  quiz.thumbnailUrl = imgUrl;
   return {};
 }

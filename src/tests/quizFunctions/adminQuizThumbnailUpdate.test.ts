@@ -8,21 +8,19 @@ import {
 } from '../wrapper';
 import { currentTime } from '../../helper';
 
-beforeAll(() => {
-  clear();
-});
-afterEach(() => {
-  clear();
-});
 const imgUrl = 'http://threeSwordStyle.png';
 let token: string, quizId: number;
 
-describe('adminQuizThumbnailUpdate', () => {
-  beforeEach(() => {
-    token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token as string;
-    quizId = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description').jsonBody.quizId as number;
-  });
+afterAll(() => {
+  clear();
+});
+beforeEach(() => {
+  clear();
+  token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token as string;
+  quizId = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description').jsonBody.quizId as number;
+});
 
+describe('adminQuizThumbnailUpdate', () => {
   test('401, invalid/empty token', () => {
     expect(() => requestQuizThumbnailUpdate(token + '1', quizId, imgUrl)).toThrow(HTTPError[401]);
     expect(() => requestQuizThumbnailUpdate('', quizId, imgUrl)).toThrow(HTTPError[401]);
