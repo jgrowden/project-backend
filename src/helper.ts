@@ -49,10 +49,11 @@ export const fetchSessionFromSessionId = (sessionId: number): QuizSessionType | 
 };
 
 export const fetchQuizSessionFromPlayerId = (playerId: number): QuizSessionType | undefined => {
-  let session: QuizSessionType;
-  getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.players.some(player => player.playerId === playerId)));
+  const quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.players.some(player => player.playerId === playerId)));
+  if (quiz === undefined) return undefined;
+  const session = quiz.quizSessions.find(session => session.players.some(player => player.playerId === playerId));
   return session;
-}
+};
 
 // generates psudorandom numbers, max 524287 unique Ids
 export const hash = (i: number): number => {

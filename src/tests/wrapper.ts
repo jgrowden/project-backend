@@ -101,7 +101,7 @@ export const requestQuizSessionPlayerJoin = (sessionId: number, name: string) =>
   requestHelper('POST', '/v1/player/join', { sessionId, name }, {});
 
 export const requestPlayerQuestionPosition = (playerId: number, questionPosition: number) =>
-  requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}`, { playerId, questionPosition }, {})
+  requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}`, { playerId, questionPosition }, {});
 
 export const requestQuizSessionPlayerAnswer = (playerId: number, questionPosition: number, answerIds: number[]) =>
   requestHelper('PUT', `/v1/player/${playerId}/question/${questionPosition}/answer`, { answerIds }, {});
