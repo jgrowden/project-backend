@@ -94,6 +94,9 @@ export const requestQuizSessionStart = (token: string, quizId: number, autoStart
 export const requestQuizSessionAnswer = (token: string, quizId: number, sessionId: number, action: string) =>
   requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
 
+export const requestQuizSessionsView = (token: string, quizId: number) =>
+  requestHelper('GET', `/v1/admin/quiz/${quizId}/sessions`, {}, { token });
+
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 
 export const errorCode = (statusCode: number) => {

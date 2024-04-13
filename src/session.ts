@@ -19,6 +19,11 @@ export interface SessionIdType {
   sessionId: number;
 }
 
+interface SessionViewType {
+  activeSessions: number[];
+  inactiveSessions: number[];
+}
+
 /**
  * Start a new session for a quiz
  * This copies the quiz, so that any edits whilst a session is running
@@ -174,4 +179,19 @@ export function adminQuizSessionUpdate(
     session.atQuestion = 0;
   }
   return {};
+}
+
+/**
+ * Retrieves active and inactive session ids (sorted in ascending order) for a quiz
+ * Active sessions are sessions that are not in the END state
+ * Inactive sessions are sessions in the END state
+ * @param {string} token 
+ * @param {number} quizId 
+ * @returns {SessionViewType}
+ */
+export function adminQuizSessionsView(token: string, quizId: number): SessionViewType {
+  return {
+    activeSessions: [],
+    inactiveSessions: []
+  }
 }

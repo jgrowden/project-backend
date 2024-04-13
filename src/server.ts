@@ -45,7 +45,8 @@ import {
 } from './quiz';
 import {
   adminQuizSessionStart,
-  adminQuizSessionUpdate
+  adminQuizSessionUpdate,
+  adminQuizSessionsView
 } from './session';
 
 import { clear } from './other';
@@ -430,6 +431,15 @@ app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Respons
   save();
   res.json(result);
 });
+
+// adminQuizSessionsView Route
+app.get('/v1/admin/quiz/:quizid/sessions', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizSessionsView(token, quizId);
+  save();
+  res.json(result);
+})
 
 // clear Route
 app.delete('/v1/clear', (req: Request, res: Response) => {
