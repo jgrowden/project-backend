@@ -46,7 +46,8 @@ import {
 } from './quiz';
 import {
   adminQuizSessionStart,
-  adminQuizSessionUpdate
+  adminQuizSessionUpdate,
+  adminQuizSessionPlayerJoin
 } from './session';
 
 import { clear } from './other';
@@ -439,6 +440,14 @@ app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Respons
   const quizId = parseInt(req.params.quizid);
   const sessionId = parseInt(req.params.sessionid);
   const result = adminQuizSessionUpdate(token, quizId, sessionId, action);
+  save();
+  res.json(result);
+});
+
+// adminQuizSessionPlayerJoin Route
+app.post('/v1/player/join', (req: Request, res: Response) => {
+  const { sessionId, name } = req.body;
+  const result = adminQuizSessionPlayerJoin(sessionId, name);
   save();
   res.json(result);
 });

@@ -4,7 +4,7 @@ import {
   requestQuizCreateV2,
   requestQuizQuestionCreateV2,
   requestQuizSessionStart,
-  requestQuizSessionAnswer,
+  requestQuizSessionUpdate,
   clear
 } from '../wrapper';
 
@@ -34,31 +34,31 @@ afterEach(() => {
 describe('Tests for PUT /v1/admin/quiz/{quizid}/session/{sessionid}', () => {
   test('Success', () => {
     const action = 'NEXT_QUESTION';
-    expect(requestQuizSessionAnswer(token, quizId, sessionId, action)).toStrictEqual({
+    expect(requestQuizSessionUpdate(token, quizId, sessionId, action)).toStrictEqual({
       statusCode: 200,
       jsonBody: {}
     });
   });
   test('Fail: empty token', () => {
-    expect(() => requestQuizSessionAnswer('', quizId, sessionId, 'NEXT_QUESTION')).toThrow(HTTPError[401]);
+    expect(() => requestQuizSessionUpdate('', quizId, sessionId, 'NEXT_QUESTION')).toThrow(HTTPError[401]);
   });
   test('Fail: invalid token', () => {
-    expect(() => requestQuizSessionAnswer(token + 'a', quizId, sessionId, 'NEXT_QUESTION')).toThrow(HTTPError[401]);
+    expect(() => requestQuizSessionUpdate(token + 'a', quizId, sessionId, 'NEXT_QUESTION')).toThrow(HTTPError[401]);
   });
   test('Fail: invalid ownership', () => {
     const otherToken = requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo').jsonBody.token as string;
-    expect(() => requestQuizSessionAnswer(otherToken, quizId, sessionId, 'NEXT_QUESTION')).toThrow(HTTPError[403]);
+    expect(() => requestQuizSessionUpdate(otherToken, quizId, sessionId, 'NEXT_QUESTION')).toThrow(HTTPError[403]);
   });
   test('Fail: invalid quizId', () => {
-    expect(() => requestQuizSessionAnswer(token, quizId + 1, sessionId, 'NEXT_QUESTION')).toThrow(HTTPError[403]);
+    expect(() => requestQuizSessionUpdate(token, quizId + 1, sessionId, 'NEXT_QUESTION')).toThrow(HTTPError[403]);
   });
   test('Fail: invalid sessionId', () => {
-    expect(() => requestQuizSessionAnswer(token, quizId, sessionId + 1, 'NEXT_QUESTION')).toThrow(HTTPError[400]);
+    expect(() => requestQuizSessionUpdate(token, quizId, sessionId + 1, 'NEXT_QUESTION')).toThrow(HTTPError[400]);
   });
   test('Fail: non-existent action', () => {
-    expect(() => requestQuizSessionAnswer(token, quizId, sessionId, 'SPAGHETTI')).toThrow(HTTPError[400]);
+    expect(() => requestQuizSessionUpdate(token, quizId, sessionId, 'SPAGHETTI')).toThrow(HTTPError[400]);
   });
   test('Fail: invalid action on current state', () => {
-    expect(() => requestQuizSessionAnswer(token, quizId, sessionId, 'GO_TO_ANSWER')).toThrow(HTTPError[400]);
+    expect(() => requestQuizSessionUpdate(token, quizId, sessionId, 'GO_TO_ANSWER')).toThrow(HTTPError[400]);
   });
 });

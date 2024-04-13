@@ -11,6 +11,8 @@ import {
   fetchDeletedQuizFromQuizId,
   generateQuizSessionId,
   fetchSessionFromSessionId,
+  generateNewPlayerName,
+  generateNewPlayerId,
   currentTime,
   updateState
 } from './helper';
@@ -174,4 +176,38 @@ export function adminQuizSessionUpdate(
     session.atQuestion = 0;
   }
   return {};
+}
+
+interface playerIdType {
+  playerId: number;
+}
+
+/**
+ * Joins a new player to some quiz session in LOBBY state
+ * @param {string} name
+ * @param {number} sessionId
+ * @returns {
+*  playerId: number
+* }
+*/
+export function adminQuizSessionPlayerJoin(
+  sessionId: number,
+  name: string
+): playerIdType {
+  const session = fetchSessionFromSessionId(sessionId);
+  if (session === undefined) {
+    throw HTTPError(400, 'Invalid sessionId');
+  }
+  if (session.state !== 'LOBBY') {
+    throw HTTPError(400, 'Session is not in LOBBY state');
+  }
+  if (session.players.find(player => player.playerName === name) !== undefined) {
+    throw HTTPError(400, 'Name of new player is not unique');
+  }
+  if (name === '') {
+    name = generateNewPlayerName();
+  }
+  const newPlayerId = generateNewPlayerId(sessionId);
+  session.players.push({ playerId: newPlayerId, playerName: name });
+  return { playerId: newPlayerId };
 }
