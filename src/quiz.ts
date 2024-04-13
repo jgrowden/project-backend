@@ -1178,5 +1178,6 @@ export function adminQuizThumbnailUpdate(token: string, quizId: number, imgUrl: 
   }
 
   quiz.thumbnailUrl = imgUrl;
+  quiz.timeLastEdited = currentTime();
   return {};
 }
