@@ -41,10 +41,13 @@ import {
   adminQuizQuestionDuplicate,
   adminQuizQuestionDelete,
   adminQuizQuestionDeleteV2,
-  adminQuizCreateV2
+  adminQuizCreateV2,
+  adminQuizThumbnailUpdate
 } from './quiz';
 import {
   adminQuizSessionStart,
+  adminQuizSessionPlayerJoin,
+  adminQuizSessionPlayerAnswer,
   adminQuizSessionUpdate
 } from './session';
 import {
@@ -415,6 +418,16 @@ app.delete('/v2/admin/quiz/:quizid/question/:questionid', (req: Request, res: Re
   res.json(result);
 });
 
+// adminQuizThumbnailUpdate Route
+app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const quizId = parseInt(req.params.quizid);
+  const { imgUrl } = req.body;
+  const result = adminQuizThumbnailUpdate(token, quizId, imgUrl);
+  save();
+  res.json(result);
+});
+
 // adminQuizSessionStart Route
 app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) => {
   const token = req.header('token');
@@ -425,7 +438,7 @@ app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) =
   res.json(result);
 });
 
-//adminQuizSessionUpdate Route
+// adminQuizSessionUpdate Route
 app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
   const token = req.header('token');
   const action = req.query.action as string;
@@ -436,14 +449,22 @@ app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Respons
   res.json(result);
 });
 
-//playerQuestionPosition Route
+// adminQuizSessionPlayerJoin Route
+app.post('/v1/player/join', (req: Request, res: Response) => {
+  const { sessionId, name } = req.body;
+  const result = adminQuizSessionPlayerJoin(sessionId, name);
+  save();
+  res.json(result);
+});
+
+// playerQuestionPosition Route
 app.get('/v1/player/:playerid/question/:questionposition', (req: Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
   const questionPosition = parseInt(req.params.questionposition);
   const result = playerQuestionPosition(playerId, questionPosition);
   save();
   res.json(result);
-})
+});
 
 //playerStatus Route
 app.get('/v1/player/:playerid', (req: Request, res: Response) => {
@@ -451,7 +472,16 @@ app.get('/v1/player/:playerid', (req: Request, res: Response) => {
   const result = playerStatus(playerId);
   save();
   res.json(result);
-})
+});
+
+app.put('/v1/player/:playerid/question/:questionposition/answer', (req:Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const questionPosition = parseInt(req.params.questionposition);
+  const { answerIds } = req.body;
+  const result = adminQuizSessionPlayerAnswer(playerId, questionPosition, answerIds);
+  save();
+  res.json(result);
+});
 
 // clear Route
 app.delete('/v1/clear', (req: Request, res: Response) => {
