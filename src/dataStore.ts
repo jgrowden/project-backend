@@ -43,19 +43,19 @@ export interface QuestionType {
   thumbnailUrl?: string;
 }
 
-export interface PlayerAnswerType {
-  playerName: string;
-  answerTimes: number;
+export interface PlayerAnswerType { // answers
+  playerId: number;
   answerIds: number[];
+  answerTime: number;
 }
 
-export interface QuestionAnswerType {
-  playersCorrectList: string[];
-  averageAnswerTime: number; // let total = 0; playerAnswers.reduce((total, answer) => total + answer.answerTimes, 0); averageAnswerTime = total / playerAnswers.length;
-  questionPosition: number; // the question referred to by atQuestion
-  percentCorrect?: number;
+export interface QuestionPlayerAnswersType { // questionAnswers
+  questionPosition: number;
   questionStartTime: number;
-  playerAnswers: PlayerAnswerType[];
+  answers: PlayerAnswerType[];
+  // we can compute all other data via helper functions: TBD
+  // averageAnswerTime, percentageCorrect
+  // what happens when questions are resubmitted to average times?
 }
 
 export interface QuizSessionType {
@@ -65,8 +65,8 @@ export interface QuizSessionType {
   quizSessionId: number;
   autoStartNum: number;
   messages: MessageType[];
-  collectedAnswers: QuestionAnswerType[]; // stores ALL answers in a single array
   metadata: QuizType;
+  playerAnswers: QuestionPlayerAnswersType[];
 }
 
 export interface PlayerType {
@@ -88,12 +88,14 @@ export interface DataType {
   users: UserType[];
   quizzes: QuizType[];
   deletedQuizzes: QuizType[];
+  id: number;
 }
 
 let data: DataType = {
   users: [],
   quizzes: [],
-  deletedQuizzes: []
+  deletedQuizzes: [],
+  id: 0
 };
 
 export interface TimeoutDataType {
@@ -106,8 +108,8 @@ let timeoutData: TimeoutDataType[] = [];
 export enum SessionState {
   LOBBY = 'LOBBY',
   QUESTION_COUNTDOWN = 'QUESTION_COUNTDOWN',
-  QUESTIONS_OPEN = 'QUESTIONS_OPEN',
-  QUESTIONS_CLOSE = 'QUESTIONS_CLOSE',
+  QUESTION_OPEN = 'QUESTION_OPEN',
+  QUESTION_CLOSE = 'QUESTION_CLOSE',
   ANSWER_SHOW = 'ANSWER_SHOW',
   FINAL_RESULTS = 'FINAL_RESULTS',
   END = 'END'

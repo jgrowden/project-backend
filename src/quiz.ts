@@ -156,17 +156,18 @@ export function adminQuizRestore(sessionId: string, quizId: number): ErrorObject
   }
 
   const deletedQuiz = fetchDeletedQuizFromQuizId(quizId);
-  if (!deletedQuiz) {
-    return returnError('Invalid quiz', 403);
-  }
-
-  if (deletedQuiz.ownerId !== user.authUserId) {
-    return returnError('Invalid quiz ownership', 403);
-  }
-
   const quiz = fetchQuizFromQuizId(quizId);
-  if (quiz) {
-    return returnError('Quiz not in trash', 400);
+
+  if (deletedQuiz !== undefined) {
+    if (deletedQuiz.ownerId !== user.authUserId) {
+      return returnError('Invalid quiz ownership', 403);
+    }
+  } else {
+    if (quiz === undefined) {
+      return returnError('Invalid quiz', 403);
+    } else {
+      return returnError('Quiz not in trash', 400);
+    }
   }
 
   const data = getData();
