@@ -169,9 +169,9 @@ export function adminQuizSessionUpdate(
   } else if (action === 'GO_TO_ANSWER') {
     // do nothing
   } else if (action === 'GO_TO_FINAL_RESULTS') {
-    session.atQuestion = 0;
+    session.atQuestion = -1;
   } else if (action === 'END') {
-    session.atQuestion = 0;
+    session.atQuestion = -1;
   }
   return {};
 }

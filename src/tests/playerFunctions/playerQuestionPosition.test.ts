@@ -201,6 +201,8 @@ describe('Testing for GET /v1/player/{playerId}/question/{questionPosition}', ()
     });
   });
   test('Fail: Player Id does not exist', () => {
+    requestQuizSessionUpdate(token, quizId, sessionId, 'NEXT_QUESTION');
+    requestQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN');
     expect(() => requestPlayerQuestionPosition(-1, 1)).toThrow(HTTPError[400]);
   });
   test('Fail: question position is not valid for the session this player is in', () => {

@@ -16,6 +16,18 @@ export interface PlayerStatusReturn {
   atQuestion: number;
 }
 
+export function playerStatus(playerId: number): PlayerStatusReturn {
+  const quizSession = fetchQuizSessionFromPlayerId(playerId);
+  if (!quizSession) {
+    throw HTTPError(400, 'PlayerId does not exist');
+  }
+  return {
+    state: quizSession.state,
+    numQuestions: quizSession.metadata.numQuestions,
+    atQuestion: quizSession.atQuestion
+  };
+}
+
 export function playerQuestionPosition(playerId: number, questionPosition: number): QuestionType {
   const quizSession = fetchQuizSessionFromPlayerId(playerId);
   if (!quizSession) {
@@ -31,16 +43,4 @@ export function playerQuestionPosition(playerId: number, questionPosition: numbe
     throw HTTPError(400, 'Session is in LOBBY, QUESTION_COUNTDOWN, or END state');
   }
   return (quizSession.metadata.questions[questionPosition - 1]);
-};
-
-export function playerStatus(playerId: number): PlayerStatusReturn {
-  const quizSession = fetchQuizSessionFromPlayerId(playerId);
-  if (!quizSession) {
-    throw HTTPError(400, 'PlayerId does not exist');
-  }
-  return {
-    state: quizSession.state,
-    numQuestions: quizSession.metadata.numQuestions,
-    atQuestion: quizSession.atQuestion
-  };
-};
+}

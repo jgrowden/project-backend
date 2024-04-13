@@ -457,19 +457,19 @@ app.post('/v1/player/join', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// playerStatus Route
+app.get('/v1/player/:playerid', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const result = playerStatus(playerId);
+  save();
+  res.json(result);
+});
+
 // playerQuestionPosition Route
 app.get('/v1/player/:playerid/question/:questionposition', (req: Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
   const questionPosition = parseInt(req.params.questionposition);
   const result = playerQuestionPosition(playerId, questionPosition);
-  save();
-  res.json(result);
-});
-
-//playerStatus Route
-app.get('/v1/player/:playerid', (req: Request, res: Response) => {
-  const playerId = parseInt(req.params.playerid);
-  const result = playerStatus(playerId);
   save();
   res.json(result);
 });

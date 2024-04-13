@@ -1,10 +1,10 @@
 import HTTPError from 'http-errors';
-import { 
+import {
   requestAuthRegister,
   requestQuizCreateV2,
   requestQuizSessionStart,
   requestQuizQuestionCreate,
-  requestQuizSessionAnswer,
+  requestQuizSessionUpdate,
   requestQuizSessionPlayerJoin,
   requestPlayerStatus,
   clear
@@ -13,9 +13,6 @@ import { QuestionType } from '../../dataStore';
 
 let token: string;
 let quizId: number;
-let questionId1: number;
-let questionId2: number;
-let questionId3: number;
 let sessionId: number;
 let playerId1: number;
 let playerId2: number;
@@ -43,9 +40,9 @@ beforeEach(() => {
     points: 4,
     answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
   };
-  questionId1 = requestQuizQuestionCreate(token, quizId, questionBody1).jsonBody.questionId as number;
-  questionId2 = requestQuizQuestionCreate(token, quizId, questionBody2).jsonBody.questionId as number;
-  questionId3 = requestQuizQuestionCreate(token, quizId, questionBody3).jsonBody.questionId as number;
+  requestQuizQuestionCreate(token, quizId, questionBody1).jsonBody.questionId as number;
+  requestQuizQuestionCreate(token, quizId, questionBody2).jsonBody.questionId as number;
+  requestQuizQuestionCreate(token, quizId, questionBody3).jsonBody.questionId as number;
   sessionId = requestQuizSessionStart(token, quizId, AUTOSTARTNUM).jsonBody.sessionId as number;
   playerId1 = requestQuizSessionPlayerJoin(sessionId, 'marcus').jsonBody.playerId as number;
   playerId2 = requestQuizSessionPlayerJoin(sessionId, 'milk').jsonBody.playerId as number;
@@ -54,82 +51,124 @@ beforeEach(() => {
 describe('Testing for GET /v1/player/{playerId}', () => {
   test('Success', () => {
     expect(requestPlayerStatus(playerId1)).toStrictEqual({
-      state: "LOBBY",
-      numQuestions: 3,
-      atQuestion: 0,
+      statusCode: 200,
+      jsonBody: {
+        state: 'LOBBY',
+        numQuestions: 3,
+        atQuestion: -1,
+      }
     });
     expect(requestPlayerStatus(playerId2)).toStrictEqual({
-      state: "LOBBY",
-      numQuestions: 3,
-      atQuestion: 0,
+      statusCode: 200,
+      jsonBody: {
+        state: 'LOBBY',
+        numQuestions: 3,
+        atQuestion: -1,
+      }
     });
-    requestQuizSessionAnswer(token, quizId, sessionId, 'NEXT_QUESTION');
+    requestQuizSessionUpdate(token, quizId, sessionId, 'NEXT_QUESTION');
     expect(requestPlayerStatus(playerId1)).toStrictEqual({
-      state: "QUESTION_COUNTDOWN",
-      numQuestions: 3,
-      atQuestion: 1,
+      statusCode: 200,
+      jsonBody: {
+        state: 'QUESTION_COUNTDOWN',
+        numQuestions: 3,
+        atQuestion: 0,
+      }
     });
     expect(requestPlayerStatus(playerId2)).toStrictEqual({
-      state: "QUESTION_COUNTDOWN",
-      numQuestions: 3,
-      atQuestion: 1,
+      statusCode: 200,
+      jsonBody: {
+        state: 'QUESTION_COUNTDOWN',
+        numQuestions: 3,
+        atQuestion: 0,
+      }
     });
-    requestQuizSessionAnswer(token, quizId, sessionId, 'SKIP_COUNTDOWN');
+    requestQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN');
     expect(requestPlayerStatus(playerId1)).toStrictEqual({
-      state: "QUESTION_OPEN",
-      numQuestions: 3,
-      atQuestion: 1,
+      statusCode: 200,
+      jsonBody: {
+        state: 'QUESTION_OPEN',
+        numQuestions: 3,
+        atQuestion: 0,
+      }
     });
     expect(requestPlayerStatus(playerId2)).toStrictEqual({
-      state: "QUESTION_OPEN",
-      numQuestions: 3,
-      atQuestion: 1,
+      statusCode: 200,
+      jsonBody: {
+        state: 'QUESTION_OPEN',
+        numQuestions: 3,
+        atQuestion: 0,
+      }
     });
-    requestQuizSessionAnswer(token, quizId, sessionId, 'GO_TO_ANSWER');
+    requestQuizSessionUpdate(token, quizId, sessionId, 'GO_TO_ANSWER');
     expect(requestPlayerStatus(playerId1)).toStrictEqual({
-      state: "ANSWER_SHOW",
-      numQuestions: 3,
-      atQuestion: 1,
+      statusCode: 200,
+      jsonBody: {
+        state: 'ANSWER_SHOW',
+        numQuestions: 3,
+        atQuestion: 0,
+      }
     });
     expect(requestPlayerStatus(playerId2)).toStrictEqual({
-      state: "ANSWER_SHOW",
-      numQuestions: 3,
-      atQuestion: 1,
+      statusCode: 200,
+      jsonBody: {
+        state: 'ANSWER_SHOW',
+        numQuestions: 3,
+        atQuestion: 0,
+      }
     });
-    requestQuizSessionAnswer(token, quizId, sessionId, 'NEXT_QUESTION');
+    requestQuizSessionUpdate(token, quizId, sessionId, 'NEXT_QUESTION');
     expect(requestPlayerStatus(playerId1)).toStrictEqual({
-      state: "QUESTION_COUNTDOWN",
-      numQuestions: 3,
-      atQuestion: 2,
+      statusCode: 200,
+      jsonBody: {
+        state: 'QUESTION_COUNTDOWN',
+        numQuestions: 3,
+        atQuestion: 1,
+      }
     });
     expect(requestPlayerStatus(playerId2)).toStrictEqual({
-      state: "QUESTION_COUNTDOWN",
-      numQuestions: 3,
-      atQuestion: 2,
+      statusCode: 200,
+      jsonBody: {
+        state: 'QUESTION_COUNTDOWN',
+        numQuestions: 3,
+        atQuestion: 1,
+      }
     });
-    requestQuizSessionAnswer(token, quizId, sessionId, 'SKIP_COUNTDOWN');
-    requestQuizSessionAnswer(token, quizId, sessionId, 'GO_TO_ANSWER');
-    requestQuizSessionAnswer(token, quizId, sessionId, 'GO_TO_FINAL_RESULTS');
+    requestQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN');
+    requestQuizSessionUpdate(token, quizId, sessionId, 'GO_TO_ANSWER');
+    requestQuizSessionUpdate(token, quizId, sessionId, 'GO_TO_FINAL_RESULTS');
     expect(requestPlayerStatus(playerId1)).toStrictEqual({
-      state: "END",
-      numQuestions: 3,
-      atQuestion: 0,
+      statusCode: 200,
+      jsonBody: {
+        state: 'FINAL_RESULTS',
+        numQuestions: 3,
+        atQuestion: -1,
+      }
     });
     expect(requestPlayerStatus(playerId2)).toStrictEqual({
-      state: "END",
-      numQuestions: 3,
-      atQuestion: 0,
+      statusCode: 200,
+      jsonBody: {
+        state: 'FINAL_RESULTS',
+        numQuestions: 3,
+        atQuestion: -1,
+      }
     });
-    requestQuizSessionAnswer(token, quizId, sessionId, 'END');
+    requestQuizSessionUpdate(token, quizId, sessionId, 'END');
     expect(requestPlayerStatus(playerId1)).toStrictEqual({
-      state: "END",
-      numQuestions: 3,
-      atQuestion: 0,
+      statusCode: 200,
+      jsonBody: {
+        state: 'END',
+        numQuestions: 3,
+        atQuestion: -1,
+      }
     });
     expect(requestPlayerStatus(playerId2)).toStrictEqual({
-      state: "END",
-      numQuestions: 3,
-      atQuestion: 0,
+      statusCode: 200,
+      jsonBody: {
+        state: 'END',
+        numQuestions: 3,
+        atQuestion: -1,
+      }
     });
   });
   test('Fail: Player Id does not exist', () => {
