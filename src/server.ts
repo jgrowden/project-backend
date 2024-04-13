@@ -439,7 +439,7 @@ app.get('/v1/admin/quiz/:quizid/sessions', (req: Request, res: Response) => {
   const result = adminQuizSessionsView(token, quizId);
   save();
   res.json(result);
-})
+});
 
 // clear Route
 app.delete('/v1/clear', (req: Request, res: Response) => {

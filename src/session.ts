@@ -115,7 +115,7 @@ export function adminQuizSessionUpdate(
     throw HTTPError(400, 'SessionId is not a session of this quiz');
   }
 
-  if (action !== 'NEXT_QUESTION') {
+  if (!(action in SessionAction)) {
     throw HTTPError(400, 'Action is not a valid enum');
   }
 
@@ -185,13 +185,34 @@ export function adminQuizSessionUpdate(
  * Retrieves active and inactive session ids (sorted in ascending order) for a quiz
  * Active sessions are sessions that are not in the END state
  * Inactive sessions are sessions in the END state
- * @param {string} token 
- * @param {number} quizId 
+ * @param {string} token
+ * @param {number} quizId
  * @returns {SessionViewType}
  */
 export function adminQuizSessionsView(token: string, quizId: number): SessionViewType {
-  return {
-    activeSessions: [],
-    inactiveSessions: []
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'invalid token');
   }
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'invalid quizId');
+  }
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'invalid quiz ownership');
+  }
+
+  const activeSessions = [];
+  const inactiveSessions = [];
+  for (const session of quiz.quizSessions) {
+    if (session.state === 'END') {
+      inactiveSessions.push(session.quizSessionId);
+    } else {
+      activeSessions.push(session.quizSessionId);
+    }
+  }
+  return {
+    activeSessions: activeSessions,
+    inactiveSessions: inactiveSessions
+  };
 }

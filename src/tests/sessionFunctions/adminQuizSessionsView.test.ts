@@ -6,17 +6,41 @@ import {
   requestQuizCreateV2,
   requestQuizQuestionCreateV2,
   requestQuizSessionStart,
-  requestQuizDelete,
   requestQuizSessionsView,
   requestQuizSessionAnswer,
 } from '../wrapper';
 
-let token: string, quizId: number;
-let AUTOSTARTNUM = 10;
+let token: string, quizId: number, questionBody: QuestionType;
+const AUTOSTARTNUM = 10;
 beforeEach(() => {
   clear();
   token = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs').jsonBody.token as string;
   quizId = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description').jsonBody.quizId as number;
+  questionBody = {
+    question: 'Who\'s the strongest?',
+    duration: 5,
+    thumbnailUrl: 'http://GodUsopp.png',
+    points: 6,
+    answers: [
+      {
+        answer: 'Luffy',
+        correct: false,
+      },
+      {
+        answer: 'Shanks',
+        correct: false,
+      },
+      {
+        answer: 'Blackbeard',
+        correct: false,
+      },
+      {
+        answer: 'God Usopp',
+        correct: true,
+      },
+    ],
+  };
+  requestQuizQuestionCreateV2(token, quizId, questionBody);
 });
 afterAll(() => {
   clear();
@@ -42,7 +66,7 @@ describe('adminQuizSessionsView', () => {
       statusCode: 200,
       jsonBody: {
         activeSessions: [
-          session2, 
+          session2,
           session3
         ],
         inactiveSessions: [
@@ -51,4 +75,4 @@ describe('adminQuizSessionsView', () => {
       }
     });
   });
-})
+});
