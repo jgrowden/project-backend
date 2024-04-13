@@ -88,6 +88,9 @@ export const requestQuizChangeOwner = (quizId: number, token: string, userEmail:
 export const requestQuizChangeOwnerV2 = (quizId: number, token: string, userEmail: string) =>
   requestHelper('POST', `/v2/admin/quiz/${quizId}/transfer`, { userEmail }, { token });
 
+export const requestQuizThumbnailUpdate = (token: string, quizId: number, imgUrl: string) =>
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/thumbnail`, { imgUrl }, { token });
+
 export const requestQuizSessionStart = (token: string, quizId: number, autoStartNum: number) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
 
