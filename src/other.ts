@@ -14,7 +14,8 @@ function clear() {
   setData({
     users: [],
     quizzes: [],
-    deletedQuizzes: []
+    deletedQuizzes: [],
+    id: 0
   });
   return {};
 }

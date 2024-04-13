@@ -55,32 +55,26 @@ export const fetchQuizSessionFromPlayerId = (playerId: number): QuizSessionType 
 }
 
 // generates psudorandom numbers, max 524287 unique Ids
-const hash = (i: number): number => {
-  return ((((54787 * i) % 524287) + 524287) % 524287);
+export const hash = (i: number): number => {
+  return ((((524287 * i) % 39916801) + 39916801) % 39916801);
 };
 
-export const generateNewUserId = (): number => {
-  const data = getData();
-  let newUserId = 2353;
-  const userIds = data.users.map(user => user.authUserId);
-  while (userIds.includes(newUserId)) newUserId = hash(newUserId);
+const newId = (): number => {
+  const newUserId = hash(getData().id);
+  getData().id++;
   return newUserId;
 };
 
+export const generateNewUserId = (): number => {
+  return newId();
+};
+
 export const generateNewQuizId = (): number => {
-  const data = getData();
-  let newQuizId = 2354;
-  const quizIds = data.quizzes.map(quiz => quiz.quizId);
-  while (quizIds.includes(newQuizId)) newQuizId = hash(newQuizId);
-  return newQuizId;
+  return newId();
 };
 
 export const generateNewPlayerId = (sessionId: number): number => {
-  const session = fetchSessionFromSessionId(sessionId);
-  const playerIds = session.players.map(player => player.playerId);
-  let newPlayerId = 2355;
-  while (playerIds.includes(newPlayerId)) newPlayerId = hash(newPlayerId);
-  return newPlayerId;
+  return newId();
 };
 
 export const generateNewPlayerName = (): string => {
@@ -119,33 +113,11 @@ export const returnError = (errorString: string, errorCode?: number): ErrorObjec
 };
 
 export const generateNewQuestionId = (): number => {
-  const data = getData();
-  let newQuestionId = 2356;
-  const QuestionIds = [];
-  for (const quiz of data.quizzes) {
-    for (const question of quiz.questions) {
-      QuestionIds.push(question.questionId);
-    }
-  }
-  while (QuestionIds.includes(newQuestionId)) {
-    newQuestionId = hash(newQuestionId);
-  }
-  return newQuestionId;
+  return newId();
 };
 
 export const generateQuizSessionId = (): number => {
-  const data = getData();
-  let newQuizSessionId = 2357;
-  const quizSessionIds = [];
-  for (const quiz of data.quizzes) {
-    for (const quizSession of quiz.quizSessions) {
-      quizSessionIds.push(quizSession.quizSessionId);
-    }
-  }
-  while (quizSessionIds.includes(newQuizSessionId)) {
-    newQuizSessionId = hash(newQuizSessionId);
-  }
-  return newQuizSessionId;
+  return newId();
 };
 
 export const updateState = (state: SessionState, action: SessionAction): SessionState | undefined => {
@@ -157,17 +129,17 @@ export const updateState = (state: SessionState, action: SessionAction): Session
     }
   } else if (state === SessionState.QUESTION_COUNTDOWN) {
     if (action === SessionAction.SKIP_COUNTDOWN) {
-      return SessionState.QUESTIONS_OPEN;
+      return SessionState.QUESTION_OPEN;
     } else if (action === SessionAction.END) {
       return SessionState.END;
     }
-  } else if (state === SessionState.QUESTIONS_OPEN) {
+  } else if (state === SessionState.QUESTION_OPEN) {
     if (action === SessionAction.GO_TO_ANSWER) {
       return SessionState.ANSWER_SHOW;
     } else if (action === SessionAction.END) {
       return SessionState.END;
     }
-  } else if (state === SessionState.QUESTIONS_CLOSE) {
+  } else if (state === SessionState.QUESTION_CLOSE) {
     if (action === SessionAction.NEXT_QUESTION) {
       return SessionState.QUESTION_COUNTDOWN;
     } else if (action === SessionAction.GO_TO_ANSWER) {
@@ -214,7 +186,7 @@ export const setRandomColour = (colours: string[]): string => {
  * @returns {number}
  */
 export const setAnswerId = (): number => {
-  return ~~(Math.random() * 1000);
+  return newId();
 };
 
 export const isValidThumbnail = (thumbnail: string) => {
