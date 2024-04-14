@@ -505,6 +505,14 @@ app.put('/v1/player/:playerid/question/:questionposition/answer', (req:Request, 
   res.json(result);
 });
 
+// playerQuestionResults Route
+app.get('/v1/player/:playerid/question/:questionposition/results', (req:Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const questionPosition = parseInt(req.params.questionposition);
+  const result = playerQuestionResults(playerId, questionPosition);
+  res.json(result);
+})
+
 // clear Route
 app.delete('/v1/clear', (req: Request, res: Response) => {
   const result = clear();

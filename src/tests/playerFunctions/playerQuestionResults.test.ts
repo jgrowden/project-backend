@@ -1,7 +1,5 @@
 import HTTPError from 'http-errors';
-import { clear, requestAuthRegister, requestPlayerQuestionPosition, requestQuestionPositionResults, requestQuizCreateV2, requestQuizQuestionCreateV2, requestQuizSessionInfo, requestQuizSessionPlayerAnswer, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestQuizSessionUpdate } from '../wrapper';
-import { generateNewPlayerId } from '../../helper';
-import { token } from 'morgan';
+import { clear, requestAuthRegister, requestPlayerQuestionPosition, requestQuestionResults, requestQuizCreateV2, requestQuizQuestionCreateV2, requestQuizSessionPlayerAnswer, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestQuizSessionUpdate } from '../wrapper';
 import { AnswerType } from '../../dataStore';
 
 beforeAll(() => {
@@ -42,7 +40,7 @@ let question2Answer4: number;
 // submit answers
 // get answer results
 
-describe('adminQuizPositionbResults testing', () => {
+describe('adminQuizPositionResults testing', () => {
   beforeEach(() => {
     token1 = requestAuthRegister('test@test.com', 'Password123', 'First', 'Last').jsonBody.token as string;
     quizId = requestQuizCreateV2(token1, 'First quiz', 'This is the first quiz').jsonBody.quizId as number;
@@ -128,33 +126,33 @@ describe('adminQuizPositionbResults testing', () => {
   test('player ID does not exist', () => {
     requestQuizSessionUpdate(token1, quizId, sessionId, "GO_TO_ANSWER");
     const uniqueId = player1 * player1 + player2 * player2 + player1 + player2;
-    expect(() => requestQuestionPositionResults(uniqueId, 1)).toThrow(HTTPError[400]);
+    expect(() => requestQuestionResults(uniqueId, 1)).toThrow(HTTPError[400]);
   });
 
   test('invalid question position', () => {
     requestQuizSessionUpdate(token1, quizId, sessionId, "GO_TO_ANSWER");
-    expect(() => requestQuestionPositionResults(player1, 10)).toThrow(HTTPError[400]);
+    expect(() => requestQuestionResults(player1, 10)).toThrow(HTTPError[400]);
   });
 
   test('session is not in ANSWER_SHOW state', () => {
     // put a sleep here for 1.1 seconds?
     expect(() => requestQuizSessionUpdate(token1, quizId, sessionId, 'NEXT_QUESTION'));
-    expect(() => requestQuestionPositionResults(player1, 1)).toThrow(HTTPError[400]);
+    expect(() => requestQuestionResults(player1, 1)).toThrow(HTTPError[400]);
   });
 
   test('session is not up to this question', () => {
     requestQuizSessionUpdate(token1, quizId, sessionId, "GO_TO_ANSWER");
-    expect(() => requestQuestionPositionResults(player1, 2)).toThrow(HTTPError[400]);
+    expect(() => requestQuestionResults(player1, 2)).toThrow(HTTPError[400]);
   });
 
   test('throw error if question position is at 0, should be at 1', () => {
     // should occur as a result of not being in answer_show state
-    expect(() => requestQuestionPositionResults(player1, 0)).toThrow(HTTPError[400]);
+    expect(() => requestQuestionResults(player1, 0)).toThrow(HTTPError[400]);
   });
 
   test('successfully view quiz question results', () => {
     requestQuizSessionUpdate(token1, quizId, sessionId, "GO_TO_ANSWER");
-    expect(requestQuestionPositionResults(player1, 1)).toStrictEqual(
+    expect(requestQuestionResults(player1, 1)).toStrictEqual(
       {
         statusCode: 200,
         jsonBody: {
@@ -177,7 +175,7 @@ describe('adminQuizPositionbResults testing', () => {
     // could put a wait here
     requestQuizSessionUpdate(token1, quizId, sessionId, 'GO_TO_ANSWER');
 
-    expect(requestQuestionPositionResults).toStrictEqual(
+    expect(requestQuestionResults(player1, 2)).toStrictEqual(
       {
         statusCode: 200,
         jsonBody: {
