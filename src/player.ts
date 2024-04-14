@@ -36,7 +36,7 @@ export function playerQuestionPosition(playerId: number, questionPosition: numbe
   if (questionPosition > quizSession.metadata.numQuestions) {
     throw HTTPError(400, 'Question position is not valid for the session this player is in');
   }
-  if (quizSession.atQuestion !== questionPosition - 1) {
+  if (quizSession.atQuestion !== questionPosition) {
     throw HTTPError(400, 'Session is not currently on this question');
   }
   if (quizSession.state === 'LOBBY' || quizSession.state === 'QUESTION_COUNTDOWN' || quizSession.state === 'END') {
