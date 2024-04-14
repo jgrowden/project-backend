@@ -95,7 +95,10 @@ export const requestQuizSessionStart = (token: string, quizId: number, autoStart
   requestHelper('POST', `/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
 
 export const requestQuizSessionUpdate = (token: string, quizId: number, sessionId: number, action: string) =>
-  requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
+
+export const requestQuizSessionsView = (token: string, quizId: number) =>
+  requestHelper('GET', `/v1/admin/quiz/${quizId}/sessions`, {}, { token });
 
 export const requestQuizSessionPlayerJoin = (sessionId: number, name: string) =>
   requestHelper('POST', '/v1/player/join', { sessionId, name }, {});

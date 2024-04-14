@@ -46,6 +46,7 @@ import {
 } from './quiz';
 import {
   adminQuizSessionStart,
+  adminQuizSessionsView,
   adminQuizSessionPlayerJoin,
   adminQuizSessionPlayerAnswer,
   adminQuizSessionUpdate
@@ -439,12 +440,21 @@ app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) =
 });
 
 // adminQuizSessionUpdate Route
-app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
+app.put('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
   const token = req.header('token');
-  const action = req.query.action as string;
+  const { action } = req.body;
   const quizId = parseInt(req.params.quizid);
   const sessionId = parseInt(req.params.sessionid);
   const result = adminQuizSessionUpdate(token, quizId, sessionId, action);
+  save();
+  res.json(result);
+});
+
+// adminQuizSessionsView Route
+app.get('/v1/admin/quiz/:quizid/sessions', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizSessionsView(token, quizId);
   save();
   res.json(result);
 });
@@ -474,6 +484,7 @@ app.get('/v1/player/:playerid/question/:questionposition', (req: Request, res: R
   res.json(result);
 });
 
+// playerAnswerSubmit Route
 app.put('/v1/player/:playerid/question/:questionposition/answer', (req:Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
   const questionPosition = parseInt(req.params.questionposition);
