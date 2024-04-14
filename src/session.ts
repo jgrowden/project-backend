@@ -184,7 +184,6 @@ export function adminQuizSessionUpdate(
   return {};
 }
 
-
 /**
  * Retrieves active and inactive session ids (sorted in ascending order) for a quiz
  * Active sessions are sessions that are not in the END state
