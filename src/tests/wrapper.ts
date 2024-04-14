@@ -100,6 +100,9 @@ export const requestQuizSessionUpdate = (token: string, quizId: number, sessionI
 export const requestQuizSessionPlayerJoin = (sessionId: number, name: string) =>
   requestHelper('POST', '/v1/player/join', { sessionId, name }, {});
 
+export const requestPlayerStatus = (playerId: number) =>
+  requestHelper('GET', `/v1/player/${playerId}`, { playerId }, {});
+
 export const requestPlayerQuestionPosition = (playerId: number, questionPosition: number) =>
   requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}`, { playerId, questionPosition }, {});
 

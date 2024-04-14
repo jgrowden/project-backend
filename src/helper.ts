@@ -52,6 +52,7 @@ export const fetchQuizSessionFromPlayerId = (playerId: number): QuizSessionType 
   const quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.players.some(player => player.playerId === playerId)));
   if (quiz === undefined) return undefined;
   const session = quiz.quizSessions.find(session => session.players.some(player => player.playerId === playerId));
+  if (session === undefined) return undefined;
   return session;
 };
 

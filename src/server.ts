@@ -51,7 +51,8 @@ import {
   adminQuizSessionUpdate
 } from './session';
 import {
-  playerQuestionPosition
+  playerQuestionPosition,
+  playerStatus
 } from './player';
 
 import { clear } from './other';
@@ -452,6 +453,14 @@ app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Respons
 app.post('/v1/player/join', (req: Request, res: Response) => {
   const { sessionId, name } = req.body;
   const result = adminQuizSessionPlayerJoin(sessionId, name);
+  save();
+  res.json(result);
+});
+
+// playerStatus Route
+app.get('/v1/player/:playerid', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const result = playerStatus(playerId);
   save();
   res.json(result);
 });
