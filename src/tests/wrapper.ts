@@ -88,11 +88,32 @@ export const requestQuizChangeOwner = (quizId: number, token: string, userEmail:
 export const requestQuizChangeOwnerV2 = (quizId: number, token: string, userEmail: string) =>
   requestHelper('POST', `/v2/admin/quiz/${quizId}/transfer`, { userEmail }, { token });
 
+export const requestQuizThumbnailUpdate = (token: string, quizId: number, imgUrl: string) =>
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/thumbnail`, { imgUrl }, { token });
+
 export const requestQuizSessionStart = (token: string, quizId: number, autoStartNum: number) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
 
-export const requestQuizSessionAnswer = (token: string, quizId: number, sessionId: number, action: string) =>
-  requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
+export const requestQuizSessionInfo = (token: string, quizId: number, sessionId: number) =>
+  requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
+
+export const requestQuizSessionUpdate = (token: string, quizId: number, sessionId: number, action: string) =>
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
+
+export const requestQuizSessionsView = (token: string, quizId: number) =>
+  requestHelper('GET', `/v1/admin/quiz/${quizId}/sessions`, {}, { token });
+
+export const requestQuizSessionPlayerJoin = (sessionId: number, name: string) =>
+  requestHelper('POST', '/v1/player/join', { sessionId, name }, {});
+
+export const requestPlayerStatus = (playerId: number) =>
+  requestHelper('GET', `/v1/player/${playerId}`, { playerId }, {});
+
+export const requestPlayerQuestionPosition = (playerId: number, questionPosition: number) =>
+  requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}`, { playerId, questionPosition }, {});
+
+export const requestQuizSessionPlayerAnswer = (playerId: number, questionPosition: number, answerIds: number[]) =>
+  requestHelper('PUT', `/v1/player/${playerId}/question/${questionPosition}/answer`, { answerIds }, {});
 
 export const requestQuestionPositionResults = (playerId: number, questionPosition: number) =>
   requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}/results`, {}, {});

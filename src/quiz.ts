@@ -156,17 +156,18 @@ export function adminQuizRestore(sessionId: string, quizId: number): ErrorObject
   }
 
   const deletedQuiz = fetchDeletedQuizFromQuizId(quizId);
-  if (!deletedQuiz) {
-    return returnError('Invalid quiz', 403);
-  }
-
-  if (deletedQuiz.ownerId !== user.authUserId) {
-    return returnError('Invalid quiz ownership', 403);
-  }
-
   const quiz = fetchQuizFromQuizId(quizId);
-  if (quiz) {
-    return returnError('Quiz not in trash', 400);
+
+  if (deletedQuiz !== undefined) {
+    if (deletedQuiz.ownerId !== user.authUserId) {
+      return returnError('Invalid quiz ownership', 403);
+    }
+  } else {
+    if (quiz === undefined) {
+      return returnError('Invalid quiz', 403);
+    } else {
+      return returnError('Quiz not in trash', 400);
+    }
   }
 
   const data = getData();
@@ -673,6 +674,10 @@ export function adminQuizQuestionCreateV2(
     throw HTTPError(400, 'There are no correct answers');
   }
 
+  if (questionBody.thumbnailUrl === undefined || questionBody.thumbnailUrl.length === 0) {
+    throw HTTPError(400, 'invalid thumbnail url');
+  }
+
   if (!isValidThumbnail(questionBody.thumbnailUrl)) {
     throw HTTPError(400, 'thumbnail must start with http:// or https:// and have type jpg, jpeg or png');
   }
@@ -1123,7 +1128,6 @@ export function adminQuizQuestionDeleteV2(
   if (!quiz) {
     throw HTTPError(403, 'Invalid quizId');
   }
-
   if (quiz.ownerId !== user.authUserId) {
     throw HTTPError(403, 'Invalid quiz ownership');
   }
@@ -1146,5 +1150,39 @@ export function adminQuizQuestionDeleteV2(
   quiz.questions.splice(questionIndex, 1);
   quiz.timeLastEdited = currentTime();
 
+  return {};
+}
+
+/**
+ * Update the thumbnail for the quiz.
+ * When this route is called, the timeLastEdited is updated.
+ * @param {string} token
+ * @param {number} quizId
+ * @param {string} imgUrl
+ * @returns {}
+ */
+export function adminQuizThumbnailUpdate(token: string, quizId: number, imgUrl: string) {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'empty/invalid token');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'invalid quizId');
+  }
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'invalid quiz ownership');
+  }
+
+  if (!imgUrl || imgUrl === '') {
+    throw HTTPError(400, 'empty/undefined imgUrl');
+  }
+  if (!isValidThumbnail(imgUrl)) {
+    throw HTTPError(400, 'imgUrl must start with http:// or https:// and have type jpg, jpeg or png');
+  }
+
+  quiz.thumbnailUrl = imgUrl;
+  quiz.timeLastEdited = currentTime();
   return {};
 }
