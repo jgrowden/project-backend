@@ -1,6 +1,8 @@
 import HTTPError from 'http-errors';
-import { clear, requestAuthRegister, requestQuestionPositionResults, requestQuizCreateV2, requestQuizQuestionCreateV2, requestQuizSessionStart } from '../wrapper';
+import { clear, requestAuthRegister, requestPlayerQuestionPosition, requestQuestionPositionResults, requestQuizCreateV2, requestQuizQuestionCreateV2, requestQuizSessionInfo, requestQuizSessionPlayerAnswer, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestQuizSessionUpdate } from '../wrapper';
 import { generateNewPlayerId } from '../../helper';
+import { token } from 'morgan';
+import { AnswerType } from '../../dataStore';
 
 beforeAll(() => {
   clear();
@@ -12,17 +14,42 @@ afterEach(() => {
 let token1: string;
 let quizId: number;
 let sessionId: number;
-let questionId: number;
+let questionId1: number;
+let questionId2: number;
+let player1: number;
+let player2: number;
 const AUTOSTARTNUM = 8;
+
+
+let question1Answers: AnswerType[];
+let question1Answer1: number;
+let question1Answer2: number;
+let question1Answer3: number;
+let question1Answer4: number;
+
+let question2Answers: AnswerType[];
+let question2Answer1: number;
+let question2Answer2: number;
+let question2Answer3: number;
+let question2Answer4: number;
+
+// register admin to create quiz
+// create quiz
+// create 2 questions
+// create session
+// register 2 players
+// next question
+// submit answers
+// get answer results
 
 describe('adminQuizPositionbResults testing', () => {
   beforeEach(() => {
     token1 = requestAuthRegister('test@test.com', 'Password123', 'First', 'Last').jsonBody.token as string;
     quizId = requestQuizCreateV2(token1, 'First quiz', 'This is the first quiz').jsonBody.quizId as number;
 
-    const questionBody = {
+    const questionBody1 = {
       question: 'Who\'s the imposter?',
-      duration: 9,
+      duration: 1,
       points: 6,
       answers: [
         {
@@ -45,32 +72,123 @@ describe('adminQuizPositionbResults testing', () => {
       thumbnailUrl: 'http://bigsus.com/imposter.jpg'
     };
 
-    questionId = requestQuizQuestionCreateV2(token1, quizId, questionBody).jsonBody.questionId as number;
+    const questionBody2 = {
+      question: 'Who last vented in electrical?',
+      duration: 1,
+      points: 7,
+      answers: [
+        {
+          answer: 'red',
+          correct: false,
+        },
+        {
+          answer: 'blue',
+          correct: false,
+        },
+        {
+          answer: 'orange',
+          correct: true,
+        },
+        {
+          answer: 'green',
+          correct: false,
+        },
+      ],
+      thumbnailUrl: 'http://biggersus.com/imposter.jpg'
+    };
+
+    questionId1 = requestQuizQuestionCreateV2(token1, quizId, questionBody1).jsonBody.questionId as number;
+    questionId2 = requestQuizQuestionCreateV2(token1, quizId, questionBody2).jsonBody.questionId as number;
 
     sessionId = requestQuizSessionStart(token1, quizId, AUTOSTARTNUM).jsonBody.sessionid as number;
+
+    player1 = requestQuizSessionPlayerJoin(sessionId, "crewmate").jsonBody.playerId as number;
+    player2 = requestQuizSessionPlayerJoin(sessionId, "engineer").jsonBody.playerId as number;
+
+    requestQuizSessionUpdate(token1, quizId, sessionId, "NEXT_QUESTION");
+    requestQuizSessionUpdate(token1, quizId, sessionId, "SKIP_COUNTDOWN");
+
+    question1Answers = requestPlayerQuestionPosition(player1, 1).jsonBody.answers as AnswerType[];
+    question1Answer1 = question1Answers[0].answerId;
+    question1Answer2 = question1Answers[1].answerId;
+    question1Answer3 = question1Answers[2].answerId;
+    question1Answer4 = question1Answers[3].answerId;
+
+    question2Answers = requestPlayerQuestionPosition(player1, 2).jsonBody.answers as AnswerType[];
+    question2Answer1 = question1Answers[0].answerId;
+    question2Answer2 = question1Answers[1].answerId;
+    question2Answer3 = question1Answers[2].answerId;
+    question2Answer4 = question1Answers[3].answerId;
+
+    requestQuizSessionPlayerAnswer(player1, 1, [question1Answer1]);
+    requestQuizSessionPlayerAnswer(player2, 1, [question1Answer2]);
+    
   });
 
   test('player ID does not exist', () => {
-
+    requestQuizSessionUpdate(token1, quizId, sessionId, "GO_TO_ANSWER");
+    const uniqueId = player1 * player1 + player2 * player2 + player1 + player2;
+    expect(() => requestQuestionPositionResults(uniqueId, 1)).toThrow(HTTPError[400]);
   });
 
   test('invalid question position', () => {
-
+    requestQuizSessionUpdate(token1, quizId, sessionId, "GO_TO_ANSWER");
+    expect(() => requestQuestionPositionResults(player1, 10)).toThrow(HTTPError[400]);
   });
 
   test('session is not in ANSWER_SHOW state', () => {
-
+    // put a sleep here for 1.1 seconds?
+    expect(() => requestQuizSessionUpdate(token1, quizId, sessionId, 'NEXT_QUESTION'));
+    expect(() => requestQuestionPositionResults(player1, 1)).toThrow(HTTPError[400]);
   });
 
   test('session is not up to this question', () => {
-
+    requestQuizSessionUpdate(token1, quizId, sessionId, "GO_TO_ANSWER");
+    expect(() => requestQuestionPositionResults(player1, 2)).toThrow(HTTPError[400]);
   });
 
   test('throw error if question position is at 0, should be at 1', () => {
-
+    // should occur as a result of not being in answer_show state
+    expect(() => requestQuestionPositionResults(player1, 0)).toThrow(HTTPError[400]);
   });
 
   test('successfully view quiz question results', () => {
+    requestQuizSessionUpdate(token1, quizId, sessionId, "GO_TO_ANSWER");
+    expect(requestQuestionPositionResults(player1, 1)).toStrictEqual(
+      {
+        statusCode: 200,
+        jsonBody: {
+          questionId: questionId1,
+          playersCorrectList: [
+            'crewmate'
+          ],
+          averageAnswerTime: 0,
+          percentCorrect: 50
+        }
+      }
+    )
 
+    requestQuizSessionUpdate(token1, quizId, sessionId, 'NEXT_QUESTION');
+    requestQuizSessionUpdate(token1, quizId, sessionId, 'SKIP_COUNTDOWN');
+    
+    requestQuizSessionPlayerAnswer(player1, 1, [question2Answer4]);
+    requestQuizSessionPlayerAnswer(player2, 1, [question2Answer3]);
+
+    // could put a wait here
+    requestQuizSessionUpdate(token1, quizId, sessionId, 'GO_TO_ANSWER');
+
+    expect(requestQuestionPositionResults).toStrictEqual(
+      {
+        statusCode: 200,
+        jsonBody: {
+          questionId: questionId2,
+          playerCorrectList: [
+            'engineer'
+          ],
+          averageAnswerTime: 0,
+          percentCorrect: 50
+        }
+      }
+    )
   });
 });
