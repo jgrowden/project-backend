@@ -45,6 +45,7 @@ import {
   adminQuizThumbnailUpdate
 } from './quiz';
 import {
+  adminQuizSessionInfo,
   adminQuizSessionStart,
   adminQuizSessionsView,
   adminQuizSessionPlayerJoin,
@@ -446,6 +447,16 @@ app.put('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Respons
   const quizId = parseInt(req.params.quizid);
   const sessionId = parseInt(req.params.sessionid);
   const result = adminQuizSessionUpdate(token, quizId, sessionId, action);
+  save();
+  res.json(result);
+});
+
+// adminQuizSessionInfo Route
+app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const quizId = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.params.sessionid);
+  const result = adminQuizSessionInfo(token, quizId, sessionId);
   save();
   res.json(result);
 });

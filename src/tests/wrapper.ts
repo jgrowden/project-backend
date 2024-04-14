@@ -94,6 +94,9 @@ export const requestQuizThumbnailUpdate = (token: string, quizId: number, imgUrl
 export const requestQuizSessionStart = (token: string, quizId: number, autoStartNum: number) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/session/start`, { autoStartNum }, { token });
 
+export const requestQuizSessionInfo = (token: string, quizId: number, sessionId: number) =>
+  requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
+
 export const requestQuizSessionUpdate = (token: string, quizId: number, sessionId: number, action: string) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
 
