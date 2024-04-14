@@ -50,6 +50,9 @@ import {
   adminQuizSessionPlayerAnswer,
   adminQuizSessionUpdate
 } from './session';
+import {
+  playerQuestionPosition
+} from './player';
 
 import { clear } from './other';
 // Set up web app
@@ -449,6 +452,15 @@ app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Respons
 app.post('/v1/player/join', (req: Request, res: Response) => {
   const { sessionId, name } = req.body;
   const result = adminQuizSessionPlayerJoin(sessionId, name);
+  save();
+  res.json(result);
+});
+
+// playerQuestionPosition Route
+app.get('/v1/player/:playerid/question/:questionposition', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const questionPosition = parseInt(req.params.questionposition);
+  const result = playerQuestionPosition(playerId, questionPosition);
   save();
   res.json(result);
 });

@@ -48,6 +48,13 @@ export const fetchSessionFromSessionId = (sessionId: number): QuizSessionType | 
   return session;
 };
 
+export const fetchQuizSessionFromPlayerId = (playerId: number): QuizSessionType | undefined => {
+  const quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.players.some(player => player.playerId === playerId)));
+  if (quiz === undefined) return undefined;
+  const session = quiz.quizSessions.find(session => session.players.some(player => player.playerId === playerId));
+  return session;
+};
+
 // generates psudorandom numbers, max 524287 unique Ids
 export const hash = (i: number): number => {
   return ((((524287 * i) % 39916801) + 39916801) % 39916801);
