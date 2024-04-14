@@ -20,6 +20,10 @@ beforeEach(() => {
   quizId = quiz.jsonBody.quizId as number;
 });
 
+afterEach(() => {
+  clear();
+});
+
 describe('Testing Quiz Restore', () => {
   describe('Testing error cases', () => {
     test('Error 401: Empty or invalid token', () => {
@@ -27,15 +31,15 @@ describe('Testing Quiz Restore', () => {
       expect(requestQuizRestore(token + '1', quizId)).toStrictEqual(errorCode(401));
     });
 
-    test('Error 403: Valid token, invalid quizId', () => {
+    test('Error 403: Quiz does not exist', () => {
       expect(requestQuizRestore(token, quizId + 1)).toStrictEqual(errorCode(403));
+    });
 
-      // Testing with valid quizId that the user does NOT own
+    test('Error 403: User does not own quiz', () => {
       const newUser = requestAuthRegister('second.user@gmail.com', 's3c0nDUser', 'Second', 'User');
       const newToken = newUser.jsonBody.token as string;
-      const newQuiz = requestQuizCreate(newToken, 'New Quiz', 'New Description');
-      const newQuizId = newQuiz.jsonBody.quizId as number;
-      expect(requestQuizRestore(token, newQuizId)).toStrictEqual(errorCode(403));
+      requestQuizDelete(token, quizId);
+      expect(requestQuizRestore(newToken, quizId)).toStrictEqual(errorCode(403));
     });
 
     test('Error 400: Quiz name of restored quiz already used by another active quiz', () => {
@@ -45,10 +49,7 @@ describe('Testing Quiz Restore', () => {
     });
 
     test('Error 400: QuizId refers to quiz not currently in trash', () => {
-      requestQuizDelete(token, quizId);
-      const newQuiz = requestQuizCreate(token, 'second quiz', 'new amazing quiz');
-      const newQuizId = newQuiz.jsonBody.quizId as number;
-      expect(requestQuizRestore(token, newQuizId)).toStrictEqual(errorCode(400));
+      expect(requestQuizRestore(token, quizId)).toStrictEqual(errorCode(400));
     });
   });
 
