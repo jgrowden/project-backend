@@ -33,8 +33,15 @@ afterEach(() => {
 
 describe('Tests for PUT /v1/admin/quiz/{quizid}/session/{sessionid}', () => {
   test('Success', () => {
-    const action = 'NEXT_QUESTION';
-    expect(requestQuizSessionUpdate(token, quizId, sessionId, action)).toStrictEqual({
+    expect(requestQuizSessionUpdate(token, quizId, sessionId, 'NEXT_QUESTION')).toStrictEqual({
+      statusCode: 200,
+      jsonBody: {}
+    });
+    expect(requestQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN')).toStrictEqual({
+      statusCode: 200,
+      jsonBody: {}
+    });
+    expect(requestQuizSessionUpdate(token, quizId, sessionId, 'END')).toStrictEqual({
       statusCode: 200,
       jsonBody: {}
     });
