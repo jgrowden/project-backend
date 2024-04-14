@@ -7,7 +7,7 @@ import {
   requestQuizQuestionCreateV2,
   requestQuizSessionStart,
   requestQuizSessionsView,
-  requestQuizSessionAnswer,
+  requestQuizSessionUpdate,
 } from '../wrapper';
 
 let token: string, quizId: number, questionBody: QuestionType;
@@ -61,7 +61,10 @@ describe('adminQuizSessionsView', () => {
     const session1 = requestQuizSessionStart(token, quizId, AUTOSTARTNUM).jsonBody.sessionId as number;
     const session2 = requestQuizSessionStart(token, quizId, AUTOSTARTNUM).jsonBody.sessionId as number;
     const session3 = requestQuizSessionStart(token, quizId, AUTOSTARTNUM).jsonBody.sessionId as number;
-    requestQuizSessionAnswer(token, quizId, session1, 'END');
+    expect(requestQuizSessionUpdate(token, quizId, session1, 'END')).toStrictEqual({
+      statusCode: 200,
+      jsonBody: {}
+    });
     expect(requestQuizSessionsView(token, quizId)).toStrictEqual({
       statusCode: 200,
       jsonBody: {
