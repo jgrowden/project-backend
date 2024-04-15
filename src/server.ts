@@ -161,7 +161,7 @@ app.put('/v1/admin/user/details', (req: Request, res: Response) => {
   res.json(result);
 });
 
-// adminUserDetailsUpdate Route
+// adminUserDetailsUpdateV2 Route
 app.put('/v2/admin/user/details', (req: Request, res: Response) => {
   const { email, nameFirst, nameLast } = req.body;
   const token = req.get('token') as string;
