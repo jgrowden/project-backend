@@ -55,6 +55,9 @@ export const requestQuizTrashEmpty = (token: string, quizIds: number[]) =>
 export const requestUserDetails = (token: string) =>
   requestHelper('GET', '/v1/admin/user/details', { token });
 
+export const requestUserDetailsV2 = (token: string) =>
+  requestHelper('GET', '/v2/admin/user/details', {}, { token });
+
 export const requestUserDetailsUpdate = (token: string, email: string, nameFirst: string, nameLast: string) =>
   requestHelper('PUT', '/v1/admin/user/details', { token, email, nameFirst, nameLast });
 
