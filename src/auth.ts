@@ -269,6 +269,51 @@ export function adminUserDetailsUpdate(
   return {};
 }
 
+export function adminUserDetailsUpdateV2(
+  sessionId: string,
+  email: string,
+  nameFirst: string,
+  nameLast: string
+): ErrorObjectWithCode | Record<string, never> {
+  const userToEdit = fetchUserFromSessionId(sessionId);
+  if (!userToEdit) {
+    throw HTTPError(401, 'User ID not found');
+  }
+
+  if (validator.isEmail(email) === false) {
+    throw HTTPError(400, 'Invalid email');
+  }
+
+  if (validName(nameFirst)) {
+    throw HTTPError(400, 'Invalid first name');
+  }
+  if (nameFirst.length < userNameMinLength || nameFirst.length > userNameMaxLength) {
+    throw HTTPError(400, 'First name does not satisfy length requirements');
+  }
+
+  if (validName(nameLast)) {
+    throw HTTPError(400, 'Invalid last name');
+  }
+  if (nameLast.length < userNameMinLength || nameLast.length > userNameMaxLength) {
+    throw HTTPError(400, 'Last name does not satisfy length requirements');
+  }
+
+  // get userId from sessionId
+  // loop through datastore userIds
+  // if a user has the same email and a different userId, email already registered
+
+  const registered = getData().users.find(user => user.email === email && user.authUserId !== userToEdit.authUserId);
+  if (registered !== undefined) {
+    throw HTTPError(400, 'Email already registered');
+  }
+
+  userToEdit.email = email;
+  userToEdit.nameFirst = nameFirst;
+  userToEdit.nameLast = nameLast;
+
+  return {};
+}
+
 /**
  * Given details relating to a password change, update the password of a logged in user.
  *
@@ -309,6 +354,44 @@ export function adminUserPasswordUpdate(
 
   if (!hasLetterAndNumber(newPassword)) {
     return returnError('Password must contain at least one letter and at least one number');
+  }
+
+  user.password = newPasswordHash;
+  user.previousPasswords.push(oldPasswordHash);
+
+  return {};
+}
+
+export function adminUserPasswordUpdateV2(
+  token: string,
+  oldPassword: string,
+  newPassword: string
+): Record<string, never> {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'User Id not found');
+  }
+
+  const oldPasswordHash = sha256(oldPassword);
+  if (oldPasswordHash !== user.password) {
+    throw HTTPError(400, 'Old password is not correct');
+  }
+
+  if (oldPassword === newPassword) {
+    throw HTTPError(400, 'New password is the same as old password');
+  }
+
+  const newPasswordHash = sha256(newPassword);
+  if (user.previousPasswords.find(password => password === newPasswordHash)) {
+    throw HTTPError(400, 'Password has been used before');
+  }
+
+  if (newPassword.length < userPasswordMinLength) {
+    throw HTTPError(400, 'Password is less than 8 characters');
+  }
+
+  if (!hasLetterAndNumber(newPassword)) {
+    throw HTTPError(400, 'Password must contain at least one letter and at least one number');
   }
 
   user.password = newPasswordHash;

@@ -38,23 +38,35 @@ export interface QuestionType {
   questionId?: number;
   question: string;
   duration: number;
-  thumbnailUrl?: string;
   points: number;
   answers: AnswerType[];
-  playersCorrectList?: string[];
-  averageAnswerTime?: number;
-  percentCorrect?: number;
   thumbnailUrl?: string;
+}
+
+export interface PlayerAnswerType { // answers
+  playerId: number;
+  answerIds: number[];
+  answerTime: number;
+}
+
+export interface QuestionPlayerAnswersType { // questionAnswers for each question
+  questionPosition: number;
+  questionStartTime: number;
+  answers: PlayerAnswerType[];
+  // we can compute all other data via helper functions: TBD
+  // averageAnswerTime, percentageCorrect
+  // what happens when questions are resubmitted to average times?
 }
 
 export interface QuizSessionType {
   state: string;
-  atQuestion: number;
+  atQuestion: number; // 0-indexed: metadata.questions[0] is the first question
   players: PlayerType[];
   quizSessionId: number;
   autoStartNum: number;
   messages: MessageType[];
   metadata: QuizType;
+  playerAnswers: QuestionPlayerAnswersType[];
 }
 
 export interface PlayerType {
@@ -76,19 +88,28 @@ export interface DataType {
   users: UserType[];
   quizzes: QuizType[];
   deletedQuizzes: QuizType[];
+  id: number;
 }
 
 let data: DataType = {
   users: [],
   quizzes: [],
-  deletedQuizzes: []
+  deletedQuizzes: [],
+  id: 0
 };
+
+export interface TimeoutDataType {
+  timeoutId: ReturnType<typeof setTimeout>;
+  sessionId: number;
+}
+
+let timeoutData: TimeoutDataType[] = [];
 
 export enum SessionState {
   LOBBY = 'LOBBY',
   QUESTION_COUNTDOWN = 'QUESTION_COUNTDOWN',
-  QUESTIONS_OPEN = 'QUESTIONS_OPEN',
-  QUESTIONS_CLOSE = 'QUESTIONS_CLOSE',
+  QUESTION_OPEN = 'QUESTION_OPEN',
+  QUESTION_CLOSE = 'QUESTION_CLOSE',
   ANSWER_SHOW = 'ANSWER_SHOW',
   FINAL_RESULTS = 'FINAL_RESULTS',
   END = 'END'
@@ -125,7 +146,15 @@ export function getData() {
   return data;
 }
 
+export function getTimeoutData() {
+  return timeoutData;
+}
+
 // Use set(newData) to pass in the entire data object, with modifications made
 export function setData(newData: DataType) {
   data = newData;
+}
+
+export function setTimeoutData(newTimeoutData: TimeoutDataType[]) {
+  timeoutData = newTimeoutData;
 }

@@ -3,8 +3,8 @@ import { QuestionType } from '../../dataStore';
 import {
   clear,
   requestAuthRegister,
-  requestQuizCreate,
-  requestQuizQuestionCreate,
+  requestQuizCreateV2,
+  requestQuizQuestionCreateV2,
   requestQuizSessionStart,
   requestQuizDelete,
 } from '../wrapper';
@@ -25,11 +25,12 @@ describe('quizSessionStart', () => {
   beforeEach(() => {
     const user = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
     token = user.jsonBody.token as string;
-    const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
+    const quiz = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');
     quizId = quiz.jsonBody.quizId as number;
     questionBody = {
       question: 'Who\'s the strongest?',
       duration: 5,
+      thumbnailUrl: 'http://GodUsopp.png',
       points: 6,
       answers: [
         {
@@ -50,7 +51,7 @@ describe('quizSessionStart', () => {
         },
       ],
     };
-    requestQuizQuestionCreate(token, quizId, questionBody);
+    requestQuizQuestionCreateV2(token, quizId, questionBody);
   });
   describe('error cases', () => {
     test('401, invalid/empty token', () => {
@@ -61,7 +62,7 @@ describe('quizSessionStart', () => {
       expect(() => requestQuizSessionStart(token, quizId + 1, AUTOSTARTNUM)).toThrow(HTTPError[403]);
       const newUser = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
       const newToken = newUser.jsonBody.token as string;
-      const newQuiz = requestQuizCreate(newToken, 'New Quiz', 'Description');
+      const newQuiz = requestQuizCreateV2(newToken, 'New Quiz', 'Description');
       const newQuizId = newQuiz.jsonBody.quizId as number;
       expect(() => requestQuizSessionStart(token, newQuizId, AUTOSTARTNUM)).toThrow(HTTPError[403]);
     });
@@ -78,7 +79,7 @@ describe('quizSessionStart', () => {
       expect(() => requestQuizSessionStart(token, quizId, AUTOSTARTNUM)).toThrow(HTTPError[400]);
     });
     test('400, quiz has no questions', () => {
-      const newQuiz = requestQuizCreate(token, 'New quiz', 'description');
+      const newQuiz = requestQuizCreateV2(token, 'New quiz', 'description');
       const newQuizId = newQuiz.jsonBody.quizId as number;
       expect(() => requestQuizSessionStart(token, newQuizId, AUTOSTARTNUM)).toThrow(HTTPError[400]);
     });
