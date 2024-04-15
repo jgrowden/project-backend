@@ -17,7 +17,8 @@ import {
   adminUserPasswordUpdate,
   adminUserDetailsUpdate,
   adminAuthLogout,
-  adminAuthLogoutV2
+  adminAuthLogoutV2,
+  adminUserDetailsUpdateV2
 } from './auth';
 import {
   adminQuizList,
@@ -33,7 +34,7 @@ import {
   adminQuizQuestionUpdate,
   adminQuizQuestionUpdateV2,
   adminQuizQuestionMove,
-  adminQuizTrashList,
+  adminQuizTrashInfo,
   adminQuizRestore,
   adminQuizTrashEmpty,
   adminQuizChangeOwner,
@@ -42,7 +43,8 @@ import {
   adminQuizQuestionDelete,
   adminQuizQuestionDeleteV2,
   adminQuizCreateV2,
-  adminQuizThumbnailUpdate
+  adminQuizThumbnailUpdate,
+  adminQuizTrashInfoV2
 } from './quiz';
 import {
   adminQuizSessionInfo,
@@ -159,6 +161,15 @@ app.put('/v1/admin/user/details', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminUserDetailsUpdate Route
+app.put('/v2/admin/user/details', (req: Request, res: Response) => {
+  const { email, nameFirst, nameLast } = req.body;
+  const token = req.get('token') as string;
+  const result = adminUserDetailsUpdateV2(token, email, nameFirst, nameLast);
+  save();
+  res.json(result);
+});
+
 // adminQuizList Route
 app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   const token = req.query.token as string;
@@ -222,13 +233,21 @@ app.delete('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
   res.json(result);
 });
 
-// adminQuizTrashList Route
+// adminQuizTrashInfo Route
 app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
   const token = req.query.token as string;
-  const result = adminQuizTrashList(token);
+  const result = adminQuizTrashInfo(token);
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizTrashInfoV2  Route
+app.get('/v2/admin/quiz/trash', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const result = adminQuizTrashInfoV2(token);
   save();
   res.json(result);
 });
