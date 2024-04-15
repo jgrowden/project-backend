@@ -100,6 +100,9 @@ export const requestQuizSessionStart = (token: string, quizId: number, autoStart
 export const requestQuizSessionInfo = (token: string, quizId: number, sessionId: number) =>
   requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
 
+export const requestQuizSessionFinalResults = (token: string, quizId: number, sessionId: number) =>
+  requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
+
 export const requestQuizSessionUpdate = (token: string, quizId: number, sessionId: number, action: string) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
 
