@@ -1,11 +1,33 @@
 import HTTPError from 'http-errors';
-import { QuestionType } from './dataStore';
+import {
+  QuestionType,
+  SessionAction,
+  SessionState,
+  getTimeoutData,
+} from './dataStore';
 import {
   fetchUserFromSessionId,
   fetchQuizFromQuizId,
   fetchDeletedQuizFromQuizId,
-  generateQuizSessionId
+  generateQuizSessionId,
+  fetchSessionFromSessionId,
+  generateNewPlayerName,
+  generateNewPlayerId,
+  currentTime,
+  updateState
 } from './helper';
+
+export interface SessionIdType {
+  sessionId: number;
+}
+
+interface playerIdType {
+  playerId: number;
+}
+interface SessionViewType {
+  activeSessions: number[];
+  inactiveSessions: number[];
+}
 
 /**
  * Start a new session for a quiz
@@ -18,7 +40,7 @@ import {
 *  sessionId: number
 * }
 */
-export function adminQuizSessionStart(token: string, quizId: number, autoStartNum: number) {
+export function adminQuizSessionStart(token: string, quizId: number, autoStartNum: number): SessionIdType {
   const user = fetchUserFromSessionId(token);
   if (!user) {
     throw HTTPError(401, 'invalid token');
@@ -56,12 +78,7 @@ export function adminQuizSessionStart(token: string, quizId: number, autoStartNu
 
   // Define type of questions to avoid typescript errors in map
   const questionCopy: QuestionType[] = JSON.parse(JSON.stringify(quiz.questions));
-  quizCopy.questions = questionCopy.map(question => {
-    question.playersCorrectList = [];
-    question.averageAnswerTime = 0;
-    question.percentCorrect = 0;
-    return question;
-  });
+  quizCopy.questions = questionCopy;
 
   quiz.quizSessions.push({
     state: 'LOBBY',
@@ -70,9 +87,200 @@ export function adminQuizSessionStart(token: string, quizId: number, autoStartNu
     quizSessionId: quizSessionId,
     autoStartNum: autoStartNum,
     messages: [],
-    metadata: quizCopy
+    metadata: quizCopy,
+    playerAnswers: []
   });
   return {
     sessionId: quizSessionId,
   };
+}
+
+export function adminQuizSessionUpdate(
+  token: string,
+  quizId: number,
+  sessionId: number,
+  action: string
+): Record<string, never> {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'User not found');
+  }
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Quiz not found');
+  }
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'User does not own quiz');
+  }
+  const session = fetchSessionFromSessionId(sessionId);
+  if (!session) {
+    throw HTTPError(400, 'Session not found');
+  }
+  if (session.quizSessionId !== sessionId) {
+    throw HTTPError(400, 'SessionId is not a session of this quiz');
+  }
+
+  if (!(action in SessionAction)) {
+    throw HTTPError(400, 'Action is not a valid enum');
+  }
+
+  const newState = updateState(session.state as SessionState, action as SessionAction) as string;
+  if (newState === undefined) {
+    throw HTTPError(400, 'Action cannot be applied in current state');
+  }
+
+  session.state = newState as string;
+  if (action === 'NEXT_QUESTION') {
+    session.atQuestion++;
+    session.playerAnswers.push({
+      questionPosition: session.atQuestion,
+      questionStartTime: currentTime(),
+      answers: []
+    });
+    const timeoutId = setTimeout(() => {
+      adminQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN');
+      for (let i = 0; i < getTimeoutData().length; i++) {
+        if (getTimeoutData()[i].sessionId === sessionId) {
+          getTimeoutData().splice(i, 1);
+          break;
+        }
+      }
+    }, 3000);
+    getTimeoutData().push({
+      timeoutId: timeoutId,
+      sessionId: sessionId
+    });
+  } else if (action === 'SKIP_COUNTDOWN') {
+    const timeoutData = getTimeoutData().find(data => data.sessionId === sessionId);
+    clearTimeout(timeoutData.timeoutId);
+    session.state = 'QUESTION_OPEN';
+    for (let i = 0; i < getTimeoutData().length; i++) {
+      if (getTimeoutData()[i].sessionId === sessionId) {
+        getTimeoutData().splice(i, 1);
+        break;
+      }
+    }
+    const timeoutId = setTimeout(() => {
+      session.state = 'QUESTION_CLOSE';
+      for (let i = 0; i < getTimeoutData().length; i++) {
+        if (getTimeoutData()[i].sessionId === sessionId) {
+          getTimeoutData().splice(i, 1);
+          break;
+        }
+      }
+    }, session.metadata.questions[session.atQuestion - 1].duration * 1000);
+    getTimeoutData().push({
+      timeoutId: timeoutId,
+      sessionId: sessionId
+    });
+  } else if (action === 'GO_TO_ANSWER') {
+    // do nothing
+  } else if (action === 'GO_TO_FINAL_RESULTS') {
+    session.atQuestion = 0;
+  } else if (action === 'END') {
+    session.atQuestion = 0;
+  }
+  return {};
+}
+
+/**
+ * Retrieves information about a session, including state, the current question,
+ * the players, and the quiz information
+ */
+export function adminQuizSessionInfo (token: string, quizId: number, sessionId: number) {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'User not found');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Quiz not found');
+  }
+
+  if (user.authUserId !== quiz.ownerId) {
+    throw HTTPError(403, 'User does not own this quiz');
+  }
+
+  for (const session of quiz.quizSessions) {
+    if (session.quizSessionId === sessionId) {
+      const metadata = JSON.parse(JSON.stringify(session.metadata));
+      delete metadata.ownerId;
+      delete metadata.quizSessions;
+      return {
+        state: session.state,
+        atQuestion: session.atQuestion,
+        players: session.players,
+        metadata: metadata
+      };
+    }
+  }
+
+  throw HTTPError(400, 'Session not found');
+}
+
+/**
+ * Retrieves active and inactive session ids (sorted in ascending order) for a quiz
+ * Active sessions are sessions that are not in the END state
+ * Inactive sessions are sessions in the END state
+ * @param {string} token
+ * @param {number} quizId
+ * @returns {SessionViewType}
+ */
+export function adminQuizSessionsView(token: string, quizId: number): SessionViewType {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'invalid token');
+  }
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'invalid quizId');
+  }
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'invalid quiz ownership');
+  }
+
+  const activeSessions = [];
+  const inactiveSessions = [];
+  for (const session of quiz.quizSessions) {
+    if (session.state === 'END') {
+      inactiveSessions.push(session.quizSessionId);
+    } else {
+      activeSessions.push(session.quizSessionId);
+    }
+  }
+  return {
+    activeSessions: activeSessions,
+    inactiveSessions: inactiveSessions
+  };
+}
+
+/**
+ * Joins a new player to some quiz session in LOBBY state
+ * @param {string} name
+ * @param {number} sessionId
+ * @returns {
+*  playerId: number
+* }
+*/
+export function adminQuizSessionPlayerJoin(
+  sessionId: number,
+  name: string
+): playerIdType {
+  const session = fetchSessionFromSessionId(sessionId);
+  if (session === undefined) {
+    throw HTTPError(400, 'Invalid sessionId');
+  }
+  if (session.state !== 'LOBBY') {
+    throw HTTPError(400, 'Session is not in LOBBY state');
+  }
+  if (session.players.find(player => player.playerName === name) !== undefined) {
+    throw HTTPError(400, 'Name of new player is not unique');
+  }
+  if (name === '') {
+    name = generateNewPlayerName();
+  }
+  const newPlayerId = generateNewPlayerId(sessionId);
+  session.players.push({ playerId: newPlayerId, playerName: name });
+  return { playerId: newPlayerId };
 }

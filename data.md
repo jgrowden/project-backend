@@ -105,7 +105,19 @@ let data = {
             duration: 60,
             thumbnailUrl: "http://google.com/some/image/path.jpg"
           }
-
+          playerAnswers: [
+            {
+              questionPosition: 1;
+              questionStartTime: 0;
+              answers: [
+                {
+                  playerId: 2;
+                  answerIds: [ 678 ];
+                  answerTime: 2;
+                }
+              ];
+            }
+          ]
         }
       ]
     }
