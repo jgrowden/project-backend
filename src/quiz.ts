@@ -1118,7 +1118,8 @@ export function adminQuizQuestionDuplicateV2(
     question: question.question,
     duration: question.duration,
     points: question.points,
-    answers: question.answers
+    answers: question.answers,
+    thumbnailUrl: question.thumbnailUrl
   };
 
   quiz.questions.splice(oldPosition + 1, 0, newQuestion);

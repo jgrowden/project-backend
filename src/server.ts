@@ -420,7 +420,7 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
 
 // adminQuizQuestionDuplicateV2 Route
 app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
-  const token = req.get('token') as string;
+  const token = req.header('token') as string;
   const quizId = parseInt(req.params.quizid);
   const questionId = parseInt(req.params.questionid);
   const result = adminQuizQuestionDuplicateV2(token, quizId, questionId);
