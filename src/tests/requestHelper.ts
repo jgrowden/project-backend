@@ -52,7 +52,7 @@ export const requestHelper = (
     };
   } catch (error) {
     bodyObject = {
-      error: `\
+      error: `
 Server responded with ${res.statusCode}, but body is not JSON!\n\n
 GIVEN:\n${bodyString}.\n
 REASON:\n${error.message}.\n

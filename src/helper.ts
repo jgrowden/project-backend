@@ -1,4 +1,12 @@
-import { getData, UserType, QuizType, QuestionType } from './dataStore';
+import {
+  getData,
+  UserType,
+  QuizType,
+  QuestionType,
+  SessionState,
+  QuizSessionType,
+  SessionAction
+} from './dataStore';
 
 export interface ErrorObject {
   error: string;
@@ -33,25 +41,54 @@ export const userWithEmailExists = (email: string): UserType | undefined => {
   return getData().users.find(user => user.email === email);
 };
 
-// generates psudorandom numbers, max 524287 unique Ids
-const hash = (i: number): number => {
-  return ((((54787 * i) % 524287) + 524287) % 524287);
+export const fetchSessionFromSessionId = (sessionId: number): QuizSessionType | undefined => {
+  const quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.quizSessionId === sessionId));
+  if (quiz === undefined) return undefined;
+  const session = quiz.quizSessions.find(quizSession => quizSession.quizSessionId === sessionId);
+  return session;
 };
 
-export const generateNewUserId = (): number => {
-  const data = getData();
-  let newUserId = 2354;
-  const userIds = data.users.map(user => user.authUserId);
-  while (userIds.includes(newUserId)) newUserId = hash(newUserId);
+// generates psudorandom numbers, max 524287 unique Ids
+export const hash = (i: number): number => {
+  return ((((524287 * i) % 39916801) + 39916801) % 39916801);
+};
+
+const newId = (): number => {
+  const newUserId = hash(getData().id);
+  getData().id++;
   return newUserId;
 };
 
+export const generateNewUserId = (): number => {
+  return newId();
+};
+
 export const generateNewQuizId = (): number => {
-  const data = getData();
-  let newQuizId = 2354;
-  const quizIds = data.quizzes.map(quiz => quiz.quizId);
-  while (quizIds.includes(newQuizId)) newQuizId = hash(newQuizId);
-  return newQuizId;
+  return newId();
+};
+
+export const generateNewPlayerId = (sessionId: number): number => {
+  return newId();
+};
+
+export const generateNewPlayerName = (): string => {
+  const letters = 'abcdefghijklmnopqrstuvwxyz';
+  const numbers = '0123456789';
+  const playerName: string[] = [];
+  let char;
+  for (let i = 0; i < 5; i++) {
+    char = letters.charAt(Math.floor(Math.random() * letters.length));
+    if (!(playerName.includes(char))) {
+      playerName.push(char);
+    }
+  }
+  for (let i = 0; i < 3; i++) {
+    char = numbers.charAt(Math.floor(Math.random() * numbers.length));
+    if (!(playerName.includes(char))) {
+      playerName.push(char);
+    }
+  }
+  return playerName.join('');
 };
 
 export const currentTime = (): number => {
@@ -70,33 +107,58 @@ export const returnError = (errorString: string, errorCode?: number): ErrorObjec
 };
 
 export const generateNewQuestionId = (): number => {
-  const data = getData();
-  let newQuestionId = 0;
-  const QuestionIds = [];
-  for (const quiz of data.quizzes) {
-    for (const question of quiz.questions) {
-      QuestionIds.push(question.questionId);
-    }
-  }
-  while (QuestionIds.includes(newQuestionId)) {
-    newQuestionId++;
-  }
-  return newQuestionId;
+  return newId();
 };
 
 export const generateQuizSessionId = (): number => {
-  const data = getData();
-  let newQuizSessionId = 0;
-  const quizSessionIds = [];
-  for (const quiz of data.quizzes) {
-    for (const quizSession of quiz.quizSessions) {
-      quizSessionIds.push(quizSession.quizSessionId);
+  return newId();
+};
+
+export const updateState = (state: SessionState, action: SessionAction): SessionState | undefined => {
+  if (state === SessionState.LOBBY) {
+    if (action === SessionAction.NEXT_QUESTION) {
+      return SessionState.QUESTION_COUNTDOWN;
+    } else if (action === SessionAction.END) {
+      return SessionState.END;
     }
+  } else if (state === SessionState.QUESTION_COUNTDOWN) {
+    if (action === SessionAction.SKIP_COUNTDOWN) {
+      return SessionState.QUESTION_OPEN;
+    } else if (action === SessionAction.END) {
+      return SessionState.END;
+    }
+  } else if (state === SessionState.QUESTION_OPEN) {
+    if (action === SessionAction.GO_TO_ANSWER) {
+      return SessionState.ANSWER_SHOW;
+    } else if (action === SessionAction.END) {
+      return SessionState.END;
+    }
+  } else if (state === SessionState.QUESTION_CLOSE) {
+    if (action === SessionAction.NEXT_QUESTION) {
+      return SessionState.QUESTION_COUNTDOWN;
+    } else if (action === SessionAction.GO_TO_ANSWER) {
+      return SessionState.ANSWER_SHOW;
+    } else if (action === SessionAction.GO_TO_FINAL_RESULTS) {
+      return SessionState.FINAL_RESULTS;
+    } else if (action === SessionAction.END) {
+      return SessionState.END;
+    }
+  } else if (state === SessionState.ANSWER_SHOW) {
+    if (action === SessionAction.NEXT_QUESTION) {
+      return SessionState.QUESTION_COUNTDOWN;
+    } else if (action === SessionAction.GO_TO_FINAL_RESULTS) {
+      return SessionState.FINAL_RESULTS;
+    } else if (action === SessionAction.END) {
+      return SessionState.END;
+    }
+  } else if (state === SessionState.FINAL_RESULTS) {
+    if (action === SessionAction.END) {
+      return SessionState.END;
+    }
+  } else if (state === SessionState.END) {
+    // do nothing;
   }
-  while (quizSessionIds.includes(newQuizSessionId)) {
-    newQuizSessionId++;
-  }
-  return newQuizSessionId;
+  return undefined;
 };
 
 /**
@@ -118,5 +180,12 @@ export const setRandomColour = (colours: string[]): string => {
  * @returns {number}
  */
 export const setAnswerId = (): number => {
-  return ~~(Math.random() * 1000);
+  return newId();
+};
+
+export const isValidThumbnail = (thumbnail: string) => {
+  if (!/\.(jpg|jpeg|png)$/i.test(thumbnail) || !/^https?:\/\//.test(thumbnail)) {
+    return false;
+  }
+  return true;
 };
