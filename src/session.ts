@@ -331,3 +331,32 @@ export function adminQuizSessionPlayerAnswer(playerId: number, questionPosition:
 
   return {};
 }
+
+export function adminQuizSessionFinalResults(token: string, quizId: number, sessionId: number) {
+  
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'User not found');
+  }
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Quiz not found');
+  }
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'User does not own quiz');
+  }
+  const session = fetchSessionFromSessionId(sessionId);
+  if (!session) {
+    throw HTTPError(400, 'Session not found');
+  }
+  if (session.quizSessionId !== sessionId) {
+    throw HTTPError(400, 'SessionId is not a session of this quiz');
+  }
+
+  if (session.state !== 'FINAL_RESULTS') {
+    throw HTTPError(400, 'Action is not in FINAL_RESULTS state');
+  }
+
+  
+
+}
