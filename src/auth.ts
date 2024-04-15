@@ -269,6 +269,51 @@ export function adminUserDetailsUpdate(
   return {};
 }
 
+export function adminUserDetailsUpdateV2(
+  sessionId: string,
+  email: string,
+  nameFirst: string,
+  nameLast: string
+): ErrorObjectWithCode | Record<string, never> {
+  const userToEdit = fetchUserFromSessionId(sessionId);
+  if (!userToEdit) {
+    throw HTTPError(401, 'User ID not found');
+  }
+
+  if (validator.isEmail(email) === false) {
+    throw HTTPError(400, 'Invalid email');
+  }
+
+  if (validName(nameFirst)) {
+    throw HTTPError(400, 'Invalid first name');
+  }
+  if (nameFirst.length < userNameMinLength || nameFirst.length > userNameMaxLength) {
+    throw HTTPError(400, 'First name does not satisfy length requirements');
+  }
+
+  if (validName(nameLast)) {
+    throw HTTPError(400, 'Invalid last name');
+  }
+  if (nameLast.length < userNameMinLength || nameLast.length > userNameMaxLength) {
+    throw HTTPError(400, 'Last name does not satisfy length requirements');
+  }
+
+  // get userId from sessionId
+  // loop through datastore userIds
+  // if a user has the same email and a different userId, email already registered
+
+  const registered = getData().users.find(user => user.email === email && user.authUserId !== userToEdit.authUserId);
+  if (registered !== undefined) {
+    throw HTTPError(400, 'Email already registered');
+  }
+
+  userToEdit.email = email;
+  userToEdit.nameFirst = nameFirst;
+  userToEdit.nameLast = nameLast;
+
+  return {};
+}
+
 /**
  * Given details relating to a password change, update the password of a logged in user.
  *

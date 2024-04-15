@@ -58,6 +58,9 @@ export const requestUserDetails = (token: string) =>
 export const requestUserDetailsUpdate = (token: string, email: string, nameFirst: string, nameLast: string) =>
   requestHelper('PUT', '/v1/admin/user/details', { token, email, nameFirst, nameLast });
 
+export const requestUserDetailsUpdateV2 = (token: string, email: string, nameFirst: string, nameLast: string) =>
+  requestHelper('PUT', '/v2/admin/user/details', { email, nameFirst, nameLast }, { token });
+
 export const requestUserPasswordUpdate = (token: string, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v1/admin/user/password', { token, oldPassword, newPassword });
 

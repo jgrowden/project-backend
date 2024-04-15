@@ -17,7 +17,8 @@ import {
   adminUserPasswordUpdate,
   adminUserDetailsUpdate,
   adminAuthLogout,
-  adminAuthLogoutV2
+  adminAuthLogoutV2,
+  adminUserDetailsUpdateV2
 } from './auth';
 import {
   adminQuizList,
@@ -155,6 +156,15 @@ app.put('/v1/admin/user/details', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminUserDetailsUpdate Route
+app.put('/v2/admin/user/details', (req: Request, res: Response) => {
+  const { email, nameFirst, nameLast } = req.body;
+  const token = req.get('token') as string;
+  const result = adminUserDetailsUpdateV2(token, email, nameFirst, nameLast);
   save();
   res.json(result);
 });
