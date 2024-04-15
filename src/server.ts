@@ -218,7 +218,7 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
 
 // adminUserPasswordUpdateV2 Route
 app.put('/v2/admin/user/password', (req: Request, res: Response) => {
-  const token = req.get('token') as string;
+  const token = req.header('token') as string;
   const { oldPassword, newPassword } = req.body;
   const result = adminUserPasswordUpdateV2(token, oldPassword, newPassword);
   save();
