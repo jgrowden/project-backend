@@ -34,7 +34,7 @@ import {
   adminQuizQuestionUpdate,
   adminQuizQuestionUpdateV2,
   adminQuizQuestionMove,
-  adminQuizTrashList,
+  adminQuizTrashInfo,
   adminQuizRestore,
   adminQuizTrashEmpty,
   adminQuizChangeOwner,
@@ -43,7 +43,8 @@ import {
   adminQuizQuestionDelete,
   adminQuizQuestionDeleteV2,
   adminQuizCreateV2,
-  adminQuizThumbnailUpdate
+  adminQuizThumbnailUpdate,
+  adminQuizTrashInfoV2
 } from './quiz';
 import {
   adminQuizSessionInfo,
@@ -232,13 +233,21 @@ app.delete('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
   res.json(result);
 });
 
-// adminQuizTrashList Route
+// adminQuizTrashInfo Route
 app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
   const token = req.query.token as string;
-  const result = adminQuizTrashList(token);
+  const result = adminQuizTrashInfo(token);
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizTrashInfoV2  Route
+app.get('/v2/admin/quiz/trash', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const result = adminQuizTrashInfoV2(token);
   save();
   res.json(result);
 });

@@ -46,6 +46,9 @@ export const requestQuizQuestionCreateV2 = (token: string, quizId: number, quest
 export const requestQuizTrashInfo = (token: string) =>
   requestHelper('GET', '/v1/admin/quiz/trash', { token });
 
+export const requestQuizTrashInfoV2 = (token: string) =>
+  requestHelper('GET', '/v2/admin/quiz/trash', {}, { token });
+
 export const requestQuizRestore = (token: string, quizId: number) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/restore`, { token });
 
