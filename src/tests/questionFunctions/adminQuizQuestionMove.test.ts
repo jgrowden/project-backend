@@ -2,7 +2,6 @@ import { requestAuthRegister, requestQuizCreate, requestQuizCreateV2, requestQui
 import { QuestionType } from '../../dataStore';
 import HTTPError from 'http-errors';
 
-
 let token: string;
 let quizId: number;
 let questionId1: number;

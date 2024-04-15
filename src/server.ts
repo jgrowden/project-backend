@@ -417,7 +417,6 @@ app.put('/v2/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: 
   res.json(result);
 });
 
-
 // adminQuizQuestionDuplicate Route
 app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
