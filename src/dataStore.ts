@@ -49,7 +49,7 @@ export interface PlayerAnswerType { // answers
   answerTime: number;
 }
 
-export interface QuestionPlayerAnswersType { // questionAnswers
+export interface QuestionPlayerAnswersType { // questionAnswers for each question
   questionPosition: number;
   questionStartTime: number;
   answers: PlayerAnswerType[];

@@ -121,6 +121,9 @@ export const requestPlayerQuestionPosition = (playerId: number, questionPosition
 export const requestQuizSessionPlayerAnswer = (playerId: number, questionPosition: number, answerIds: number[]) =>
   requestHelper('PUT', `/v1/player/${playerId}/question/${questionPosition}/answer`, { answerIds }, {});
 
+export const requestQuestionResults = (playerId: number, questionPosition: number) =>
+  requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}/results`, {}, {});
+
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 
 export const errorCode = (statusCode: number) => {

@@ -51,11 +51,12 @@ import {
   adminQuizSessionStart,
   adminQuizSessionsView,
   adminQuizSessionPlayerJoin,
-  adminQuizSessionPlayerAnswer,
   adminQuizSessionUpdate
 } from './session';
 import {
+  playerQuestionAnswer,
   playerQuestionPosition,
+  playerQuestionResults,
   playerStatus
 } from './player';
 
@@ -519,8 +520,16 @@ app.put('/v1/player/:playerid/question/:questionposition/answer', (req:Request, 
   const playerId = parseInt(req.params.playerid);
   const questionPosition = parseInt(req.params.questionposition);
   const { answerIds } = req.body;
-  const result = adminQuizSessionPlayerAnswer(playerId, questionPosition, answerIds);
+  const result = playerQuestionAnswer(playerId, questionPosition, answerIds);
   save();
+  res.json(result);
+});
+
+// playerQuestionResults Route
+app.get('/v1/player/:playerid/question/:questionposition/results', (req:Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const questionPosition = parseInt(req.params.questionposition);
+  const result = playerQuestionResults(playerId, questionPosition);
   res.json(result);
 });
 
