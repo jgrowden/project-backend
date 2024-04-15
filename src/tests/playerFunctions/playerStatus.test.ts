@@ -55,7 +55,7 @@ describe('Testing for GET /v1/player/{playerId}', () => {
       jsonBody: {
         state: 'LOBBY',
         numQuestions: 3,
-        atQuestion: -1,
+        atQuestion: 0,
       }
     });
     expect(requestPlayerStatus(playerId2)).toStrictEqual({
@@ -63,7 +63,7 @@ describe('Testing for GET /v1/player/{playerId}', () => {
       jsonBody: {
         state: 'LOBBY',
         numQuestions: 3,
-        atQuestion: -1,
+        atQuestion: 0,
       }
     });
     requestQuizSessionUpdate(token, quizId, sessionId, 'NEXT_QUESTION');
@@ -72,7 +72,7 @@ describe('Testing for GET /v1/player/{playerId}', () => {
       jsonBody: {
         state: 'QUESTION_COUNTDOWN',
         numQuestions: 3,
-        atQuestion: 0,
+        atQuestion: 1,
       }
     });
     expect(requestPlayerStatus(playerId2)).toStrictEqual({
@@ -80,7 +80,7 @@ describe('Testing for GET /v1/player/{playerId}', () => {
       jsonBody: {
         state: 'QUESTION_COUNTDOWN',
         numQuestions: 3,
-        atQuestion: 0,
+        atQuestion: 1,
       }
     });
     requestQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN');
@@ -89,7 +89,7 @@ describe('Testing for GET /v1/player/{playerId}', () => {
       jsonBody: {
         state: 'QUESTION_OPEN',
         numQuestions: 3,
-        atQuestion: 0,
+        atQuestion: 1,
       }
     });
     expect(requestPlayerStatus(playerId2)).toStrictEqual({
@@ -97,7 +97,7 @@ describe('Testing for GET /v1/player/{playerId}', () => {
       jsonBody: {
         state: 'QUESTION_OPEN',
         numQuestions: 3,
-        atQuestion: 0,
+        atQuestion: 1,
       }
     });
     requestQuizSessionUpdate(token, quizId, sessionId, 'GO_TO_ANSWER');
@@ -106,7 +106,7 @@ describe('Testing for GET /v1/player/{playerId}', () => {
       jsonBody: {
         state: 'ANSWER_SHOW',
         numQuestions: 3,
-        atQuestion: 0,
+        atQuestion: 1,
       }
     });
     expect(requestPlayerStatus(playerId2)).toStrictEqual({
@@ -114,7 +114,7 @@ describe('Testing for GET /v1/player/{playerId}', () => {
       jsonBody: {
         state: 'ANSWER_SHOW',
         numQuestions: 3,
-        atQuestion: 0,
+        atQuestion: 1,
       }
     });
     requestQuizSessionUpdate(token, quizId, sessionId, 'NEXT_QUESTION');
@@ -123,7 +123,7 @@ describe('Testing for GET /v1/player/{playerId}', () => {
       jsonBody: {
         state: 'QUESTION_COUNTDOWN',
         numQuestions: 3,
-        atQuestion: 1,
+        atQuestion: 2,
       }
     });
     expect(requestPlayerStatus(playerId2)).toStrictEqual({
@@ -131,7 +131,7 @@ describe('Testing for GET /v1/player/{playerId}', () => {
       jsonBody: {
         state: 'QUESTION_COUNTDOWN',
         numQuestions: 3,
-        atQuestion: 1,
+        atQuestion: 2,
       }
     });
     requestQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN');
@@ -142,7 +142,7 @@ describe('Testing for GET /v1/player/{playerId}', () => {
       jsonBody: {
         state: 'FINAL_RESULTS',
         numQuestions: 3,
-        atQuestion: -1,
+        atQuestion: 0,
       }
     });
     expect(requestPlayerStatus(playerId2)).toStrictEqual({
@@ -150,7 +150,7 @@ describe('Testing for GET /v1/player/{playerId}', () => {
       jsonBody: {
         state: 'FINAL_RESULTS',
         numQuestions: 3,
-        atQuestion: -1,
+        atQuestion: 0,
       }
     });
     requestQuizSessionUpdate(token, quizId, sessionId, 'END');
@@ -159,7 +159,7 @@ describe('Testing for GET /v1/player/{playerId}', () => {
       jsonBody: {
         state: 'END',
         numQuestions: 3,
-        atQuestion: -1,
+        atQuestion: 0,
       }
     });
     expect(requestPlayerStatus(playerId2)).toStrictEqual({
@@ -167,7 +167,7 @@ describe('Testing for GET /v1/player/{playerId}', () => {
       jsonBody: {
         state: 'END',
         numQuestions: 3,
-        atQuestion: -1,
+        atQuestion: 0,
       }
     });
   });

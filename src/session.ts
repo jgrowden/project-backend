@@ -4,7 +4,6 @@ import {
   SessionAction,
   SessionState,
   getTimeoutData,
-  getData
 } from './dataStore';
 import {
   fetchUserFromSessionId,
@@ -20,6 +19,14 @@ import {
 
 export interface SessionIdType {
   sessionId: number;
+}
+
+interface playerIdType {
+  playerId: number;
+}
+interface SessionViewType {
+  activeSessions: number[];
+  inactiveSessions: number[];
 }
 
 /**
@@ -75,7 +82,7 @@ export function adminQuizSessionStart(token: string, quizId: number, autoStartNu
 
   quiz.quizSessions.push({
     state: 'LOBBY',
-    atQuestion: -1,
+    atQuestion: 0,
     players: [],
     quizSessionId: quizSessionId,
     autoStartNum: autoStartNum,
@@ -161,7 +168,7 @@ export function adminQuizSessionUpdate(
           break;
         }
       }
-    }, session.metadata.questions[session.atQuestion].duration * 1000);
+    }, session.metadata.questions[session.atQuestion - 1].duration * 1000);
     getTimeoutData().push({
       timeoutId: timeoutId,
       sessionId: sessionId
@@ -176,8 +183,76 @@ export function adminQuizSessionUpdate(
   return {};
 }
 
-interface playerIdType {
-  playerId: number;
+/**
+ * Retrieves information about a session, including state, the current question,
+ * the players, and the quiz information
+ */
+export function adminQuizSessionInfo (token: string, quizId: number, sessionId: number) {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'User not found');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Quiz not found');
+  }
+
+  if (user.authUserId !== quiz.ownerId) {
+    throw HTTPError(403, 'User does not own this quiz');
+  }
+
+  for (const session of quiz.quizSessions) {
+    if (session.quizSessionId === sessionId) {
+      const metadata = JSON.parse(JSON.stringify(session.metadata));
+      delete metadata.ownerId;
+      delete metadata.quizSessions;
+      return {
+        state: session.state,
+        atQuestion: session.atQuestion,
+        players: session.players,
+        metadata: metadata
+      };
+    }
+  }
+
+  throw HTTPError(400, 'Session not found');
+}
+
+/**
+ * Retrieves active and inactive session ids (sorted in ascending order) for a quiz
+ * Active sessions are sessions that are not in the END state
+ * Inactive sessions are sessions in the END state
+ * @param {string} token
+ * @param {number} quizId
+ * @returns {SessionViewType}
+ */
+export function adminQuizSessionsView(token: string, quizId: number): SessionViewType {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'invalid token');
+  }
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'invalid quizId');
+  }
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'invalid quiz ownership');
+  }
+
+  const activeSessions = [];
+  const inactiveSessions = [];
+  for (const session of quiz.quizSessions) {
+    if (session.state === 'END') {
+      inactiveSessions.push(session.quizSessionId);
+    } else {
+      activeSessions.push(session.quizSessionId);
+    }
+  }
+  return {
+    activeSessions: activeSessions,
+    inactiveSessions: inactiveSessions
+  };
 }
 
 /**
@@ -208,32 +283,4 @@ export function adminQuizSessionPlayerJoin(
   const newPlayerId = generateNewPlayerId(sessionId);
   session.players.push({ playerId: newPlayerId, playerName: name });
   return { playerId: newPlayerId };
-}
-
-export function adminQuizSessionPlayerAnswer(playerId: number, questionPosition: number, answerIds: number[]) {
-  // fetch quiz session from player id
-  const quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.players.some(player => player.playerId === playerId)));
-  if (!quiz) throw HTTPError(400, 'Invalid player id');
-  const session = quiz.quizSessions.find(session => session.players.some(player => player.playerId === playerId));
-  if (session.metadata.questions.length < questionPosition || questionPosition < 1) throw HTTPError(400, 'Invalid quesiton number');
-  if (session.state !== 'QUESTION_OPEN') throw HTTPError(400, 'Session is not in QUESTIONS_OPEN state');
-  if (answerIds.length <= 0) throw HTTPError(400, 'Less than 1 answerId submitted');
-  let validAnswerIdFlag = true;
-  let noDuplicateAnswerIdFlag = true;
-  for (const answerId of answerIds) {
-    if (!session.metadata.questions[questionPosition - 1].answers.some(answer => answer.answerId === answerId)) validAnswerIdFlag = false;
-    if (answerIds.filter(someAnswerId => someAnswerId === answerId).length !== 1) noDuplicateAnswerIdFlag = false;
-  }
-  if (!validAnswerIdFlag) throw HTTPError(400, 'Invalid answer Id');
-  if (!noDuplicateAnswerIdFlag) throw HTTPError(400, 'Duplicate answer Ids');
-
-  // according to the specification, the $N$th person who got all the correct answers gets a score of P/N.
-  const questionAnswers = session.playerAnswers.find(playerAnswer => playerAnswer.questionPosition === questionPosition - 1);
-  questionAnswers.answers.push({
-    playerId: playerId,
-    answerIds: answerIds,
-    answerTime: currentTime()
-  });
-
-  return {};
 }

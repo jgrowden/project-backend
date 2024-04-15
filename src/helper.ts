@@ -5,7 +5,8 @@ import {
   QuestionType,
   SessionState,
   QuizSessionType,
-  SessionAction
+  SessionAction,
+  QuestionPlayerAnswersType
 } from './dataStore';
 
 export interface ErrorObject {
@@ -45,6 +46,14 @@ export const fetchSessionFromSessionId = (sessionId: number): QuizSessionType | 
   const quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.quizSessionId === sessionId));
   if (quiz === undefined) return undefined;
   const session = quiz.quizSessions.find(quizSession => quizSession.quizSessionId === sessionId);
+  return session;
+};
+
+export const fetchQuizSessionFromPlayerId = (playerId: number): QuizSessionType | undefined => {
+  const quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.players.some(player => player.playerId === playerId)));
+  if (quiz === undefined) return undefined;
+  const session = quiz.quizSessions.find(session => session.players.some(player => player.playerId === playerId));
+  if (session === undefined) return undefined;
   return session;
 };
 
@@ -188,4 +197,23 @@ export const isValidThumbnail = (thumbnail: string) => {
     return false;
   }
   return true;
+};
+
+export const calculateQuestionAverageAnswerTime = (playerAnswers: QuestionPlayerAnswersType) => {
+  let totalTimeTaken = 0;
+  let numAnswers = 0;
+
+  for (const answer of playerAnswers.answers) {
+    totalTimeTaken += (answer.answerTime - playerAnswers.questionStartTime);
+    numAnswers++;
+  }
+
+  let averageTime: number;
+  if (numAnswers === 0) {
+    averageTime = 0;
+  } else {
+    averageTime = Math.floor(totalTimeTaken / numAnswers);
+  }
+
+  return averageTime;
 };

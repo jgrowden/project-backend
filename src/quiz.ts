@@ -438,12 +438,27 @@ export function adminQuizRemoveV2(
 *    ]
 * }} - object with list of all quizzes by their unique ID number and name.
  */
-export function adminQuizTrashList(
+export function adminQuizTrashInfo(
   sessionId: string
 ): ErrorObjectWithCode | AdminQuizListReturn {
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
-    return returnError("invalid user ID'", 401);
+    return returnError('invalid user ID', 401);
+  }
+
+  const data = getData();
+  const userDeletedQuizzes = data.deletedQuizzes.filter(quiz => quiz.ownerId === user.authUserId);
+  const trashedQuizList = userDeletedQuizzes.map(quiz => { return { quizId: quiz.quizId, name: quiz.name }; });
+
+  return { quizzes: trashedQuizList };
+}
+
+export function adminQuizTrashInfoV2(
+  sessionId: string
+): ErrorObjectWithCode | AdminQuizListReturn {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    throw HTTPError(401, 'invalid user ID');
   }
 
   const data = getData();
@@ -672,6 +687,10 @@ export function adminQuizQuestionCreateV2(
 
   if (questionBody.answers.find(answer => answer.correct === true) === undefined) {
     throw HTTPError(400, 'There are no correct answers');
+  }
+
+  if (questionBody.thumbnailUrl === undefined || questionBody.thumbnailUrl.length === 0) {
+    throw HTTPError(400, 'invalid thumbnail url');
   }
 
   if (!isValidThumbnail(questionBody.thumbnailUrl)) {
