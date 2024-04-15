@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizCreateV2, requestQuizInfo, requestQuizInfoV2, requestQuizQuestionCreate,requestQuizQuestionCreateV2, requestQuizQuestionDuplicate, requestQuizQuestionDuplicateV2, clear, errorCode } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizCreateV2, requestQuizInfo, requestQuizInfoV2, requestQuizQuestionCreate, requestQuizQuestionCreateV2, requestQuizQuestionDuplicate, requestQuizQuestionDuplicateV2, clear, errorCode } from '../wrapper';
 import { QuestionType } from '../../dataStore';
 import HTTPError from 'http-errors';
 

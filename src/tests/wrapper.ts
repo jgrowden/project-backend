@@ -132,4 +132,3 @@ export const clear = () => requestHelper('DELETE', '/v1/clear');
 export const errorCode = (statusCode: number) => {
   return { statusCode: statusCode, jsonBody: { error: expect.any(String) } };
 };
-
