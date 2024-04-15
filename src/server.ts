@@ -413,9 +413,6 @@ app.put('/v2/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: 
   const questionId = parseInt(req.params.questionid);
   const { newPosition } = req.body;
   const result = adminQuizQuestionMoveV2(token, quizId, questionId, newPosition);
-  if ('errorCode' in result) {
-    return res.status(result.errorCode).json(result.errorObject);
-  }
   save();
   res.json(result);
 });

@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestAuthRegisterV2, requestQuizCreate, requestQuizCreateV2, requestQuizInfo, requestQuizInfoV2, requestQuizQuestionCreate, requestQuizQuestionCreateV2, requestQuizQuestionMove, requestQuizQuestionMoveV2, clear, errorCode } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizCreateV2, requestQuizInfo, requestQuizInfoV2, requestQuizQuestionCreate, requestQuizQuestionCreateV2, requestQuizQuestionMove, requestQuizQuestionMoveV2, clear, errorCode } from '../wrapper';
 import { QuestionType } from '../../dataStore';
 import HTTPError from 'http-errors';
 
@@ -9,36 +9,36 @@ let questionId1: number;
 let questionId2: number;
 let questionId3: number;
 
-beforeEach(() => {
-  clear();
-  const user = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
-  token = user.jsonBody.token as string;
-  const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
-  quizId = quiz.jsonBody.quizId as number;
-  const questionBody1: QuestionType = {
-    question: 'Question1?',
-    duration: 3,
-    points: 4,
-    answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
-  };
-  const questionBody2: QuestionType = {
-    question: 'Question2?',
-    duration: 3,
-    points: 4,
-    answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
-  };
-  const questionBody3: QuestionType = {
-    question: 'Question3?',
-    duration: 3,
-    points: 4,
-    answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
-  };
-  questionId1 = requestQuizQuestionCreate(token, quizId, questionBody1).jsonBody.questionId as number;
-  questionId2 = requestQuizQuestionCreate(token, quizId, questionBody2).jsonBody.questionId as number;
-  questionId3 = requestQuizQuestionCreate(token, quizId, questionBody3).jsonBody.questionId as number;
-});
-
 describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
+  beforeEach(() => {
+    clear();
+    const user = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
+    token = user.jsonBody.token as string;
+    const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
+    quizId = quiz.jsonBody.quizId as number;
+    const questionBody1: QuestionType = {
+      question: 'Question1?',
+      duration: 3,
+      points: 4,
+      answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
+    };
+    const questionBody2: QuestionType = {
+      question: 'Question2?',
+      duration: 3,
+      points: 4,
+      answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
+    };
+    const questionBody3: QuestionType = {
+      question: 'Question3?',
+      duration: 3,
+      points: 4,
+      answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
+    };
+    questionId1 = requestQuizQuestionCreate(token, quizId, questionBody1).jsonBody.questionId as number;
+    questionId2 = requestQuizQuestionCreate(token, quizId, questionBody2).jsonBody.questionId as number;
+    questionId3 = requestQuizQuestionCreate(token, quizId, questionBody3).jsonBody.questionId as number;
+  });
+
   test('Successfully moving quiz to start', () => {
     expect(requestQuizQuestionMove(token, quizId, questionId3, 0)).toStrictEqual({
       statusCode: 200,
@@ -317,6 +317,37 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
 });
 
 describe('Testing /v2/admin/quiz/{quizid}/question/{questionid}/move:', () => {
+  beforeEach(() => {
+    clear();
+    const user = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
+    token = user.jsonBody.token as string;
+    const quiz = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');
+    quizId = quiz.jsonBody.quizId as number;
+    const questionBody1: QuestionType = {
+      question: 'Question1?',
+      duration: 3,
+      points: 4,
+      thumbnailUrl: 'http://example.com/birb.jpg',
+      answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
+    };
+    const questionBody2: QuestionType = {
+      question: 'Question2?',
+      duration: 3,
+      points: 4,
+      thumbnailUrl: 'http://example.com/birb.jpg',
+      answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
+    };
+    const questionBody3: QuestionType = {
+      question: 'Question3?',
+      duration: 3,
+      points: 4,
+      thumbnailUrl: 'http://example.com/birb.jpg',
+      answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
+    };
+    questionId1 = requestQuizQuestionCreateV2(token, quizId, questionBody1).jsonBody.questionId as number;
+    questionId2 = requestQuizQuestionCreateV2(token, quizId, questionBody2).jsonBody.questionId as number;
+    questionId3 = requestQuizQuestionCreateV2(token, quizId, questionBody3).jsonBody.questionId as number;
+  });
   test('Successfully moving quiz to start', () => {
     expect(requestQuizQuestionMoveV2(token, quizId, questionId3, 0)).toStrictEqual({
       statusCode: 200,
@@ -332,12 +363,14 @@ describe('Testing /v2/admin/quiz/{quizid}/question/{questionid}/move:', () => {
         description: 'Quiz Description',
         duration: 9,
         numQuestions: 3,
+        thumbnailUrl: '',
         questions: [
           {
             questionId: questionId3,
             question: 'Question3?',
             duration: 3,
             points: 4,
+            thumbnailUrl: 'http://example.com/birb.jpg',
             answers: [
               {
                 answerId: expect.any(Number),
@@ -358,6 +391,7 @@ describe('Testing /v2/admin/quiz/{quizid}/question/{questionid}/move:', () => {
             question: 'Question1?',
             duration: 3,
             points: 4,
+            thumbnailUrl: 'http://example.com/birb.jpg',
             answers: [
               {
                 answerId: expect.any(Number),
@@ -378,6 +412,7 @@ describe('Testing /v2/admin/quiz/{quizid}/question/{questionid}/move:', () => {
             question: 'Question2?',
             duration: 3,
             points: 4,
+            thumbnailUrl: 'http://example.com/birb.jpg',
             answers: [
               {
                 answerId: expect.any(Number),
@@ -412,12 +447,14 @@ describe('Testing /v2/admin/quiz/{quizid}/question/{questionid}/move:', () => {
         description: 'Quiz Description',
         duration: 9,
         numQuestions: 3,
+        thumbnailUrl: '',
         questions: [
           {
             questionId: questionId2,
             question: 'Question2?',
             duration: 3,
             points: 4,
+            thumbnailUrl: 'http://example.com/birb.jpg',
             answers: [
               {
                 answerId: expect.any(Number),
@@ -438,6 +475,7 @@ describe('Testing /v2/admin/quiz/{quizid}/question/{questionid}/move:', () => {
             question: 'Question3?',
             duration: 3,
             points: 4,
+            thumbnailUrl: 'http://example.com/birb.jpg',
             answers: [
               {
                 answerId: expect.any(Number),
@@ -458,6 +496,7 @@ describe('Testing /v2/admin/quiz/{quizid}/question/{questionid}/move:', () => {
             question: 'Question1?',
             duration: 3,
             points: 4,
+            thumbnailUrl: 'http://example.com/birb.jpg',
             answers: [
               {
                 answerId: expect.any(Number),
@@ -492,12 +531,14 @@ describe('Testing /v2/admin/quiz/{quizid}/question/{questionid}/move:', () => {
         description: 'Quiz Description',
         duration: 9,
         numQuestions: 3,
+        thumbnailUrl: '',
         questions: [
           {
             questionId: questionId2,
             question: 'Question2?',
             duration: 3,
             points: 4,
+            thumbnailUrl: 'http://example.com/birb.jpg',
             answers: [
               {
                 answerId: expect.any(Number),
@@ -518,6 +559,7 @@ describe('Testing /v2/admin/quiz/{quizid}/question/{questionid}/move:', () => {
             question: 'Question1?',
             duration: 3,
             points: 4,
+            thumbnailUrl: 'http://example.com/birb.jpg',
             answers: [
               {
                 answerId: expect.any(Number),
@@ -538,6 +580,7 @@ describe('Testing /v2/admin/quiz/{quizid}/question/{questionid}/move:', () => {
             question: 'Question3?',
             duration: 3,
             points: 4,
+            thumbnailUrl: 'http://example.com/birb.jpg',
             answers: [
               {
                 answerId: expect.any(Number),
@@ -579,7 +622,7 @@ describe('Testing /v2/admin/quiz/{quizid}/question/{questionid}/move:', () => {
     expect(() => requestQuizQuestionMoveV2(token, quizId + 1, questionId1, 0)).toThrow(HTTPError[403]);
   });
   test('Failed test: User does not own the quiz.', () => {
-    const newUser = requestAuthRegisterV2('frieren.theslayer@gmail.com', 'ushouldwatchfr1eren', 'Frieren', 'TheSlayer');
+    const newUser = requestAuthRegister('frieren.theslayer@gmail.com', 'ushouldwatchfr1eren', 'Frieren', 'TheSlayer');
     const newToken = newUser.jsonBody.token as string;
     const newQuiz = requestQuizCreateV2(newToken, 'Quiz Name', 'Quiz Description');
     const newQuizId = newQuiz.jsonBody.quizId as number;
@@ -587,6 +630,7 @@ describe('Testing /v2/admin/quiz/{quizid}/question/{questionid}/move:', () => {
       question: 'new question',
       duration: 3,
       points: 4,
+      thumbnailUrl: 'http://example.com/birb.jpg',
       answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
     };
     const newQuestionId = requestQuizQuestionCreateV2(newToken, newQuizId, newQuestionBody).jsonBody.questionId as number;
