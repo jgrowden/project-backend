@@ -34,6 +34,7 @@ import {
   adminQuizQuestionUpdate,
   adminQuizQuestionUpdateV2,
   adminQuizQuestionMove,
+  adminQuizQuestionMoveV2,
   adminQuizTrashInfo,
   adminQuizRestore,
   adminQuizTrashEmpty,
@@ -401,6 +402,17 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: 
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizQuestionMoveV2 Route
+app.put('/v2/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: Response) => {
+  const token = req.header('token') as string;
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const { newPosition } = req.body;
+  const result = adminQuizQuestionMoveV2(token, quizId, questionId, newPosition);
   save();
   res.json(result);
 });
