@@ -16,6 +16,9 @@ export const requestAuthLogoutV2 = (token: string) =>
 export const requestQuizList = (token: string) =>
   requestHelper('GET', '/v1/admin/quiz/list', { token });
 
+export const requestQuizListV2 = (token: string) =>
+  requestHelper('GET', '/v2/admin/quiz/list', {}, { token });
+
 export const requestQuizCreate = (token: string, name: string, description: string) =>
   requestHelper('POST', '/v1/admin/quiz', { token, name, description });
 
@@ -66,6 +69,9 @@ export const requestUserDetailsUpdateV2 = (token: string, email: string, nameFir
 
 export const requestUserPasswordUpdate = (token: string, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v1/admin/user/password', { token, oldPassword, newPassword });
+
+export const requestUserPasswordUpdateV2 = (token: string, oldPassword: string, newPassword: string) =>
+  requestHelper('PUT', '/v2/admin/user/password', { oldPassword, newPassword }, { token });
 
 export const requestQuizNameUpdate = (token: string, quizId: number, name: string) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/name`, { token, name });

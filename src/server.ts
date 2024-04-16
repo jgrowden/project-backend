@@ -15,6 +15,7 @@ import {
   adminAuthLogin,
   adminUserDetails,
   adminUserPasswordUpdate,
+  adminUserPasswordUpdateV2,
   adminUserDetailsUpdate,
   adminAuthLogout,
   adminAuthLogoutV2,
@@ -22,6 +23,7 @@ import {
 } from './auth';
 import {
   adminQuizList,
+  adminQuizListV2,
   adminQuizCreate,
   adminQuizRemove,
   adminQuizRemoveV2,
@@ -184,6 +186,14 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizListV2 Route
+app.get('/v2/admin/quiz/list', (req: Request, res: Response) => {
+  const token = req.header('token') as string;
+  const result = adminQuizListV2(token);
+  save();
+  res.json(result);
+});
+
 // adminQuizCreate route
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const { token, name, description } = req.body;
@@ -211,6 +221,15 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminUserPasswordUpdateV2 Route
+app.put('/v2/admin/user/password', (req: Request, res: Response) => {
+  const token = req.header('token') as string;
+  const { oldPassword, newPassword } = req.body;
+  const result = adminUserPasswordUpdateV2(token, oldPassword, newPassword);
   save();
   res.json(result);
 });
