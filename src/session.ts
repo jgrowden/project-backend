@@ -4,12 +4,7 @@ import {
   QuizSessionType,
   SessionAction,
   SessionState,
-<<<<<<< HEAD
-  getData,
-  getTimeoutData
-=======
   getTimeoutData,
->>>>>>> master
 } from './dataStore';
 import {
   fetchUserFromSessionId,
@@ -213,13 +208,16 @@ export function adminQuizSessionResultsCSV(token: string, quizId: number, sessio
     header.push(`question${i}rank `);
   }
 
-  let playerArray: string[];
-  csvData.push(header);
-  playerArray = [];
   for (let i = 0; i < quizSession.players.length; i++) {
-    let player_array = [];
-    player_array.push(`${quizSession.players[i].playerName}`);
+    csvData.push([`${quizSession.players[i].playerName}`]);
   }
+
+  for (let i = 0; i < quizSession.players.length; i++) {
+    for(let i = 0; i < quiz.numQuestions; i++) {
+
+    }
+  }
+  
 }
 
 /**
