@@ -23,6 +23,12 @@ export interface ErrorString {
   error: string
 }
 
+interface playerNameWithScoreAndTime {
+  name: string;
+  score: number;
+  timeToAnswer?: number;
+}
+
 export const fetchUserFromSessionId = (sessionId: string): UserType | undefined => {
   return getData().users.find(user => user.sessions.some(session => session === sessionId));
 };
@@ -212,8 +218,116 @@ export const calculateQuestionAverageAnswerTime = (playerAnswers: QuestionPlayer
   if (numAnswers === 0) {
     averageTime = 0;
   } else {
-    averageTime = Math.floor(totalTimeTaken / numAnswers);
+    averageTime = Math.round(totalTimeTaken / numAnswers);
   }
 
   return averageTime;
+};
+
+function cmp (a: playerNameWithScoreAndTime, b: playerNameWithScoreAndTime) {
+  if (a.timeToAnswer <= b.timeToAnswer) {
+    return -1;
+  }
+  return 1;
+}
+
+export const getUsersRankedByScore = (quizSession: QuizSessionType) => {
+  // for each user, calculate score
+  // check if they are correct
+  // if so, add them to an array with the time taken
+  // sort the array in increasing order of time taken.
+  // add the scores of the people in the array to the usersRankedByScore array, adding P/N
+  // sort the usersRankedByScore array again, in order of decreasing score
+
+  // const playerAnswers = quizSession.playerAnswers[questionPosition - 1];
+  const usersRankedByScore: playerNameWithScoreAndTime[] = [];
+  for (const player of quizSession.players) {
+    usersRankedByScore.push({ name: player.playerName, score: 0 });
+  }
+
+  for (const questionResponses of quizSession.playerAnswers) {
+    const playersCorrectList: playerNameWithScoreAndTime[] = [];
+    const questionAnswersArray = quizSession.metadata.questions[questionResponses.questionPosition - 1].answers;
+    const score = quizSession.metadata.questions[questionResponses.questionPosition - 1].points;
+
+    for (const playerAnswer of questionResponses.answers) {
+      let allCorrect = true;
+
+      for (const questionAnswer of questionAnswersArray) {
+        const answerFound = playerAnswer.answerIds.find(answerId => answerId === questionAnswer.answerId);
+        if (answerFound === undefined && questionAnswer.correct === false) {
+          // correct, player did not choose incorrect answer
+        } else if (answerFound !== undefined && questionAnswer.correct === false) {
+          // incorrect answer was chosen
+          allCorrect = false;
+        } else if (answerFound === undefined && questionAnswer.correct === true) {
+          // incorrect, did not choose the correct answer
+          allCorrect = false;
+        } else {
+          // correct, player chose the correct answer
+        }
+      }
+
+      // if all answers supplied by the user match the answers of the quiz, their name is saved
+      if (allCorrect === true) {
+        const playerName = quizSession.players.find(player => player.playerId === playerAnswer.playerId).playerName;
+        const timeToAnswer = playerAnswer.answerTime - questionResponses.questionStartTime;
+        playersCorrectList.push({ name: playerName, score: score, timeToAnswer: timeToAnswer });
+      }
+    }
+
+    playersCorrectList.sort(cmp);
+
+    let scalingFactor = 1;
+    for (const player of playersCorrectList) {
+      const playerToIncrement = usersRankedByScore.find(user => user.name === player.name);
+      playerToIncrement.score += Math.round(score / scalingFactor);
+      scalingFactor++;
+    }
+  }
+
+  return usersRankedByScore;
+};
+
+export const getQuestionResults = (quizSession: QuizSessionType, questionPosition: number) => {
+  const playersCorrectList: string[] = [];
+  const questionAnswersArray = quizSession.metadata.questions[questionPosition - 1].answers;
+  const playerAnswers = quizSession.playerAnswers[questionPosition - 1];
+
+  // for every player's answers, check that it matches the answers to the question
+  for (const playerAnswer of playerAnswers.answers) {
+    let allCorrect = true;
+
+    for (const questionAnswer of questionAnswersArray) {
+      const answerFound = playerAnswer.answerIds.find(answerId => answerId === questionAnswer.answerId);
+      if (answerFound === undefined && questionAnswer.correct === false) {
+        // correct, player did not choose incorrect answer
+      } else if (answerFound !== undefined && questionAnswer.correct === false) {
+        // incorrect answer was chosen
+        allCorrect = false;
+      } else if (answerFound === undefined && questionAnswer.correct === true) {
+        // incorrect, did not choose the correct answer
+        allCorrect = false;
+      } else {
+        // correct, player chose the correct answer
+      }
+    }
+
+    // if all answers supplied by the user match the answers of the quiz, their name is saved
+    if (allCorrect === true) {
+      const playerName = quizSession.players.find(player => player.playerId === playerAnswer.playerId).playerName;
+      playersCorrectList.push(playerName);
+    }
+  }
+
+  const numPlayersCorrect = playersCorrectList.length;
+  const numPlayers = quizSession.players.length;
+  const percentCorrect = Math.round(numPlayersCorrect / numPlayers * 100);
+
+  return {
+    questionId: quizSession.metadata.questions[questionPosition - 1].questionId,
+    playersCorrectList: playersCorrectList,
+    averageAnswerTime: calculateQuestionAverageAnswerTime(playerAnswers),
+    percentCorrect: percentCorrect
+  };
 };

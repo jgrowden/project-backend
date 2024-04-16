@@ -14,7 +14,9 @@ import {
   generateNewPlayerName,
   generateNewPlayerId,
   currentTime,
-  updateState
+  updateState,
+  getUsersRankedByScore,
+  getQuestionResults
 } from './helper';
 
 export interface SessionIdType {
@@ -27,6 +29,13 @@ interface playerIdType {
 interface SessionViewType {
   activeSessions: number[];
   inactiveSessions: number[];
+}
+
+interface questionResultsType {
+  questionId: number;
+  playersCorrectList: string[];
+  averageAnswerTime: number;
+  percentCorrect: number;
 }
 
 /**
@@ -286,7 +295,6 @@ export function adminQuizSessionPlayerJoin(
 }
 
 export function adminQuizSessionFinalResults(token: string, quizId: number, sessionId: number) {
-  
   const user = fetchUserFromSessionId(token);
   if (!user) {
     throw HTTPError(401, 'User not found');
@@ -310,6 +318,16 @@ export function adminQuizSessionFinalResults(token: string, quizId: number, sess
     throw HTTPError(400, 'Action is not in FINAL_RESULTS state');
   }
 
-  
+  const usersRankedByScore = getUsersRankedByScore(session);
+  const questionResults: questionResultsType[] = [];
+  let currentQuestion = 1;
+  for (let i = 0; i < session.playerAnswers.length; i++) {
+    questionResults.push(getQuestionResults(session, currentQuestion));
+    currentQuestion++;
+  }
 
+  return {
+    usersRankedByScore: usersRankedByScore,
+    questionResults: questionResults
+  };
 }

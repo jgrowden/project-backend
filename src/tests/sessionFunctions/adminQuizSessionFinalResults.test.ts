@@ -25,8 +25,10 @@ let player1: number;
 let player2: number;
 let questionBody1: QuestionType;
 let questionBody2: QuestionType;
+let questionBody3: QuestionType;
 let questionId1: number;
 let questionId2: number;
+let questionId3: number;
 const AUTOSTARTNUM = 10;
 
 let question1Answers: AnswerType[];
@@ -67,9 +69,9 @@ describe('adminQuizSessionFinalResults testing', () => {
       thumbnailUrl: 'http://sus.com/sus.jpg'
     };
 
-    questionBody1 = {
+    questionBody2 = {
       question: 'Why last vented in electrical?',
-      duration: 1,
+      duration: 2,
       points: 8,
       answers: [
         {
@@ -92,8 +94,34 @@ describe('adminQuizSessionFinalResults testing', () => {
       thumbnailUrl: 'http://alsosus.com/sus.jpg'
     };
 
+    questionBody3 = {
+      question: 'How many imposters are left?',
+      duration: 1,
+      points: 6,
+      answers: [
+        {
+          answer: '1',
+          correct: true,
+        },
+        {
+          answer: '2',
+          correct: false,
+        },
+        {
+          answer: '3',
+          correct: false,
+        },
+        {
+          answer: '4',
+          correct: false,
+        },
+      ],
+      thumbnailUrl: 'http://alsosus.com/sus.jpg'
+    };
+
     questionId1 = requestQuizQuestionCreateV2(token1, quizId1, questionBody1).jsonBody.questionId as number;
     questionId2 = requestQuizQuestionCreateV2(token1, quizId1, questionBody2).jsonBody.questionId as number;
+    questionId3 = requestQuizQuestionCreateV2(token1, quizId1, questionBody3).jsonBody.questionId as number;
     sessionId1 = requestQuizSessionStart(token1, quizId1, AUTOSTARTNUM).jsonBody.sessionId as number;
 
     player1 = requestQuizSessionPlayerJoin(sessionId1, 'person1').jsonBody.playerId as number;
@@ -131,17 +159,21 @@ describe('adminQuizSessionFinalResults testing', () => {
     expect(requestQuizSessionInfo(token1, quizId1, sessionId1).jsonBody.state).toStrictEqual('QUESTION_CLOSE');
     requestQuizSessionUpdate(token1, quizId1, sessionId1, 'GO_TO_ANSWER');
     requestQuizSessionUpdate(token1, quizId1, sessionId1, 'NEXT_QUESTION');
+    requestQuizSessionUpdate(token1, quizId1, sessionId1, 'SKIP_COUNTDOWN');
 
-    question2Answers = requestPlayerQuestionPosition(player1, 1).jsonBody.answers as AnswerType[];
+    question2Answers = requestPlayerQuestionPosition(player1, 2).jsonBody.answers as AnswerType[];
     const question2Answer1 = question2Answers[0].answerId; // correct answer
-    requestQuizSessionPlayerAnswer(player1, 1, [question2Answer1]);
+    requestQuizSessionPlayerAnswer(player1, 2, [question2Answer1]);
     sleepSync(1100);
-    requestQuizSessionPlayerAnswer(player2, 1, [question2Answer1]);
+    requestQuizSessionPlayerAnswer(player2, 2, [question2Answer1]);
     sleepSync(1100);
 
     expect(requestQuizSessionInfo(token1, quizId1, sessionId1).jsonBody.state).toStrictEqual('QUESTION_CLOSE');
     requestQuizSessionUpdate(token1, quizId1, sessionId1, 'GO_TO_ANSWER');
-    requestQuizSessionUpdate(token1, quizId1, sessionId1, 'END');
+    requestQuizSessionUpdate(token1, quizId1, sessionId1, 'NEXT_QUESTION');
+    requestQuizSessionUpdate(token1, quizId1, sessionId1, 'SKIP_COUNTDOWN');
+    requestQuizSessionUpdate(token1, quizId1, sessionId1, 'GO_TO_ANSWER');
+    requestQuizSessionUpdate(token1, quizId1, sessionId1, 'GO_TO_FINAL_RESULTS');
 
     expect(requestQuizSessionFinalResults(token1, quizId1, sessionId1)).toStrictEqual(
       {
@@ -149,11 +181,11 @@ describe('adminQuizSessionFinalResults testing', () => {
         jsonBody: {
           usersRankedByScore: [
             {
-              name: 'player1',
+              name: 'person1',
               score: 8
             },
             {
-              name: 'player2',
+              name: 'person2',
               score: 14
             }
           ],
@@ -161,19 +193,25 @@ describe('adminQuizSessionFinalResults testing', () => {
             {
               questionId: questionId1,
               playersCorrectList: [
-                'player2'
+                'person2'
               ],
-              averageAnswerTime: 1,
+              averageAnswerTime: expect.any(Number), // should be 0, generalised just in case
               percentCorrect: 50
             },
             {
               questionId: questionId2,
               playersCorrectList: [
-                'player1',
-                'player2'
+                'person1',
+                'person2'
               ],
-              averageAnswerTime: 1,
+              averageAnswerTime: expect.any(Number), // should be 1, generalised just in case
               percentCorrect: 100
+            },
+            {
+              questionId: questionId3,
+              playersCorrectList: [],
+              averageAnswerTime: 0, // no answers, should be 0
+              percentCorrect: 0
             }
           ]
         }

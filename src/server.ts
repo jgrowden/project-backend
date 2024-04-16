@@ -51,7 +51,8 @@ import {
   adminQuizSessionStart,
   adminQuizSessionsView,
   adminQuizSessionPlayerJoin,
-  adminQuizSessionUpdate
+  adminQuizSessionUpdate,
+  adminQuizSessionFinalResults
 } from './session';
 import {
   playerQuestionAnswer,
@@ -494,6 +495,16 @@ app.get('/v1/admin/quiz/:quizid/sessions', (req: Request, res: Response) => {
 app.post('/v1/player/join', (req: Request, res: Response) => {
   const { sessionId, name } = req.body;
   const result = adminQuizSessionPlayerJoin(sessionId, name);
+  save();
+  res.json(result);
+});
+
+// adminQuizSessionFinalResults Route
+app.get('/v1/admin/quiz/:quizid/session/:sessionid/results', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const sessionId = parseInt(req.params.sessionid);
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizSessionFinalResults(token, quizId, sessionId);
   save();
   res.json(result);
 });
