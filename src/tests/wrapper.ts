@@ -88,6 +88,9 @@ export const requestQuizQuestionMove = (token: string, quizId: number, questionI
 export const requestQuizQuestionDuplicate = (token: string, quizId: number, questionId: number) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/question/${questionId}/duplicate`, { token });
 
+export const requestQuizQuestionDuplicateV2 = (token: string, quizId: number, questionId: number) =>
+  requestHelper('POST', `/v2/admin/quiz/${quizId}/question/${questionId}/duplicate`, {}, { token });
+
 export const requestQuizChangeOwner = (quizId: number, token: string, userEmail: string) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/transfer`, { token, userEmail });
 
