@@ -6,7 +6,8 @@ import {
   SessionState,
   QuizSessionType,
   SessionAction,
-  QuestionPlayerAnswersType
+  QuestionPlayerAnswersType,
+  PlayerAnswerType
 } from './dataStore';
 
 export interface ErrorObject {
@@ -27,6 +28,7 @@ interface playerNameWithScoreAndTime {
   name: string;
   score: number;
   timeToAnswer?: number;
+  rank?: number;
 }
 
 export const fetchUserFromSessionId = (sessionId: string): UserType | undefined => {
@@ -379,3 +381,57 @@ export const getQuestionResults = (quizSession: QuizSessionType, questionPositio
     percentCorrect: percentCorrect
   };
 };
+
+/**
+ * returns the players in an array containing their rank and score for the given question
+ *
+ * @param quizSession
+ * @param questionPosition
+ * @returns {playerNameWithScoreAndTime[]}
+ *
+*/
+export const getUsersRankAndScoreByQuestion = ( quizSession: QuizSessionType, questionPosition: number ): playerNameWithScoreAndTime[] => {
+  let players: playerNameWithScoreAndTime[];
+  const correctPlayers = getQuestionResults(quizSession, questionPosition).playersCorrectList;
+  const playerAnswers = quizSession.playerAnswers[questionPosition - 1];
+  for (let player of quizSession.players) {
+    if (correctPlayers.find(correctPlayer => correctPlayer === player.playerName)) {
+      let playerAnswer: PlayerAnswerType = playerAnswers.answers.find(playerAnswer => playerAnswer.playerId === player.playerId)
+      players.push({
+        name: player.playerName,
+        score: quizSession.metadata.questions[questionPosition - 1].points,
+        timeToAnswer: playerAnswer.answerTime
+      })
+    } else {
+      players.push({
+        name: player.playerName,
+        score: 0
+      })
+    }
+  }
+  players.sort(cmp);
+  let scalingFactor = 1;
+  for (const player of correctPlayers) {
+    const playerToIncrement = players.find(user => user.name === player);
+    playerToIncrement.score = Math.round(playerToIncrement.score / scalingFactor);
+    scalingFactor++;
+  }
+  players.sort(cmp2);
+  let sameRank: number = 1;
+  for (const player of players) {
+    if (players.indexOf(player) === 0) {
+      players[0].rank = 1;
+      continue;
+    } else {
+      let index: number = players.indexOf(player);
+      if (players[index].score === players[index - 1].score) {
+        players[index].rank = players[index - 1].rank;
+        sameRank++;
+      } else {
+        players[index].rank = players[index - 1].rank + sameRank;
+        sameRank = 1;
+      }
+    }
+  }
+  return players;
+}

@@ -17,8 +17,10 @@ import {
   currentTime,
   updateState,
   getUsersRankedByScore,
-  getQuestionResults
+  getQuestionResults,
+  getUsersRankAndScoreByQuestion
 } from './helper';
+import { mkConfig, generateCsv, download } from "export-to-csv";
 
 export interface SessionIdType {
   sessionId: number;
@@ -227,19 +229,23 @@ export function adminQuizSessionResultsCSV(token: string, quizId: number, sessio
   header.push('Player');
   for(let i = 1; i <= quiz.numQuestions; i++) {
     header.push(`question${i}score`);
-    header.push(`question${i}rank `);
+    header.push(`question${i}rank`);
   }
+  csvData.push(header);
 
   for (let i = 0; i < quizSession.players.length; i++) {
     csvData.push([`${quizSession.players[i].playerName}`]);
   }
 
-  for (let i = 0; i < quizSession.players.length; i++) {
-    for(let i = 0; i < quiz.numQuestions; i++) {
-
+  for (let i = 1; i <= quiz.numQuestions; i++) {
+    let playersData = getUsersRankAndScoreByQuestion(quizSession, i);
+    for (let j = 1; j <= quizSession.players.length; j++) {
+      let playerData = playersData.find(playerData => playerData.name === csvData[j][0]);
+      csvData[j].push(playerData.score.toString());
+      csvData[j].push(playerData.rank.toString());
     }
   }
-  
+});
 }
 
 /**
