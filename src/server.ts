@@ -19,6 +19,7 @@ import {
   adminUserDetailsUpdate,
   adminAuthLogout,
   adminAuthLogoutV2,
+  adminUserDetailsV2,
   adminUserDetailsUpdateV2
 } from './auth';
 import {
@@ -55,7 +56,8 @@ import {
   adminQuizSessionStart,
   adminQuizSessionsView,
   adminQuizSessionPlayerJoin,
-  adminQuizSessionUpdate
+  adminQuizSessionUpdate,
+  adminQuizSessionFinalResults
 } from './session';
 import {
   playerQuestionAnswer,
@@ -151,7 +153,13 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
-  save();
+  res.json(result);
+});
+
+// adminUserDetailsV2 Route
+app.get('/v2/admin/user/details', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const result = adminUserDetailsV2(token);
   res.json(result);
 });
 
@@ -536,6 +544,16 @@ app.get('/v1/admin/quiz/:quizid/sessions', (req: Request, res: Response) => {
 app.post('/v1/player/join', (req: Request, res: Response) => {
   const { sessionId, name } = req.body;
   const result = adminQuizSessionPlayerJoin(sessionId, name);
+  save();
+  res.json(result);
+});
+
+// adminQuizSessionFinalResults Route
+app.get('/v1/admin/quiz/:quizid/session/:sessionid/results', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const sessionId = parseInt(req.params.sessionid);
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizSessionFinalResults(token, quizId, sessionId);
   save();
   res.json(result);
 });

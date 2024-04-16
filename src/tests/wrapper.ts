@@ -61,6 +61,9 @@ export const requestQuizTrashEmpty = (token: string, quizIds: number[]) =>
 export const requestUserDetails = (token: string) =>
   requestHelper('GET', '/v1/admin/user/details', { token });
 
+export const requestUserDetailsV2 = (token: string) =>
+  requestHelper('GET', '/v2/admin/user/details', {}, { token });
+
 export const requestUserDetailsUpdate = (token: string, email: string, nameFirst: string, nameLast: string) =>
   requestHelper('PUT', '/v1/admin/user/details', { token, email, nameFirst, nameLast });
 
@@ -114,6 +117,9 @@ export const requestQuizSessionStart = (token: string, quizId: number, autoStart
 
 export const requestQuizSessionInfo = (token: string, quizId: number, sessionId: number) =>
   requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}`, {}, { token });
+
+export const requestQuizSessionFinalResults = (token: string, quizId: number, sessionId: number) =>
+  requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}/results`, {}, { token });
 
 export const requestQuizSessionUpdate = (token: string, quizId: number, sessionId: number, action: string) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/session/${sessionId}`, { action }, { token });
