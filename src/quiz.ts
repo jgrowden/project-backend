@@ -98,6 +98,31 @@ export function adminQuizDescriptionUpdate(sessionId: string, quizId: number, de
   return {};
 }
 
+export function adminQuizDescriptionUpdateV2(sessionId: string, quizId: number, description: string): Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    throw HTTPError(401, 'Invalid token');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Invalid quiz');
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'Invalid quiz ownership');
+  }
+
+  if (description.length > quizDescriptionMaxLength) {
+    throw HTTPError(400, 'Quiz description should be less than 100 characters');
+  }
+
+  quiz.description = description;
+  quiz.timeLastEdited = currentTime();
+
+  return {};
+}
+
 /**
  * Update the name of the relevant quiz.
  *
