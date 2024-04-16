@@ -19,6 +19,7 @@ import {
   adminUserDetailsUpdate,
   adminAuthLogout,
   adminAuthLogoutV2,
+  adminUserDetailsV2,
   adminUserDetailsUpdateV2
 } from './auth';
 import {
@@ -151,7 +152,13 @@ app.get('/v1/admin/user/details', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
-  save();
+  res.json(result);
+});
+
+// adminUserDetailsV2 Route
+app.get('/v2/admin/user/details', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const result = adminUserDetailsV2(token);
   res.json(result);
 });
 

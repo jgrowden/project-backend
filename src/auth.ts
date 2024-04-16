@@ -213,6 +213,23 @@ export function adminUserDetails(sessionId: string): AdminUserDetailsReturn | Er
   };
 }
 
+export function adminUserDetailsV2(sessionId: string): AdminUserDetailsReturn | ErrorObjectWithCode {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    throw HTTPError(401, 'User ID not found');
+  }
+
+  return {
+    user: {
+      userId: user.authUserId,
+      name: `${user.nameFirst} ${user.nameLast}`,
+      email: user.email,
+      numSuccessfulLogins: user.numSuccessfulLogins,
+      numFailedPasswordsSinceLastLogin: user.numFailedPasswordsSinceLastLogin,
+    }
+  };
+}
+
 /**
  * Given an admin user's sessionId and a set of properties,
  *  update the properties of this logged in admin user.
