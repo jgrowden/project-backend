@@ -253,6 +253,18 @@ export function adminQuizList(sessionId: string): AdminQuizListReturn | ErrorObj
   return { quizzes: returnQuizzes };
 }
 
+export function adminQuizListV2(token: string): AdminQuizListReturn {
+  const user = fetchUserFromSessionId(token);
+
+  if (!user) {
+    throw HTTPError(401, 'Invalid user id');
+  }
+
+  const userQuizzes = user.userQuizzes.map(quizId => fetchQuizFromQuizId(quizId));
+  const returnQuizzes = userQuizzes.map(quiz => { return { quizId: quiz.quizId, name: quiz.name }; });
+  return { quizzes: returnQuizzes };
+}
+
 /**
  * Given basic details about a new quiz, create one for the logged in user.
  *
@@ -1035,6 +1047,49 @@ export function adminQuizQuestionMove(
   return {};
 }
 
+export function adminQuizQuestionMoveV2(
+  token: string,
+  quizId: number,
+  questionId: number,
+  newPosition: number
+): Record<string, never> {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'Invalid token');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Invalid quizId');
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'Invalid quiz ownership');
+  }
+
+  const question = fetchQuestionFromQuestionId(quiz, questionId);
+  if (!question) {
+    throw HTTPError(400, 'Invalid questionId');
+  }
+
+  if (newPosition < 0 || newPosition >= (quiz.questions.length)) {
+    throw HTTPError(400, 'Invalid new position');
+  }
+
+  if (quiz.questions[newPosition].questionId === questionId) {
+    throw HTTPError(400, 'Question is already in the new position');
+  }
+
+  const oldElement = quiz.questions.find(question => question.questionId === questionId);
+  const oldPosition = quiz.questions.indexOf(oldElement);
+
+  quiz.questions.splice(oldPosition, 1);
+  quiz.questions.splice(newPosition, 0, oldElement);
+  quiz.timeLastEdited = currentTime();
+
+  return {};
+}
+
 /**
  * A particular question gets duplicated to immediately after where the source question is
  * When this route is called, the timeLastEdited is updated
@@ -1076,6 +1131,50 @@ export function adminQuizQuestionDuplicate(
     duration: question.duration,
     points: question.points,
     answers: question.answers
+  };
+
+  quiz.questions.splice(oldPosition + 1, 0, newQuestion);
+  quiz.numQuestions = quiz.questions.length;
+  quiz.duration += newQuestion.duration;
+  quiz.timeLastEdited = currentTime();
+
+  return { newQuestionId: newQuestion.questionId };
+}
+
+export function adminQuizQuestionDuplicateV2(
+  token: string,
+  quizId: number,
+  questionId: number
+): AdminQuizQuestionDuplicateReturn {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'Invalid token');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Invalid quizId');
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'Invalid quiz ownership');
+  }
+
+  const question = fetchQuestionFromQuestionId(quiz, questionId);
+  if (!question) {
+    throw HTTPError(400, 'Invalid questionId');
+  }
+
+  const oldElement = quiz.questions.find(question => question.questionId === questionId);
+  const oldPosition = quiz.questions.indexOf(oldElement);
+
+  const newQuestion: QuestionType = {
+    questionId: generateNewQuestionId(),
+    question: question.question,
+    duration: question.duration,
+    points: question.points,
+    answers: question.answers,
+    thumbnailUrl: question.thumbnailUrl
   };
 
   quiz.questions.splice(oldPosition + 1, 0, newQuestion);
