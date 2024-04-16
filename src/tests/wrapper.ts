@@ -16,6 +16,9 @@ export const requestAuthLogoutV2 = (token: string) =>
 export const requestQuizList = (token: string) =>
   requestHelper('GET', '/v1/admin/quiz/list', { token });
 
+export const requestQuizListV2 = (token: string) =>
+  requestHelper('GET', '/v2/admin/quiz/list', {}, { token });
+
 export const requestQuizCreate = (token: string, name: string, description: string) =>
   requestHelper('POST', '/v1/admin/quiz', { token, name, description });
 
@@ -70,6 +73,9 @@ export const requestUserDetailsUpdateV2 = (token: string, email: string, nameFir
 export const requestUserPasswordUpdate = (token: string, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v1/admin/user/password', { token, oldPassword, newPassword });
 
+export const requestUserPasswordUpdateV2 = (token: string, oldPassword: string, newPassword: string) =>
+  requestHelper('PUT', '/v2/admin/user/password', { oldPassword, newPassword }, { token });
+
 export const requestQuizNameUpdate = (token: string, quizId: number, name: string) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/name`, { token, name });
 
@@ -88,8 +94,14 @@ export const requestQuestionDeleteV2 = (token: string, quizId: number, questionI
 export const requestQuizQuestionMove = (token: string, quizId: number, questionId: number, newPosition: number) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}/move`, { token, newPosition });
 
+export const requestQuizQuestionMoveV2 = (token: string, quizId: number, questionId: number, newPosition: number) =>
+  requestHelper('PUT', `/v2/admin/quiz/${quizId}/question/${questionId}/move`, { newPosition }, { token });
+
 export const requestQuizQuestionDuplicate = (token: string, quizId: number, questionId: number) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/question/${questionId}/duplicate`, { token });
+
+export const requestQuizQuestionDuplicateV2 = (token: string, quizId: number, questionId: number) =>
+  requestHelper('POST', `/v2/admin/quiz/${quizId}/question/${questionId}/duplicate`, {}, { token });
 
 export const requestQuizChangeOwner = (quizId: number, token: string, userEmail: string) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/transfer`, { token, userEmail });
@@ -123,6 +135,9 @@ export const requestPlayerQuestionPosition = (playerId: number, questionPosition
 
 export const requestQuizSessionPlayerAnswer = (playerId: number, questionPosition: number, answerIds: number[]) =>
   requestHelper('PUT', `/v1/player/${playerId}/question/${questionPosition}/answer`, { answerIds }, {});
+
+export const requestQuestionResults = (playerId: number, questionPosition: number) =>
+  requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}/results`, {}, {});
 
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 

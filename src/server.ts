@@ -15,6 +15,7 @@ import {
   adminAuthLogin,
   adminUserDetails,
   adminUserPasswordUpdate,
+  adminUserPasswordUpdateV2,
   adminUserDetailsUpdate,
   adminAuthLogout,
   adminAuthLogoutV2,
@@ -23,6 +24,7 @@ import {
 } from './auth';
 import {
   adminQuizList,
+  adminQuizListV2,
   adminQuizCreate,
   adminQuizRemove,
   adminQuizRemoveV2,
@@ -35,12 +37,14 @@ import {
   adminQuizQuestionUpdate,
   adminQuizQuestionUpdateV2,
   adminQuizQuestionMove,
+  adminQuizQuestionMoveV2,
   adminQuizTrashInfo,
   adminQuizRestore,
   adminQuizTrashEmpty,
   adminQuizChangeOwner,
   adminQuizChangeOwnerV2,
   adminQuizQuestionDuplicate,
+  adminQuizQuestionDuplicateV2,
   adminQuizQuestionDelete,
   adminQuizQuestionDeleteV2,
   adminQuizCreateV2,
@@ -52,11 +56,12 @@ import {
   adminQuizSessionStart,
   adminQuizSessionsView,
   adminQuizSessionPlayerJoin,
-  adminQuizSessionPlayerAnswer,
   adminQuizSessionUpdate
 } from './session';
 import {
+  playerQuestionAnswer,
   playerQuestionPosition,
+  playerQuestionResults,
   playerStatus
 } from './player';
 
@@ -188,6 +193,14 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizListV2 Route
+app.get('/v2/admin/quiz/list', (req: Request, res: Response) => {
+  const token = req.header('token') as string;
+  const result = adminQuizListV2(token);
+  save();
+  res.json(result);
+});
+
 // adminQuizCreate route
 app.post('/v1/admin/quiz', (req: Request, res: Response) => {
   const { token, name, description } = req.body;
@@ -215,6 +228,15 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminUserPasswordUpdateV2 Route
+app.put('/v2/admin/user/password', (req: Request, res: Response) => {
+  const token = req.header('token') as string;
+  const { oldPassword, newPassword } = req.body;
+  const result = adminUserPasswordUpdateV2(token, oldPassword, newPassword);
   save();
   res.json(result);
 });
@@ -410,6 +432,17 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: 
   res.json(result);
 });
 
+// adminQuizQuestionMoveV2 Route
+app.put('/v2/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: Response) => {
+  const token = req.header('token') as string;
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const { newPosition } = req.body;
+  const result = adminQuizQuestionMoveV2(token, quizId, questionId, newPosition);
+  save();
+  res.json(result);
+});
+
 // adminQuizQuestionDuplicate Route
 app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
@@ -419,6 +452,16 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizQuestionDuplicateV2 Route
+app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
+  const token = req.header('token') as string;
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const result = adminQuizQuestionDuplicateV2(token, quizId, questionId);
   save();
   res.json(result);
 });
@@ -526,8 +569,16 @@ app.put('/v1/player/:playerid/question/:questionposition/answer', (req:Request, 
   const playerId = parseInt(req.params.playerid);
   const questionPosition = parseInt(req.params.questionposition);
   const { answerIds } = req.body;
-  const result = adminQuizSessionPlayerAnswer(playerId, questionPosition, answerIds);
+  const result = playerQuestionAnswer(playerId, questionPosition, answerIds);
   save();
+  res.json(result);
+});
+
+// playerQuestionResults Route
+app.get('/v1/player/:playerid/question/:questionposition/results', (req:Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const questionPosition = parseInt(req.params.questionposition);
+  const result = playerQuestionResults(playerId, questionPosition);
   res.json(result);
 });
 

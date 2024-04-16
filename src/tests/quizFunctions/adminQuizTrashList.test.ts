@@ -1,4 +1,4 @@
-import { 
+import {
   errorCode,
   clear,
   requestAuthRegister,
@@ -7,7 +7,7 @@ import {
   requestQuizTrashInfo,
   requestQuizTrashInfoV2,
   requestQuizDeleteV2,
-  requestQuizCreateV2 
+  requestQuizCreateV2
 } from '../wrapper';
 import HTTPError from 'http-errors';
 let token1: string;
@@ -113,7 +113,6 @@ describe('adminQuizTrashInfo testing', () => {
     );
   });
 });
-
 
 describe('adminQuizTrashInfo v2 testing', () => {
   test('invalid session id', () => {
