@@ -156,17 +156,18 @@ export function adminQuizRestore(sessionId: string, quizId: number): ErrorObject
   }
 
   const deletedQuiz = fetchDeletedQuizFromQuizId(quizId);
-  if (!deletedQuiz) {
-    return returnError('Invalid quiz', 403);
-  }
-
-  if (deletedQuiz.ownerId !== user.authUserId) {
-    return returnError('Invalid quiz ownership', 403);
-  }
-
   const quiz = fetchQuizFromQuizId(quizId);
-  if (quiz) {
-    return returnError('Quiz not in trash', 400);
+
+  if (deletedQuiz !== undefined) {
+    if (deletedQuiz.ownerId !== user.authUserId) {
+      return returnError('Invalid quiz ownership', 403);
+    }
+  } else {
+    if (quiz === undefined) {
+      return returnError('Invalid quiz', 403);
+    } else {
+      return returnError('Quiz not in trash', 400);
+    }
   }
 
   const data = getData();
@@ -245,6 +246,18 @@ export function adminQuizList(sessionId: string): AdminQuizListReturn | ErrorObj
 
   if (!user) {
     return returnError('User ID not found', 401);
+  }
+
+  const userQuizzes = user.userQuizzes.map(quizId => fetchQuizFromQuizId(quizId));
+  const returnQuizzes = userQuizzes.map(quiz => { return { quizId: quiz.quizId, name: quiz.name }; });
+  return { quizzes: returnQuizzes };
+}
+
+export function adminQuizListV2(token: string): AdminQuizListReturn {
+  const user = fetchUserFromSessionId(token);
+
+  if (!user) {
+    throw HTTPError(401, 'Invalid user id');
   }
 
   const userQuizzes = user.userQuizzes.map(quizId => fetchQuizFromQuizId(quizId));
@@ -437,12 +450,27 @@ export function adminQuizRemoveV2(
 *    ]
 * }} - object with list of all quizzes by their unique ID number and name.
  */
-export function adminQuizTrashList(
+export function adminQuizTrashInfo(
   sessionId: string
 ): ErrorObjectWithCode | AdminQuizListReturn {
   const user = fetchUserFromSessionId(sessionId);
   if (!user) {
-    return returnError("invalid user ID'", 401);
+    return returnError('invalid user ID', 401);
+  }
+
+  const data = getData();
+  const userDeletedQuizzes = data.deletedQuizzes.filter(quiz => quiz.ownerId === user.authUserId);
+  const trashedQuizList = userDeletedQuizzes.map(quiz => { return { quizId: quiz.quizId, name: quiz.name }; });
+
+  return { quizzes: trashedQuizList };
+}
+
+export function adminQuizTrashInfoV2(
+  sessionId: string
+): ErrorObjectWithCode | AdminQuizListReturn {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    throw HTTPError(401, 'invalid user ID');
   }
 
   const data = getData();
@@ -671,6 +699,10 @@ export function adminQuizQuestionCreateV2(
 
   if (questionBody.answers.find(answer => answer.correct === true) === undefined) {
     throw HTTPError(400, 'There are no correct answers');
+  }
+
+  if (questionBody.thumbnailUrl === undefined || questionBody.thumbnailUrl.length === 0) {
+    throw HTTPError(400, 'invalid thumbnail url');
   }
 
   if (!isValidThumbnail(questionBody.thumbnailUrl)) {
@@ -1015,6 +1047,49 @@ export function adminQuizQuestionMove(
   return {};
 }
 
+export function adminQuizQuestionMoveV2(
+  token: string,
+  quizId: number,
+  questionId: number,
+  newPosition: number
+): Record<string, never> {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'Invalid token');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Invalid quizId');
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'Invalid quiz ownership');
+  }
+
+  const question = fetchQuestionFromQuestionId(quiz, questionId);
+  if (!question) {
+    throw HTTPError(400, 'Invalid questionId');
+  }
+
+  if (newPosition < 0 || newPosition >= (quiz.questions.length)) {
+    throw HTTPError(400, 'Invalid new position');
+  }
+
+  if (quiz.questions[newPosition].questionId === questionId) {
+    throw HTTPError(400, 'Question is already in the new position');
+  }
+
+  const oldElement = quiz.questions.find(question => question.questionId === questionId);
+  const oldPosition = quiz.questions.indexOf(oldElement);
+
+  quiz.questions.splice(oldPosition, 1);
+  quiz.questions.splice(newPosition, 0, oldElement);
+  quiz.timeLastEdited = currentTime();
+
+  return {};
+}
+
 /**
  * A particular question gets duplicated to immediately after where the source question is
  * When this route is called, the timeLastEdited is updated
@@ -1056,6 +1131,50 @@ export function adminQuizQuestionDuplicate(
     duration: question.duration,
     points: question.points,
     answers: question.answers
+  };
+
+  quiz.questions.splice(oldPosition + 1, 0, newQuestion);
+  quiz.numQuestions = quiz.questions.length;
+  quiz.duration += newQuestion.duration;
+  quiz.timeLastEdited = currentTime();
+
+  return { newQuestionId: newQuestion.questionId };
+}
+
+export function adminQuizQuestionDuplicateV2(
+  token: string,
+  quizId: number,
+  questionId: number
+): AdminQuizQuestionDuplicateReturn {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'Invalid token');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Invalid quizId');
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'Invalid quiz ownership');
+  }
+
+  const question = fetchQuestionFromQuestionId(quiz, questionId);
+  if (!question) {
+    throw HTTPError(400, 'Invalid questionId');
+  }
+
+  const oldElement = quiz.questions.find(question => question.questionId === questionId);
+  const oldPosition = quiz.questions.indexOf(oldElement);
+
+  const newQuestion: QuestionType = {
+    questionId: generateNewQuestionId(),
+    question: question.question,
+    duration: question.duration,
+    points: question.points,
+    answers: question.answers,
+    thumbnailUrl: question.thumbnailUrl
   };
 
   quiz.questions.splice(oldPosition + 1, 0, newQuestion);
@@ -1123,7 +1242,6 @@ export function adminQuizQuestionDeleteV2(
   if (!quiz) {
     throw HTTPError(403, 'Invalid quizId');
   }
-
   if (quiz.ownerId !== user.authUserId) {
     throw HTTPError(403, 'Invalid quiz ownership');
   }
@@ -1146,5 +1264,39 @@ export function adminQuizQuestionDeleteV2(
   quiz.questions.splice(questionIndex, 1);
   quiz.timeLastEdited = currentTime();
 
+  return {};
+}
+
+/**
+ * Update the thumbnail for the quiz.
+ * When this route is called, the timeLastEdited is updated.
+ * @param {string} token
+ * @param {number} quizId
+ * @param {string} imgUrl
+ * @returns {}
+ */
+export function adminQuizThumbnailUpdate(token: string, quizId: number, imgUrl: string) {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'empty/invalid token');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'invalid quizId');
+  }
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'invalid quiz ownership');
+  }
+
+  if (!imgUrl || imgUrl === '') {
+    throw HTTPError(400, 'empty/undefined imgUrl');
+  }
+  if (!isValidThumbnail(imgUrl)) {
+    throw HTTPError(400, 'imgUrl must start with http:// or https:// and have type jpg, jpeg or png');
+  }
+
+  quiz.thumbnailUrl = imgUrl;
+  quiz.timeLastEdited = currentTime();
   return {};
 }

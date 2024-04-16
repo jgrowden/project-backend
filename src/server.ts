@@ -15,12 +15,15 @@ import {
   adminAuthLogin,
   adminUserDetails,
   adminUserPasswordUpdate,
+  adminUserPasswordUpdateV2,
   adminUserDetailsUpdate,
   adminAuthLogout,
-  adminAuthLogoutV2
+  adminAuthLogoutV2,
+  adminUserDetailsUpdateV2
 } from './auth';
 import {
   adminQuizList,
+  adminQuizListV2,
   adminQuizCreate,
   adminQuizRemove,
   adminQuizRemoveV2,
@@ -33,22 +36,31 @@ import {
   adminQuizQuestionUpdate,
   adminQuizQuestionUpdateV2,
   adminQuizQuestionMove,
-  adminQuizTrashList,
+  adminQuizQuestionMoveV2,
+  adminQuizTrashInfo,
   adminQuizRestore,
   adminQuizTrashEmpty,
   adminQuizChangeOwner,
   adminQuizChangeOwnerV2,
   adminQuizQuestionDuplicate,
+  adminQuizQuestionDuplicateV2,
   adminQuizQuestionDelete,
   adminQuizQuestionDeleteV2,
-  adminQuizCreateV2
+  adminQuizCreateV2,
+  adminQuizThumbnailUpdate,
+  adminQuizTrashInfoV2
 } from './quiz';
 import {
+  adminQuizSessionInfo,
   adminQuizSessionStart,
+  adminQuizSessionsView,
+  adminQuizSessionPlayerJoin,
   adminQuizSessionUpdate
 } from './session';
 import {
+  playerQuestionAnswer,
   playerQuestionPosition,
+  playerQuestionResults,
   playerStatus
 } from './player';
 
@@ -154,6 +166,15 @@ app.put('/v1/admin/user/details', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminUserDetailsUpdateV2 Route
+app.put('/v2/admin/user/details', (req: Request, res: Response) => {
+  const { email, nameFirst, nameLast } = req.body;
+  const token = req.get('token') as string;
+  const result = adminUserDetailsUpdateV2(token, email, nameFirst, nameLast);
+  save();
+  res.json(result);
+});
+
 // adminQuizList Route
 app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   const token = req.query.token as string;
@@ -161,6 +182,14 @@ app.get('/v1/admin/quiz/list', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizListV2 Route
+app.get('/v2/admin/quiz/list', (req: Request, res: Response) => {
+  const token = req.header('token') as string;
+  const result = adminQuizListV2(token);
   save();
   res.json(result);
 });
@@ -196,6 +225,15 @@ app.put('/v1/admin/user/password', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminUserPasswordUpdateV2 Route
+app.put('/v2/admin/user/password', (req: Request, res: Response) => {
+  const token = req.header('token') as string;
+  const { oldPassword, newPassword } = req.body;
+  const result = adminUserPasswordUpdateV2(token, oldPassword, newPassword);
+  save();
+  res.json(result);
+});
+
 // adminQuizRemove Route
 app.delete('/v1/admin/quiz/:quizid', (req: Request, res: Response) => {
   const token = req.query.token as string;
@@ -217,13 +255,21 @@ app.delete('/v2/admin/quiz/:quizid', (req: Request, res: Response) => {
   res.json(result);
 });
 
-// adminQuizTrashList Route
+// adminQuizTrashInfo Route
 app.get('/v1/admin/quiz/trash', (req: Request, res: Response) => {
   const token = req.query.token as string;
-  const result = adminQuizTrashList(token);
+  const result = adminQuizTrashInfo(token);
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizTrashInfoV2  Route
+app.get('/v2/admin/quiz/trash', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const result = adminQuizTrashInfoV2(token);
   save();
   res.json(result);
 });
@@ -379,6 +425,17 @@ app.put('/v1/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: 
   res.json(result);
 });
 
+// adminQuizQuestionMoveV2 Route
+app.put('/v2/admin/quiz/:quizid/question/:questionid/move', (req: Request, res: Response) => {
+  const token = req.header('token') as string;
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const { newPosition } = req.body;
+  const result = adminQuizQuestionMoveV2(token, quizId, questionId, newPosition);
+  save();
+  res.json(result);
+});
+
 // adminQuizQuestionDuplicate Route
 app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
@@ -388,6 +445,16 @@ app.post('/v1/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request,
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizQuestionDuplicateV2 Route
+app.post('/v2/admin/quiz/:quizid/question/:questionid/duplicate', (req: Request, res: Response) => {
+  const token = req.header('token') as string;
+  const quizId = parseInt(req.params.quizid);
+  const questionId = parseInt(req.params.questionid);
+  const result = adminQuizQuestionDuplicateV2(token, quizId, questionId);
   save();
   res.json(result);
 });
@@ -415,6 +482,16 @@ app.delete('/v2/admin/quiz/:quizid/question/:questionid', (req: Request, res: Re
   res.json(result);
 });
 
+// adminQuizThumbnailUpdate Route
+app.put('/v1/admin/quiz/:quizid/thumbnail', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const quizId = parseInt(req.params.quizid);
+  const { imgUrl } = req.body;
+  const result = adminQuizThumbnailUpdate(token, quizId, imgUrl);
+  save();
+  res.json(result);
+});
+
 // adminQuizSessionStart Route
 app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) => {
   const token = req.header('token');
@@ -425,10 +502,10 @@ app.post('/v1/admin/quiz/:quizid/session/start', (req: Request, res: Response) =
   res.json(result);
 });
 
-//adminQuizSessionUpdate Route
-app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
+// adminQuizSessionUpdate Route
+app.put('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
   const token = req.header('token');
-  const action = req.query.action as string;
+  const { action } = req.body;
   const quizId = parseInt(req.params.quizid);
   const sessionId = parseInt(req.params.sessionid);
   const result = adminQuizSessionUpdate(token, quizId, sessionId, action);
@@ -436,22 +513,67 @@ app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Respons
   res.json(result);
 });
 
-//playerQuestionPosition Route
+// adminQuizSessionInfo Route
+app.get('/v1/admin/quiz/:quizid/session/:sessionid', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const quizId = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.params.sessionid);
+  const result = adminQuizSessionInfo(token, quizId, sessionId);
+  save();
+  res.json(result);
+});
+
+// adminQuizSessionsView Route
+app.get('/v1/admin/quiz/:quizid/sessions', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizSessionsView(token, quizId);
+  save();
+  res.json(result);
+});
+
+// adminQuizSessionPlayerJoin Route
+app.post('/v1/player/join', (req: Request, res: Response) => {
+  const { sessionId, name } = req.body;
+  const result = adminQuizSessionPlayerJoin(sessionId, name);
+  save();
+  res.json(result);
+});
+
+// playerStatus Route
+app.get('/v1/player/:playerid', (req: Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const result = playerStatus(playerId);
+  save();
+  res.json(result);
+});
+
+// playerQuestionPosition Route
 app.get('/v1/player/:playerid/question/:questionposition', (req: Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
   const questionPosition = parseInt(req.params.questionposition);
   const result = playerQuestionPosition(playerId, questionPosition);
   save();
   res.json(result);
-})
+});
 
-//playerStatus Route
-app.get('/v1/player/:playerid', (req: Request, res: Response) => {
+// playerAnswerSubmit Route
+app.put('/v1/player/:playerid/question/:questionposition/answer', (req:Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
-  const result = playerStatus(playerId);
+  const questionPosition = parseInt(req.params.questionposition);
+  const { answerIds } = req.body;
+  const result = playerQuestionAnswer(playerId, questionPosition, answerIds);
   save();
   res.json(result);
-})
+});
+
+// playerQuestionResults Route
+app.get('/v1/player/:playerid/question/:questionposition/results', (req:Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const questionPosition = parseInt(req.params.questionposition);
+  const result = playerQuestionResults(playerId, questionPosition);
+  res.json(result);
+});
 
 // clear Route
 app.delete('/v1/clear', (req: Request, res: Response) => {
