@@ -37,6 +37,12 @@ export const requestQuizInfo = (token: string, quizId: number) =>
 export const requestQuizInfoV2 = (token: string, quizId: number) =>
   requestHelper('GET', `/v2/admin/quiz/${quizId}`, {}, { token });
 
+export const requestQuizNameUpdate = (token: string, quizId: number, name: string) =>
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/name`, { token, name });
+
+export const requestQuizNameUpdateV2 = (token: string, quizId: number, name: string) =>
+  requestHelper('PUT', `/v2/admin/quiz/${quizId}/name`, { name }, { token });
+
 export const requestQuizDescriptionUpdate = (token: string, quizId: number, description: string) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/description`, { token, description });
 
@@ -75,9 +81,6 @@ export const requestUserPasswordUpdate = (token: string, oldPassword: string, ne
 
 export const requestUserPasswordUpdateV2 = (token: string, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v2/admin/user/password', { oldPassword, newPassword }, { token });
-
-export const requestQuizNameUpdate = (token: string, quizId: number, name: string) =>
-  requestHelper('PUT', `/v1/admin/quiz/${quizId}/name`, { token, name });
 
 export const requestQuestionUpdate = (token: string, quizId: number, questionId: number, questionBody: QuestionType) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { token, questionBody });

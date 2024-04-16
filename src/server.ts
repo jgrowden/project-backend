@@ -31,6 +31,7 @@ import {
   adminQuizInfo,
   adminQuizInfoV2,
   adminQuizNameUpdate,
+  adminQuizNameUpdateV2,
   adminQuizDescriptionUpdate,
   adminQuizQuestionCreate,
   adminQuizQuestionCreateV2,
