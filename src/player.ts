@@ -4,9 +4,9 @@ import {
   getData,
 } from './dataStore';
 import {
-  calculateQuestionAverageAnswerTime,
   currentTime,
   fetchQuizSessionFromPlayerId,
+  getQuestionResults,
 } from './helper';
 
 export interface SessionIdType {
@@ -109,43 +109,5 @@ export function playerQuestionResults(playerId: number, questionPosition: number
     throw HTTPError(400, 'Session is not yet up to this question');
   }
 
-  const playersCorrectList: string[] = [];
-  const questionAnswersArray = quizSession.metadata.questions[questionPosition - 1].answers;
-  const playerAnswers = quizSession.playerAnswers[questionPosition - 1];
-
-  // for every player's answers, check that it matches the answers to the question
-  for (const playerAnswer of playerAnswers.answers) {
-    let allCorrect = true;
-
-    for (const questionAnswer of questionAnswersArray) {
-      const answerFound = playerAnswer.answerIds.find(answerId => answerId === questionAnswer.answerId);
-      if (answerFound === undefined && questionAnswer.correct === false) {
-        // correct, player did not choose incorrect answer
-      } else if (answerFound !== undefined && questionAnswer.correct === false) {
-        // incorrect answer was chosen
-        allCorrect = false;
-      } else if (answerFound === undefined && questionAnswer.correct === true) {
-        // incorrect, did not choose the correct answer
-        allCorrect = false;
-      } else {
-        // correct, player chose the correct answer
-      }
-    }
-
-    // if all answers supplied by the user match the answers of the quiz, their name is saved
-    if (allCorrect === true) {
-      const playerName = quizSession.players.find(player => player.playerId === playerAnswer.playerId).playerName;
-      playersCorrectList.push(playerName);
-    }
-  }
-
-  const numPlayersCorrect = playersCorrectList.length;
-  const numPlayers = quizSession.players.length;
-  const percentCorrect = Math.round(numPlayersCorrect / numPlayers * 100);
-  return {
-    questionId: quizSession.metadata.questions[questionPosition - 1].questionId,
-    playersCorrectList: playersCorrectList,
-    averageAnswerTime: calculateQuestionAverageAnswerTime(playerAnswers),
-    percentCorrect: percentCorrect
-  };
+  return getQuestionResults(quizSession, questionPosition);
 }

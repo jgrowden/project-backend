@@ -14,7 +14,9 @@ import {
   generateNewPlayerName,
   generateNewPlayerId,
   currentTime,
-  updateState
+  updateState,
+  getUsersRankedByScore,
+  getQuestionResults
 } from './helper';
 
 export interface SessionIdType {
@@ -29,6 +31,13 @@ interface SessionViewType {
   inactiveSessions: number[];
 }
 
+interface questionResultsType {
+  questionId: number;
+  playersCorrectList: string[];
+  averageAnswerTime: number;
+  percentCorrect: number;
+}
+
 /**
  * Start a new session for a quiz
  * This copies the quiz, so that any edits whilst a session is running
@@ -40,6 +49,7 @@ interface SessionViewType {
 *  sessionId: number
 * }
 */
+
 export function adminQuizSessionStart(token: string, quizId: number, autoStartNum: number): SessionIdType {
   const user = fetchUserFromSessionId(token);
   if (!user) {
@@ -138,12 +148,16 @@ export function adminQuizSessionUpdate(
       answers: []
     });
     const timeoutId = setTimeout(() => {
-      adminQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN');
-      for (let i = 0; i < getTimeoutData().length; i++) {
-        if (getTimeoutData()[i].sessionId === sessionId) {
-          getTimeoutData().splice(i, 1);
-          break;
+      try {
+        adminQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN');
+        for (let i = 0; i < getTimeoutData().length; i++) {
+          if (getTimeoutData()[i].sessionId === sessionId) {
+            getTimeoutData().splice(i, 1);
+            break;
+          }
         }
+      } catch (err) {
+        console.error('error caught', 'SKIP_COUNTDOWN', err, getTimeoutData());
       }
     }, 3000);
     getTimeoutData().push({
@@ -151,30 +165,38 @@ export function adminQuizSessionUpdate(
       sessionId: sessionId
     });
   } else if (action === 'SKIP_COUNTDOWN') {
-    const timeoutData = getTimeoutData().find(data => data.sessionId === sessionId);
-    clearTimeout(timeoutData.timeoutId);
-    session.state = 'QUESTION_OPEN';
-    for (let i = 0; i < getTimeoutData().length; i++) {
-      if (getTimeoutData()[i].sessionId === sessionId) {
-        getTimeoutData().splice(i, 1);
-        break;
+    for (const timer of getTimeoutData()) {
+      if (timer.sessionId === sessionId) {
+        clearTimeout(timer.timeoutId);
+        getTimeoutData().splice(getTimeoutData().indexOf(timer));
       }
     }
-    const timeoutId = setTimeout(() => {
-      session.state = 'QUESTION_CLOSE';
-      for (let i = 0; i < getTimeoutData().length; i++) {
-        if (getTimeoutData()[i].sessionId === sessionId) {
-          getTimeoutData().splice(i, 1);
-          break;
+
+    const timeoutId = setTimeout((sessionId) => {
+      try {
+        session.state = 'QUESTION_CLOSE';
+        for (let i = 0; i < getTimeoutData().length; i++) {
+          if (getTimeoutData()[i].sessionId === sessionId) {
+            clearTimeout(getTimeoutData()[i].timeoutId);
+            getTimeoutData().splice(i, 1);
+            break;
+          }
         }
+      } catch (err) {
+        console.log('error caught', err);
       }
-    }, session.metadata.questions[session.atQuestion - 1].duration * 1000);
+    }, session.metadata.questions[session.atQuestion - 1].duration * 1000, sessionId);
     getTimeoutData().push({
       timeoutId: timeoutId,
       sessionId: sessionId
     });
   } else if (action === 'GO_TO_ANSWER') {
-    // do nothing
+    for (const timer of getTimeoutData()) {
+      if (timer.sessionId === sessionId) {
+        clearTimeout(timer.timeoutId);
+        getTimeoutData().splice(getTimeoutData().indexOf(timer));
+      }
+    }
   } else if (action === 'GO_TO_FINAL_RESULTS') {
     session.atQuestion = 0;
   } else if (action === 'END') {
@@ -283,4 +305,42 @@ export function adminQuizSessionPlayerJoin(
   const newPlayerId = generateNewPlayerId(sessionId);
   session.players.push({ playerId: newPlayerId, playerName: name });
   return { playerId: newPlayerId };
+}
+
+export function adminQuizSessionFinalResults(token: string, quizId: number, sessionId: number) {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'User not found');
+  }
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Quiz not found');
+  }
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'User does not own quiz');
+  }
+  const session = fetchSessionFromSessionId(sessionId);
+  if (!session) {
+    throw HTTPError(400, 'Session not found');
+  }
+  if (session.quizSessionId !== sessionId) {
+    throw HTTPError(400, 'SessionId is not a session of this quiz');
+  }
+
+  if (session.state !== 'FINAL_RESULTS') {
+    throw HTTPError(400, 'Action is not in FINAL_RESULTS state');
+  }
+
+  const usersRankedByScore = getUsersRankedByScore(session);
+  const questionResults: questionResultsType[] = [];
+  let currentQuestion = 1;
+  for (let i = 0; i < session.playerAnswers.length; i++) {
+    questionResults.push(getQuestionResults(session, currentQuestion));
+    currentQuestion++;
+  }
+
+  return {
+    usersRankedByScore: usersRankedByScore,
+    questionResults: questionResults
+  };
 }
