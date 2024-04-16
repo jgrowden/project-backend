@@ -340,6 +340,16 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizNameUpdateV2 Route
+app.put('/v2/admin/quiz/:quizid/name', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const quizId = parseInt(req.params.quizid);
+  const { name } = req.body;
+  const result = adminQuizNameUpdateV2(token, quizId, name);
+  save();
+  res.json(result);
+});
+
 // adminQuizDescriptionUpdate Route
 app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
