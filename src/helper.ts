@@ -205,6 +205,12 @@ export const isValidThumbnail = (thumbnail: string) => {
   return true;
 };
 
+/**
+ * Calculates the average time for players to answer a question
+ *
+ * @param {QuestionPlayerAnswersType} playerAnswers
+ * @returns {number} averageTime
+ */
 export const calculateQuestionAverageAnswerTime = (playerAnswers: QuestionPlayerAnswersType) => {
   let totalTimeTaken = 0;
   let numAnswers = 0;
@@ -224,22 +230,43 @@ export const calculateQuestionAverageAnswerTime = (playerAnswers: QuestionPlayer
   return averageTime;
 };
 
+// comparator function for getUsersRankedByScore
 function cmp (a: playerNameWithScoreAndTime, b: playerNameWithScoreAndTime) {
-  if (a.timeToAnswer <= b.timeToAnswer) {
+  if (a.timeToAnswer < b.timeToAnswer) {
     return -1;
+  } else if (a.timeToAnswer === b.timeToAnswer) {
+    return 0;
   }
   return 1;
 }
 
-export const getUsersRankedByScore = (quizSession: QuizSessionType) => {
-  // for each user, calculate score
-  // check if they are correct
-  // if so, add them to an array with the time taken
-  // sort the array in increasing order of time taken.
-  // add the scores of the people in the array to the usersRankedByScore array, adding P/N
-  // sort the usersRankedByScore array again, in order of decreasing score
+// comparator function for getUsersRankedByScore
+function cmp2 (a: playerNameWithScoreAndTime, b: playerNameWithScoreAndTime) {
+  if (a.score > b.score) {
+    return -1;
+  } else if (a.score === b.score) {
+    return 0;
+  }
+  return 1;
+}
 
-  // const playerAnswers = quizSession.playerAnswers[questionPosition - 1];
+/**
+ * Calculates the score of each user, and returns it in an array of objects containing their
+ * name and score.
+ *
+ * Truthfully, this is an abomination as the data required is stored in different sections of the quiz session object.
+ * Here is a breakdown:
+ *  - for each question
+ *    - find all the players who answered correctly, save into a temporary array
+ *    - sort these players by order of increasing time to answer
+ *    - save these scores to another array containing each player's total score, using the formula P/N
+ *  - sort the final scores array by order of decreasing score
+ *
+ * @param {QuizSessionType} quizSession
+ * @returns {playerNameWithScoreAndTime[]}
+ */
+
+export const getUsersRankedByScore = (quizSession: QuizSessionType) => {
   const usersRankedByScore: playerNameWithScoreAndTime[] = [];
   for (const player of quizSession.players) {
     usersRankedByScore.push({ name: player.playerName, score: 0 });
@@ -278,6 +305,8 @@ export const getUsersRankedByScore = (quizSession: QuizSessionType) => {
 
     playersCorrectList.sort(cmp);
 
+    // according to spec, the score a player earns is P/N, where P is the question score and N
+    // is the order in which the person submitted the correct answer
     let scalingFactor = 1;
     for (const player of playersCorrectList) {
       const playerToIncrement = usersRankedByScore.find(user => user.name === player.name);
@@ -286,9 +315,25 @@ export const getUsersRankedByScore = (quizSession: QuizSessionType) => {
     }
   }
 
+  usersRankedByScore.sort(cmp2);
+
   return usersRankedByScore;
 };
 
+/**
+ * returns the results of a question, including the questionId, the players
+ * who answered correctly, the average answer time and the percent of
+ * players who got the correct answer
+ *
+ * @param quizSession
+ * @param questionPosition
+ * @returns {
+ *  questionId: number,
+ *  playersCorrectList: string[],
+ *  averageAnswerTime: number,
+ *  percentCorrect: number
+ * }
+ */
 export const getQuestionResults = (quizSession: QuizSessionType, questionPosition: number) => {
   const playersCorrectList: string[] = [];
   const questionAnswersArray = quizSession.metadata.questions[questionPosition - 1].answers;
@@ -323,6 +368,9 @@ export const getQuestionResults = (quizSession: QuizSessionType, questionPositio
   const numPlayersCorrect = playersCorrectList.length;
   const numPlayers = quizSession.players.length;
   const percentCorrect = Math.round(numPlayersCorrect / numPlayers * 100);
+
+  // sort playersCorrectList in increasing alphabetical order
+  playersCorrectList.sort((a, b) => a.localeCompare(b));
 
   return {
     questionId: quizSession.metadata.questions[questionPosition - 1].questionId,

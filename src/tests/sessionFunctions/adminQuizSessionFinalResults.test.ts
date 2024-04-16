@@ -23,6 +23,7 @@ let token2: string;
 let sessionId1: number;
 let player1: number;
 let player2: number;
+let player3: number;
 let questionBody1: QuestionType;
 let questionBody2: QuestionType;
 let questionBody3: QuestionType;
@@ -33,6 +34,7 @@ const AUTOSTARTNUM = 10;
 
 let question1Answers: AnswerType[];
 let question2Answers: AnswerType[];
+let question3Answers: AnswerType[];
 
 describe('adminQuizSessionFinalResults testing', () => {
   beforeEach(() => {
@@ -72,7 +74,7 @@ describe('adminQuizSessionFinalResults testing', () => {
     questionBody2 = {
       question: 'Why last vented in electrical?',
       duration: 2,
-      points: 8,
+      points: 6,
       answers: [
         {
           answer: 'Red',
@@ -96,8 +98,8 @@ describe('adminQuizSessionFinalResults testing', () => {
 
     questionBody3 = {
       question: 'How many imposters are left?',
-      duration: 1,
-      points: 6,
+      duration: 10,
+      points: 8,
       answers: [
         {
           answer: '1',
@@ -126,6 +128,7 @@ describe('adminQuizSessionFinalResults testing', () => {
 
     player1 = requestQuizSessionPlayerJoin(sessionId1, 'person1').jsonBody.playerId as number;
     player2 = requestQuizSessionPlayerJoin(sessionId1, 'person2').jsonBody.playerId as number;
+    player3 = requestQuizSessionPlayerJoin(sessionId1, 'person3').jsonBody.playerId as number;
 
     requestQuizSessionUpdate(token1, quizId1, sessionId1, 'NEXT_QUESTION');
     requestQuizSessionUpdate(token1, quizId1, sessionId1, 'SKIP_COUNTDOWN');
@@ -154,9 +157,8 @@ describe('adminQuizSessionFinalResults testing', () => {
     const question1Answer4 = question1Answers[3].answerId; // correct answer
     requestQuizSessionPlayerAnswer(player1, 1, [question1Answer1]);
     requestQuizSessionPlayerAnswer(player2, 1, [question1Answer4]);
-    sleepSync(1100);
+    requestQuizSessionPlayerAnswer(player3, 1, [question1Answer4]);
 
-    expect(requestQuizSessionInfo(token1, quizId1, sessionId1).jsonBody.state).toStrictEqual('QUESTION_CLOSE');
     requestQuizSessionUpdate(token1, quizId1, sessionId1, 'GO_TO_ANSWER');
     requestQuizSessionUpdate(token1, quizId1, sessionId1, 'NEXT_QUESTION');
     requestQuizSessionUpdate(token1, quizId1, sessionId1, 'SKIP_COUNTDOWN');
@@ -164,6 +166,7 @@ describe('adminQuizSessionFinalResults testing', () => {
     question2Answers = requestPlayerQuestionPosition(player1, 2).jsonBody.answers as AnswerType[];
     const question2Answer1 = question2Answers[0].answerId; // correct answer
     requestQuizSessionPlayerAnswer(player1, 2, [question2Answer1]);
+    requestQuizSessionPlayerAnswer(player3, 2, [question2Answer1]);
     sleepSync(1100);
     requestQuizSessionPlayerAnswer(player2, 2, [question2Answer1]);
     sleepSync(1100);
@@ -181,28 +184,34 @@ describe('adminQuizSessionFinalResults testing', () => {
         jsonBody: {
           usersRankedByScore: [
             {
-              name: 'person1',
+              name: 'person2',
+              score: 12
+            },
+            {
+              name: 'person3',
               score: 8
             },
             {
-              name: 'person2',
-              score: 14
+              name: 'person1',
+              score: 6
             }
           ],
           questionResults: [
             {
               questionId: questionId1,
               playersCorrectList: [
-                'person2'
+                'person2',
+                'person3'
               ],
               averageAnswerTime: expect.any(Number), // should be 0, generalised just in case
-              percentCorrect: 50
+              percentCorrect: 67
             },
             {
               questionId: questionId2,
               playersCorrectList: [
                 'person1',
-                'person2'
+                'person2',
+                'person3'
               ],
               averageAnswerTime: expect.any(Number), // should be 1, generalised just in case
               percentCorrect: 100
@@ -212,6 +221,94 @@ describe('adminQuizSessionFinalResults testing', () => {
               playersCorrectList: [],
               averageAnswerTime: 0, // no answers, should be 0
               percentCorrect: 0
+            }
+          ]
+        }
+      }
+    );
+  });
+
+  test('successfully get quiz info test 2', () => {
+    question1Answers = requestPlayerQuestionPosition(player1, 1).jsonBody.answers as AnswerType[];
+    const question1Answer4 = question1Answers[3].answerId; // correct answer
+    requestQuizSessionPlayerAnswer(player3, 1, [question1Answer4]);
+    requestQuizSessionPlayerAnswer(player2, 1, [question1Answer4]);
+    requestQuizSessionPlayerAnswer(player1, 1, [question1Answer4]);
+
+    requestQuizSessionUpdate(token1, quizId1, sessionId1, 'GO_TO_ANSWER');
+    requestQuizSessionUpdate(token1, quizId1, sessionId1, 'NEXT_QUESTION');
+
+    // test that state is open after 3 seconds
+    sleepSync(3100);
+    expect(requestQuizSessionInfo(token1, quizId1, sessionId1).jsonBody.state).toStrictEqual('QUESTION_OPEN');
+
+    question2Answers = requestPlayerQuestionPosition(player1, 2).jsonBody.answers as AnswerType[];
+    const question2Answer1 = question2Answers[0].answerId; // correct answer
+    requestQuizSessionPlayerAnswer(player1, 2, [question2Answer1]);
+    requestQuizSessionPlayerAnswer(player2, 2, [question2Answer1]);
+    requestQuizSessionPlayerAnswer(player3, 2, [question2Answer1]);
+
+    requestQuizSessionUpdate(token1, quizId1, sessionId1, 'GO_TO_ANSWER');
+    requestQuizSessionUpdate(token1, quizId1, sessionId1, 'NEXT_QUESTION');
+    requestQuizSessionUpdate(token1, quizId1, sessionId1, 'SKIP_COUNTDOWN');
+
+    question3Answers = requestPlayerQuestionPosition(player1, 3).jsonBody.answers as AnswerType[];
+    const question3Answer1 = question3Answers[0].answerId; // correct answer
+    requestQuizSessionPlayerAnswer(player3, 3, [question3Answer1]);
+    requestQuizSessionPlayerAnswer(player2, 3, [question3Answer1]);
+    requestQuizSessionPlayerAnswer(player1, 3, [question3Answer1]);
+
+    requestQuizSessionUpdate(token1, quizId1, sessionId1, 'GO_TO_ANSWER');
+    requestQuizSessionUpdate(token1, quizId1, sessionId1, 'GO_TO_FINAL_RESULTS');
+
+    expect(requestQuizSessionFinalResults(token1, quizId1, sessionId1)).toStrictEqual(
+      {
+        statusCode: 200,
+        jsonBody: {
+          usersRankedByScore: [
+            {
+              name: 'person3',
+              score: 20
+            },
+            {
+              name: 'person1', // Based on the spec, this could be either person 1 or 2. only score should matter to order here
+              score: 12
+            },
+            {
+              name: 'person2',
+              score: 12
+            }
+          ],
+          questionResults: [
+            {
+              questionId: questionId1,
+              playersCorrectList: [
+                'person1',
+                'person2',
+                'person3'
+              ],
+              averageAnswerTime: expect.any(Number), // should be 0, generalised just in case
+              percentCorrect: 100
+            },
+            {
+              questionId: questionId2,
+              playersCorrectList: [
+                'person1',
+                'person2',
+                'person3'
+              ],
+              averageAnswerTime: expect.any(Number), // should be 0 , generalised just in case
+              percentCorrect: 100
+            },
+            {
+              questionId: questionId3,
+              playersCorrectList: [
+                'person1',
+                'person2',
+                'person3'
+              ],
+              averageAnswerTime: expect.any(Number), // should be 0 , generalised just in case
+              percentCorrect: 100
             }
           ]
         }

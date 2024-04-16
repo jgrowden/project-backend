@@ -49,6 +49,7 @@ interface questionResultsType {
 *  sessionId: number
 * }
 */
+
 export function adminQuizSessionStart(token: string, quizId: number, autoStartNum: number): SessionIdType {
   const user = fetchUserFromSessionId(token);
   if (!user) {
@@ -147,12 +148,16 @@ export function adminQuizSessionUpdate(
       answers: []
     });
     const timeoutId = setTimeout(() => {
-      adminQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN');
-      for (let i = 0; i < getTimeoutData().length; i++) {
-        if (getTimeoutData()[i].sessionId === sessionId) {
-          getTimeoutData().splice(i, 1);
-          break;
+      try {
+        adminQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN');
+        for (let i = 0; i < getTimeoutData().length; i++) {
+          if (getTimeoutData()[i].sessionId === sessionId) {
+            getTimeoutData().splice(i, 1);
+            break;
+          }
         }
+      } catch (err) {
+        console.error('error caught', 'SKIP_COUNTDOWN', err, getTimeoutData());
       }
     }, 3000);
     getTimeoutData().push({
@@ -160,30 +165,38 @@ export function adminQuizSessionUpdate(
       sessionId: sessionId
     });
   } else if (action === 'SKIP_COUNTDOWN') {
-    const timeoutData = getTimeoutData().find(data => data.sessionId === sessionId);
-    clearTimeout(timeoutData.timeoutId);
-    session.state = 'QUESTION_OPEN';
-    for (let i = 0; i < getTimeoutData().length; i++) {
-      if (getTimeoutData()[i].sessionId === sessionId) {
-        getTimeoutData().splice(i, 1);
-        break;
+    for (const timer of getTimeoutData()) {
+      if (timer.sessionId === sessionId) {
+        clearTimeout(timer.timeoutId);
+        getTimeoutData().splice(getTimeoutData().indexOf(timer));
       }
     }
-    const timeoutId = setTimeout(() => {
-      session.state = 'QUESTION_CLOSE';
-      for (let i = 0; i < getTimeoutData().length; i++) {
-        if (getTimeoutData()[i].sessionId === sessionId) {
-          getTimeoutData().splice(i, 1);
-          break;
+
+    const timeoutId = setTimeout((sessionId) => {
+      try {
+        session.state = 'QUESTION_CLOSE';
+        for (let i = 0; i < getTimeoutData().length; i++) {
+          if (getTimeoutData()[i].sessionId === sessionId) {
+            clearTimeout(getTimeoutData()[i].timeoutId);
+            getTimeoutData().splice(i, 1);
+            break;
+          }
         }
+      } catch (err) {
+        console.log('error caught', err);
       }
-    }, session.metadata.questions[session.atQuestion - 1].duration * 1000);
+    }, session.metadata.questions[session.atQuestion - 1].duration * 1000, sessionId);
     getTimeoutData().push({
       timeoutId: timeoutId,
       sessionId: sessionId
     });
   } else if (action === 'GO_TO_ANSWER') {
-    // do nothing
+    for (const timer of getTimeoutData()) {
+      if (timer.sessionId === sessionId) {
+        clearTimeout(timer.timeoutId);
+        getTimeoutData().splice(getTimeoutData().indexOf(timer));
+      }
+    }
   } else if (action === 'GO_TO_FINAL_RESULTS') {
     session.atQuestion = 0;
   } else if (action === 'END') {
