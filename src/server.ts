@@ -66,6 +66,8 @@ import {
   playerQuestionAnswer,
   playerQuestionPosition,
   playerQuestionResults,
+  playerSessionResults,
+  playerSendChat,
   playerStatus
 } from './player';
 
@@ -622,6 +624,14 @@ app.get('/v1/player/:playerid/question/:questionposition/results', (req:Request,
   const playerId = parseInt(req.params.playerid);
   const questionPosition = parseInt(req.params.questionposition);
   const result = playerQuestionResults(playerId, questionPosition);
+  res.json(result);
+});
+
+// playerSendChat Route
+app.post('/v1/player/:playerid/chat', (req:Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const { message } = req.body;
+  const result = playerSendChat(playerId, message);
   res.json(result);
 });
 
