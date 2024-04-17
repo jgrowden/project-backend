@@ -186,6 +186,44 @@ export function adminQuizRestore(sessionId: string, quizId: number): ErrorObject
   return {};
 }
 
+export function adminQuizRestoreV2(sessionId: string, quizId: number): Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
+  console.log(`${user}`);
+  if (!user) {
+    throw HTTPError(401, 'Invalid token');
+  }
+
+  const deletedQuiz = fetchDeletedQuizFromQuizId(quizId);
+  const quiz = fetchQuizFromQuizId(quizId);
+
+  if (deletedQuiz !== undefined) {
+    if (deletedQuiz.ownerId !== user.authUserId) {
+      throw HTTPError(403, 'Invalid quiz ownership');
+    }
+  } else {
+    if (quiz === undefined) {
+      throw HTTPError(403, 'Invalid quiz');
+    } else {
+      throw HTTPError(400, 'Quiz not in trash');
+    }
+  }
+
+  const data = getData();
+  if (data.quizzes.find(quiz => quiz.ownerId === user.authUserId && quiz.name === deletedQuiz.name)) {
+    throw HTTPError(400, 'Quiz name already taken');
+  }
+
+  data.deletedQuizzes.splice(data.deletedQuizzes.indexOf(deletedQuiz), 1);
+
+  data.quizzes.push(deletedQuiz);
+
+  user.userQuizzes.push(quizId);
+
+  deletedQuiz.timeLastEdited = currentTime();
+
+  return {};
+}
+
 /**
  * Permanently delete specific quizzes currently sitting in the trash
  *
