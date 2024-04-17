@@ -141,6 +141,40 @@ export function adminQuizNameUpdate(sessionId: string, quizId: number, name: str
   return {};
 }
 
+export function adminQuizNameUpdateV2(sessionId: string, quizId: number, name: string): Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    throw HTTPError(401, 'Invalid token');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Invalid quiz');
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'Invalid quiz ownership');
+  }
+
+  if (regex.test(name)) {
+    throw HTTPError(400, 'Invalid characters found in quiz name');
+  }
+
+  if (name.length < quizNameMinLength || name.length > quizNameMaxLength) {
+    throw HTTPError(400, 'Invalid quiz name length');
+  }
+
+  const data = getData();
+  if (data.quizzes.find(quiz => quiz.ownerId === user.authUserId && quiz.name === name)) {
+    throw HTTPError(400, 'Quiz name already taken');
+  }
+
+  quiz.name = name;
+  quiz.timeLastEdited = currentTime();
+
+  return {};
+}
+
 /**
  * Restore a quiz from trash.
  *

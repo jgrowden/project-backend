@@ -31,6 +31,7 @@ import {
   adminQuizInfo,
   adminQuizInfoV2,
   adminQuizNameUpdate,
+  adminQuizNameUpdateV2,
   adminQuizDescriptionUpdate,
   adminQuizQuestionCreate,
   adminQuizQuestionCreateV2,
@@ -336,6 +337,16 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizNameUpdateV2 Route
+app.put('/v2/admin/quiz/:quizid/name', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const quizId = parseInt(req.params.quizid);
+  const { name } = req.body;
+  const result = adminQuizNameUpdateV2(token, quizId, name);
   save();
   res.json(result);
 });
