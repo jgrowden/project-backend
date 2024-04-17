@@ -70,6 +70,9 @@ export const requestQuizRestoreV2 = (token: string, quizId: number) =>
 export const requestQuizTrashEmpty = (token: string, quizIds: number[]) =>
   requestHelper('DELETE', '/v1/admin/quiz/trash/empty', { token, quizIds: JSON.stringify(quizIds) });
 
+export const requestQuizTrashEmptyV2 = (token: string, quizIds: number[]) =>
+  requestHelper('DELETE', '/v2/admin/quiz/trash/empty', { quizIds: JSON.stringify(quizIds) }, { token });
+
 export const requestUserDetails = (token: string) =>
   requestHelper('GET', '/v1/admin/user/details', { token });
 
