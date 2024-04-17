@@ -46,6 +46,9 @@ export const requestQuizNameUpdateV2 = (token: string, quizId: number, name: str
 export const requestQuizDescriptionUpdate = (token: string, quizId: number, description: string) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/description`, { token, description });
 
+export const requestQuizDescriptionUpdateV2 = (token: string, quizId: number, description: string) =>
+  requestHelper('PUT', `/v2/admin/quiz/${quizId}/description`, { description }, { token });
+
 export const requestQuizQuestionCreate = (token: string, quizId: number, questionBody: QuestionType) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/question`, { token, questionBody });
 
