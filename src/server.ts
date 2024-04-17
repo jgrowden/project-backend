@@ -66,7 +66,6 @@ import {
   playerQuestionAnswer,
   playerQuestionPosition,
   playerQuestionResults,
-  playerSessionResults,
   playerSendChat,
   playerStatus
 } from './player';
