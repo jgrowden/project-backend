@@ -1,11 +1,13 @@
 import HTTPError from 'http-errors';
 import {
   QuestionType,
+  MessageType,
   getData,
 } from './dataStore';
 import {
   currentTime,
   fetchQuizSessionFromPlayerId,
+  getUsersRankedByScore,
   getQuestionResults,
 } from './helper';
 
@@ -18,6 +20,9 @@ export interface PlayerStatusReturn {
   numQuestions: number;
   atQuestion: number;
 }
+
+const messageMinLength = 1;
+const messageMaxLength = 100;
 
 export function playerStatus(playerId: number): PlayerStatusReturn {
   const quizSession = fetchQuizSessionFromPlayerId(playerId);
@@ -110,4 +115,25 @@ export function playerQuestionResults(playerId: number, questionPosition: number
   }
 
   return getQuestionResults(quizSession, questionPosition);
+}
+
+export function playerSendChat(playerId: number, message: string) {
+  const quizSession = fetchQuizSessionFromPlayerId(playerId);
+  if (!quizSession) {
+    throw HTTPError(400, 'PlayerId does not exist');
+  }
+  if (message.length < messageMinLength || message.length > messageMaxLength) {
+    throw HTTPError(400, 'Invalid message length');
+  }
+
+  const player = quizSession.players.find(p => p.playerId === playerId);
+
+  quizSession.messages.push({
+    messageBody: message,
+    playerId: playerId,
+    playerName: player.playerName,
+    timeSent: currentTime()
+  });
+
+  return {};
 }
