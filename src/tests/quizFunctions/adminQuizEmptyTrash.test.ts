@@ -32,6 +32,13 @@ describe('adminQuizEmptyTrashV1 http testing', () => {
       expect(requestQuizTrashEmpty(otherToken, [quizId1])).toStrictEqual(errorCode(403));
     });
 
+    test('Error 403: Quiz does not exist', () => {
+      clear();
+      const user = requestAuthRegister('hayden.smith@unsw.edu.au', 'haydensmith123', 'Hayden', 'Smith');
+      token = user.jsonBody.token as string;
+      expect(requestQuizTrashEmpty(token, [1])).toStrictEqual(errorCode(403));
+    });
+
     test('Error 400: One or more quiz IDs not in the trash', () => {
       expect(requestQuizTrashEmpty(token, [quizId1])).toStrictEqual(errorCode(400));
     });
@@ -93,6 +100,13 @@ describe('adminQuizEmptyTrashV2 http testing', () => {
       const otherToken = otherUser.jsonBody.token as string;
       requestQuizDelete(token, quizId1);
       expect(() => requestQuizTrashEmptyV2(otherToken, [quizId1])).toThrow(HTTPError[403]);
+    });
+
+    test('Error 403: Quiz does not exist', () => {
+      clear();
+      const user = requestAuthRegister('hayden.smith@unsw.edu.au', 'haydensmith123', 'Hayden', 'Smith');
+      token = user.jsonBody.token as string;
+      expect(() => requestQuizTrashEmptyV2(token, [1])).toThrow(HTTPError[403]);
     });
 
     test('Error 400: One or more quiz IDs not in the trash', () => {
