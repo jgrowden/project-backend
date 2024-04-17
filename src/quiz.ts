@@ -279,6 +279,32 @@ export function adminQuizTrashEmpty(sessionId: string, quizIds: number[]): Error
   return {};
 }
 
+export function adminQuizTrashEmptyV2(sessionId: string, quizIds: number[]): Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    throw HTTPError(401, 'Invalid token');
+  }
+
+  const data = getData();
+  const deletedQuizzes = data.deletedQuizzes;
+
+  for (const quizId of quizIds) {
+    const quiz = deletedQuizzes.find(quiz => quiz.quizId === quizId);
+    if (quiz && quiz.ownerId !== user.authUserId) {
+      throw HTTPError(403, 'Invalid quiz ownership');
+    }
+  }
+
+  const nonTrashedQuizIds = quizIds.filter(quizId => !deletedQuizzes.some(quiz => quiz.quizId === quizId));
+  if (nonTrashedQuizIds.length > 0) {
+    throw HTTPError(400, 'One or more quizzes not in the trash');
+  }
+
+  data.deletedQuizzes = deletedQuizzes.filter(quiz => !quizIds.includes(quiz.quizId));
+
+  return {};
+}
+
 // Everything below has been migrated over to the server
 
 /// /////////////////////////////////////////////////////////////////////////////

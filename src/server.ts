@@ -43,6 +43,7 @@ import {
   adminQuizTrashInfo,
   adminQuizRestore,
   adminQuizTrashEmpty,
+  adminQuizTrashEmptyV2,
   adminQuizChangeOwner,
   adminQuizChangeOwnerV2,
   adminQuizQuestionDuplicate,
@@ -305,6 +306,16 @@ app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizTrashEmptyV2 Route
+app.delete('/v2/admin/quiz/trash/empty', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const quizIdsString = req.query.quizIds as string;
+  const quizIds = JSON.parse(quizIdsString) as number[];
+  const result = adminQuizTrashEmptyV2(token, quizIds);
   save();
   res.json(result);
 });
