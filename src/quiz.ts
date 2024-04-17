@@ -98,6 +98,31 @@ export function adminQuizDescriptionUpdate(sessionId: string, quizId: number, de
   return {};
 }
 
+export function adminQuizDescriptionUpdateV2(sessionId: string, quizId: number, description: string): Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    throw HTTPError(401, 'Invalid token');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Invalid quiz');
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'Invalid quiz ownership');
+  }
+
+  if (description.length > quizDescriptionMaxLength) {
+    throw HTTPError(400, 'Quiz description should be less than 100 characters');
+  }
+
+  quiz.description = description;
+  quiz.timeLastEdited = currentTime();
+
+  return {};
+}
+
 /**
  * Update the name of the relevant quiz.
  *
@@ -141,6 +166,40 @@ export function adminQuizNameUpdate(sessionId: string, quizId: number, name: str
   return {};
 }
 
+export function adminQuizNameUpdateV2(sessionId: string, quizId: number, name: string): Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
+  if (!user) {
+    throw HTTPError(401, 'Invalid token');
+  }
+
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Invalid quiz');
+  }
+
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'Invalid quiz ownership');
+  }
+
+  if (regex.test(name)) {
+    throw HTTPError(400, 'Invalid characters found in quiz name');
+  }
+
+  if (name.length < quizNameMinLength || name.length > quizNameMaxLength) {
+    throw HTTPError(400, 'Invalid quiz name length');
+  }
+
+  const data = getData();
+  if (data.quizzes.find(quiz => quiz.ownerId === user.authUserId && quiz.name === name)) {
+    throw HTTPError(400, 'Quiz name already taken');
+  }
+
+  quiz.name = name;
+  quiz.timeLastEdited = currentTime();
+
+  return {};
+}
+
 /**
  * Restore a quiz from trash.
  *
@@ -173,6 +232,44 @@ export function adminQuizRestore(sessionId: string, quizId: number): ErrorObject
   const data = getData();
   if (data.quizzes.find(quiz => quiz.ownerId === user.authUserId && quiz.name === deletedQuiz.name)) {
     return returnError('Quiz name already taken', 400);
+  }
+
+  data.deletedQuizzes.splice(data.deletedQuizzes.indexOf(deletedQuiz), 1);
+
+  data.quizzes.push(deletedQuiz);
+
+  user.userQuizzes.push(quizId);
+
+  deletedQuiz.timeLastEdited = currentTime();
+
+  return {};
+}
+
+export function adminQuizRestoreV2(sessionId: string, quizId: number): Record<string, never> {
+  const user = fetchUserFromSessionId(sessionId);
+  console.log(`${user}`);
+  if (!user) {
+    throw HTTPError(401, 'Invalid token');
+  }
+
+  const deletedQuiz = fetchDeletedQuizFromQuizId(quizId);
+  const quiz = fetchQuizFromQuizId(quizId);
+
+  if (deletedQuiz !== undefined) {
+    if (deletedQuiz.ownerId !== user.authUserId) {
+      throw HTTPError(403, 'Invalid quiz ownership');
+    }
+  } else {
+    if (quiz === undefined) {
+      throw HTTPError(403, 'Invalid quiz');
+    } else {
+      throw HTTPError(400, 'Quiz not in trash');
+    }
+  }
+
+  const data = getData();
+  if (data.quizzes.find(quiz => quiz.ownerId === user.authUserId && quiz.name === deletedQuiz.name)) {
+    throw HTTPError(400, 'Quiz name already taken');
   }
 
   data.deletedQuizzes.splice(data.deletedQuizzes.indexOf(deletedQuiz), 1);

@@ -31,7 +31,9 @@ import {
   adminQuizInfo,
   adminQuizInfoV2,
   adminQuizNameUpdate,
+  adminQuizNameUpdateV2,
   adminQuizDescriptionUpdate,
+  adminQuizDescriptionUpdateV2,
   adminQuizQuestionCreate,
   adminQuizQuestionCreateV2,
   adminQuizQuestionUpdate,
@@ -40,6 +42,7 @@ import {
   adminQuizQuestionMoveV2,
   adminQuizTrashInfo,
   adminQuizRestore,
+  adminQuizRestoreV2,
   adminQuizTrashEmpty,
   adminQuizChangeOwner,
   adminQuizChangeOwnerV2,
@@ -294,6 +297,15 @@ app.post('/v1/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizRestoreV2 Route
+app.post('/v2/admin/quiz/:quizid/restore', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const quizId = parseInt(req.params.quizid);
+  const result = adminQuizRestoreV2(token, quizId);
+  save();
+  res.json(result);
+});
+
 // adminQuizTrashEmpty Route
 app.delete('/v1/admin/quiz/trash/empty', (req: Request, res: Response) => {
   const token = req.query.token as string;
@@ -340,6 +352,16 @@ app.put('/v1/admin/quiz/:quizid/name', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizNameUpdateV2 Route
+app.put('/v2/admin/quiz/:quizid/name', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const quizId = parseInt(req.params.quizid);
+  const { name } = req.body;
+  const result = adminQuizNameUpdateV2(token, quizId, name);
+  save();
+  res.json(result);
+});
+
 // adminQuizDescriptionUpdate Route
 app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   const quizId = parseInt(req.params.quizid);
@@ -348,6 +370,16 @@ app.put('/v1/admin/quiz/:quizid/description', (req: Request, res: Response) => {
   if ('errorCode' in result) {
     return res.status(result.errorCode).json(result.errorObject);
   }
+  save();
+  res.json(result);
+});
+
+// adminQuizDescriptionUpdateV2 Route
+app.put('/v2/admin/quiz/:quizid/description', (req: Request, res: Response) => {
+  const token = req.get('token') as string;
+  const quizId = parseInt(req.params.quizid);
+  const { description } = req.body;
+  const result = adminQuizDescriptionUpdateV2(token, quizId, description);
   save();
   res.json(result);
 });
