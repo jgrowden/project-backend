@@ -20,7 +20,9 @@ import {
   getQuestionResults,
   getUsersRankAndScoreByQuestion
 } from './helper';
-import { mkConfig, generateCsv, download } from "export-to-csv";
+const { convertArrayToCSV } = require('convert-array-to-csv');
+const converter = require('convert-array-to-csv');
+import fs from 'fs';
 
 export interface SessionIdType {
   sessionId: number;
@@ -245,8 +247,16 @@ export function adminQuizSessionResultsCSV(token: string, quizId: number, sessio
       csvData[j].push(playerData.rank.toString());
     }
   }
-});
-}
+  const csvFromArrayOfArrays = convertArrayToCSV(csvData, {
+    header,
+    separator: ','
+  });
+  fs.writeFile('../csv-results/quizdata.csv', csvFromArrayOfArrays, (err) => {
+    if (err) throw err;
+  });
+  return '../csv-results/quizdata.csv'
+};
+
 
 /**
  * Retrieves information about a session, including state, the current question,
