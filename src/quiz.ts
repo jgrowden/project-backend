@@ -290,8 +290,8 @@ export function adminQuizTrashEmptyV2(sessionId: string, quizIds: number[]): Rec
   }
 
   for (const quizId of quizIds) {
-    let deletedQuiz = fetchDeletedQuizFromQuizId(quizId);
-    let quiz = fetchQuizFromQuizId(quizId);
+    const deletedQuiz = fetchDeletedQuizFromQuizId(quizId);
+    const quiz = fetchQuizFromQuizId(quizId);
 
     if (deletedQuiz !== undefined) {
       if (deletedQuiz.ownerId !== user.authUserId) {
