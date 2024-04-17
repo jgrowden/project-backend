@@ -1,13 +1,11 @@
 import HTTPError from 'http-errors';
 import {
   QuestionType,
-  MessageType,
   getData,
 } from './dataStore';
 import {
   currentTime,
   fetchQuizSessionFromPlayerId,
-  getUsersRankedByScore,
   getQuestionResults,
 } from './helper';
 

@@ -1,6 +1,6 @@
 import HTTPError from 'http-errors';
-import { clear, requestAuthRegister, requestQuizCreateV2, requestQuizQuestionCreateV2, requestSessionResults, requestQuizSessionInfo, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestSendChat } from '../wrapper';
-import { QuestionType, MessageType } from '../../dataStore';
+import { clear, requestAuthRegister, requestQuizCreateV2, requestQuizQuestionCreateV2, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestSendChat } from '../wrapper';
+import { QuestionType } from '../../dataStore';
 
 beforeEach(() => {
   clear();
@@ -18,12 +18,6 @@ let player3: number;
 let questionBody1: QuestionType;
 let questionBody2: QuestionType;
 let questionBody3: QuestionType;
-let questionId1: number;
-let questionId2: number;
-let questionId3: number;
-let message1: MessageType;
-let message2: MessageType;
-let message3: MessageType;
 const AUTOSTARTNUM = 10;
 
 describe('playerSendChat testing', () => {
@@ -109,9 +103,9 @@ describe('playerSendChat testing', () => {
       thumbnailUrl: 'http://alsosus.com/sus.jpg'
     };
 
-    questionId1 = requestQuizQuestionCreateV2(token1, quizId1, questionBody1).jsonBody.questionId as number;
-    questionId2 = requestQuizQuestionCreateV2(token1, quizId1, questionBody2).jsonBody.questionId as number;
-    questionId3 = requestQuizQuestionCreateV2(token1, quizId1, questionBody3).jsonBody.questionId as number;
+    requestQuizQuestionCreateV2(token1, quizId1, questionBody1).jsonBody.questionId as number;
+    requestQuizQuestionCreateV2(token1, quizId1, questionBody2).jsonBody.questionId as number;
+    requestQuizQuestionCreateV2(token1, quizId1, questionBody3).jsonBody.questionId as number;
     sessionId1 = requestQuizSessionStart(token1, quizId1, AUTOSTARTNUM).jsonBody.sessionId as number;
 
     player1 = requestQuizSessionPlayerJoin(sessionId1, 'person1').jsonBody.playerId as number;
@@ -202,24 +196,24 @@ describe('playerSendChat testing', () => {
       thumbnailUrl: 'http://alsosus.com/sus.jpg'
     };
 
-    questionId1 = requestQuizQuestionCreateV2(token1, quizId1, questionBody1).jsonBody.questionId as number;
-    questionId2 = requestQuizQuestionCreateV2(token1, quizId1, questionBody2).jsonBody.questionId as number;
-    questionId3 = requestQuizQuestionCreateV2(token1, quizId1, questionBody3).jsonBody.questionId as number;
+    requestQuizQuestionCreateV2(token1, quizId1, questionBody1).jsonBody.questionId as number;
+    requestQuizQuestionCreateV2(token1, quizId1, questionBody2).jsonBody.questionId as number;
+    requestQuizQuestionCreateV2(token1, quizId1, questionBody3).jsonBody.questionId as number;
     sessionId1 = requestQuizSessionStart(token1, quizId1, AUTOSTARTNUM).jsonBody.sessionId as number;
 
     player1 = requestQuizSessionPlayerJoin(sessionId1, 'person1').jsonBody.playerId as number;
-    
-    expect(() => requestSendChat(player1 + 1, "hi")).toThrow(HTTPError[400]);
+
+    expect(() => requestSendChat(player1 + 1, 'hi')).toThrow(HTTPError[400]);
   });
 
   test('message too long or short', () => {
-    expect(() => requestSendChat(player1, "")).toThrow(HTTPError[400]);
-    expect(() => requestSendChat(player1, "01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890")).toThrow(HTTPError[400]);
+    expect(() => requestSendChat(player1, '')).toThrow(HTTPError[400]);
+    expect(() => requestSendChat(player1, '01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890')).toThrow(HTTPError[400]);
   });
 
   test('successfully send chat', () => {
-    requestSendChat(player1, "hi everyone!");
-    requestSendChat(player2, "hey player1, how are we all?");
-    requestSendChat(player3, "fantastic");
+    requestSendChat(player1, 'hi everyone!');
+    requestSendChat(player2, 'hey player1, how are we all?');
+    requestSendChat(player3, 'fantastic');
   });
 });
