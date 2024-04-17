@@ -66,6 +66,7 @@ import {
   playerQuestionAnswer,
   playerQuestionPosition,
   playerQuestionResults,
+  playerSessionResults,
   playerStatus
 } from './player';
 
@@ -622,6 +623,13 @@ app.get('/v1/player/:playerid/question/:questionposition/results', (req:Request,
   const playerId = parseInt(req.params.playerid);
   const questionPosition = parseInt(req.params.questionposition);
   const result = playerQuestionResults(playerId, questionPosition);
+  res.json(result);
+});
+
+// playerSessionResults Route
+app.get('/v1/player/:playerid/results', (req:Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const result = playerSessionResults(playerId);
   res.json(result);
 });
 
