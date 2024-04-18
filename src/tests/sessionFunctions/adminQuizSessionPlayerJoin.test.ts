@@ -35,6 +35,12 @@ describe('Testing for POST /v1/player/join:', () => {
       jsonBody: { playerId: expect.any(Number) }
     });
   });
+  test('Success: no name provided', () => {
+    expect(requestQuizSessionPlayerJoin(sessionId, '')).toStrictEqual({
+      statusCode: 200,
+      jsonBody: { playerId: expect.any(Number) }
+    });
+  });
   test('Fail: Name given is not unique', () => {
     requestQuizSessionPlayerJoin(sessionId, 'John Smith');
     expect(() => requestQuizSessionPlayerJoin(sessionId, 'John Smith')).toThrow(HTTPError[400]);
@@ -43,7 +49,7 @@ describe('Testing for POST /v1/player/join:', () => {
     expect(() => requestQuizSessionPlayerJoin(sessionId + 1, 'John Smith')).toThrow(HTTPError[400]);
   });
   test('Fail: Session is not in LOBBY state', () => {
-    requestQuizSessionUpdate(token, quizId, sessionId, 'NEXT_QUESTION');
+    expect(() => requestQuizSessionUpdate(token, quizId, sessionId, 'NEXT_QUESTION')).not.toThrow(HTTPError[400]);
     expect(() => requestQuizSessionPlayerJoin(sessionId, 'John Smith')).toThrow(HTTPError[400]);
   });
 });

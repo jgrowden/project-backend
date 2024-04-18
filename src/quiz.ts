@@ -5,7 +5,7 @@ import {
   fetchDeletedQuizFromQuizId,
   fetchQuestionFromQuestionId,
   generateNewQuizId,
-  userWithEmailExists,
+  fetchUserfromEmail,
   generateNewQuestionId,
   currentTime,
   returnError,
@@ -351,12 +351,6 @@ export function adminQuizTrashEmptyV2(sessionId: string, quizIds: number[]): Rec
   return {};
 }
 
-// Everything below has been migrated over to the server
-
-/// /////////////////////////////////////////////////////////////////////////////
-/// /////////////////////////////////////////////////////////////////////////////
-/// /////////////////////////////////////////////////////////////////////////////
-
 /**
  * Provide a list of all quizzes that are owned by the currently logged in user.
  *
@@ -379,9 +373,7 @@ export function adminQuizList(sessionId: string): AdminQuizListReturn | ErrorObj
     return returnError('User ID not found', 401);
   }
 
-  const userQuizzes = user.userQuizzes.map(quizId => fetchQuizFromQuizId(quizId));
-  const returnQuizzes = userQuizzes.map(quiz => { return { quizId: quiz.quizId, name: quiz.name }; });
-  return { quizzes: returnQuizzes };
+  return { quizzes: user.userQuizzes.map(quizId => { return { quizId: quizId, name: fetchQuizFromQuizId(quizId).name }; }) };
 }
 
 export function adminQuizListV2(token: string): AdminQuizListReturn {
@@ -391,9 +383,7 @@ export function adminQuizListV2(token: string): AdminQuizListReturn {
     throw HTTPError(401, 'Invalid user id');
   }
 
-  const userQuizzes = user.userQuizzes.map(quizId => fetchQuizFromQuizId(quizId));
-  const returnQuizzes = userQuizzes.map(quiz => { return { quizId: quiz.quizId, name: quiz.name }; });
-  return { quizzes: returnQuizzes };
+  return { quizzes: user.userQuizzes.map(quizId => { return { quizId: quizId, name: fetchQuizFromQuizId(quizId).name }; }) };
 }
 
 /**
@@ -885,7 +875,7 @@ export function adminQuizChangeOwner(
     return returnError('Email provided is the same as the logged in user');
   }
 
-  const userWithEmailExist = userWithEmailExists(userEmail);
+  const userWithEmailExist = fetchUserfromEmail(userEmail);
   if (!userWithEmailExist) {
     return returnError('User email does not exist');
   }
@@ -925,7 +915,7 @@ export function adminQuizChangeOwnerV2(
     throw HTTPError(400, 'Email provided is the same as the logged in user');
   }
 
-  const userWithEmailExist = userWithEmailExists(userEmail);
+  const userWithEmailExist = fetchUserfromEmail(userEmail);
   if (!userWithEmailExist) {
     throw HTTPError(400, 'User email does not exist');
   }
@@ -936,7 +926,9 @@ export function adminQuizChangeOwnerV2(
   }
 
   const quizState = quiz.quizSessions.find(session => session.state !== 'END');
-  if (quizState) throw HTTPError(400, 'Some session is not in END state');
+  if (quizState) {
+    throw HTTPError(400, 'Some session is not in END state');
+  }
 
   quiz.ownerId = userWithEmailExist.authUserId;
   user.userQuizzes.splice(user.userQuizzes.indexOf(quizId), 1);
@@ -1423,6 +1415,7 @@ export function adminQuizThumbnailUpdate(token: string, quizId: number, imgUrl: 
   if (!imgUrl || imgUrl === '') {
     throw HTTPError(400, 'empty/undefined imgUrl');
   }
+
   if (!isValidThumbnail(imgUrl)) {
     throw HTTPError(400, 'imgUrl must start with http:// or https:// and have type jpg, jpeg or png');
   }
