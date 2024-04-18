@@ -1,4 +1,4 @@
-import request, { HttpVerb } from 'sync-request-curl';
+import request, { HttpVerb } from 'sync-request';
 import { port, url } from '../config.json';
 import { IncomingHttpHeaders } from 'http';
 import HTTPError from 'http-errors';
