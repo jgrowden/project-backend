@@ -145,7 +145,7 @@ export const requestQuizSessionPlayerJoin = (sessionId: number, name: string) =>
 export const requestPlayerStatus = (playerId: number) =>
   requestHelper('GET', `/v1/player/${playerId}`, { playerId }, {});
 
-export const requestQuizSessionResultsCSV = (token: string, quizId: number, sessionId: number) => 
+export const requestQuizSessionResultsCSV = (token: string, quizId: number, sessionId: number) =>
   requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}/results/csv`, { quizId, sessionId }, { token });
 
 export const requestPlayerQuestionPosition = (playerId: number, questionPosition: number) =>
@@ -157,7 +157,11 @@ export const requestQuizSessionPlayerAnswer = (playerId: number, questionPositio
 export const requestQuestionResults = (playerId: number, questionPosition: number) =>
   requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}/results`, {}, {});
 
-export const clear = () => requestHelper('DELETE', '/v1/clear');
+export const requestCSV = (filename: string) => {
+  requestHelper('GET', `/csv-results/${filename}`, {}, {});
+};
+
+export const requestClear = () => requestHelper('DELETE', '/v1/clear');
 
 export const errorCode = (statusCode: number) => {
   return { statusCode: statusCode, jsonBody: { error: expect.any(String) } };

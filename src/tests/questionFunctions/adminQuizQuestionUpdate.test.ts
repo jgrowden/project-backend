@@ -10,7 +10,7 @@ import {
   requestQuizQuestionCreateV2,
   requestQuestionUpdate,
   requestQuestionUpdateV2,
-  clear,
+  requestClear,
   errorCode
 } from '../wrapper';
 
@@ -19,7 +19,7 @@ let quizId: number;
 let questionId: number;
 let questionBody: QuestionType;
 beforeEach(() => {
-  clear();
+  requestClear();
 });
 
 describe('Testing Question Update V1', () => {

@@ -1,5 +1,5 @@
 import HTTPError from 'http-errors';
-import { 
+import {
   requestAuthRegister,
   requestQuizCreateV2,
   requestQuizSessionStart,
@@ -7,23 +7,18 @@ import {
   requestQuizSessionUpdate,
   requestQuizSessionPlayerJoin,
   requestQuizSessionResultsCSV,
-  clear
+  requestClear
 } from '../wrapper';
 import { QuestionType } from '../../dataStore';
 
 let token: string;
 let anotherToken: string;
 let quizId: number;
-let questionId1: number;
-let questionId2: number;
-let questionId3: number;
 let sessionId: number;
-let playerId1: number;
-let playerId2: number;
 const AUTOSTARTNUM = 10;
 
 beforeEach(() => {
-  clear();
+  requestClear();
   token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token as string;
   anotherToken = requestAuthRegister('bestMother420@gmail.com', 'iamreallytall420', 'alyssa', 'iscrazyhelpme').jsonBody.token as string;
   quizId = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description').jsonBody.quizId as number;
@@ -45,12 +40,12 @@ beforeEach(() => {
     points: 4,
     answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }]
   };
-  questionId1 = requestQuizQuestionCreate(token, quizId, questionBody1).jsonBody.questionId as number;
-  questionId2 = requestQuizQuestionCreate(token, quizId, questionBody2).jsonBody.questionId as number;
-  questionId3 = requestQuizQuestionCreate(token, quizId, questionBody3).jsonBody.questionId as number;
+  requestQuizQuestionCreate(token, quizId, questionBody1);
+  requestQuizQuestionCreate(token, quizId, questionBody2);
+  requestQuizQuestionCreate(token, quizId, questionBody3);
   sessionId = requestQuizSessionStart(token, quizId, AUTOSTARTNUM).jsonBody.sessionId as number;
-  playerId1 = requestQuizSessionPlayerJoin(sessionId, 'marcus').jsonBody.playerId as number;
-  playerId2 = requestQuizSessionPlayerJoin(sessionId, 'milk').jsonBody.playerId as number;
+  requestQuizSessionPlayerJoin(sessionId, 'marcus');
+  requestQuizSessionPlayerJoin(sessionId, 'milk');
 });
 
 describe('Testing for GET /v1/admin/quiz/{quizid}/session/{sessionid}/results/csv', () => {
@@ -65,12 +60,10 @@ describe('Testing for GET /v1/admin/quiz/{quizid}/session/{sessionid}/results/cs
     requestQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN');
     requestQuizSessionUpdate(token, quizId, sessionId, 'GO_TO_ANSWER');
     requestQuizSessionUpdate(token, quizId, sessionId, 'GO_TO_FINAL_RESULTS');
-    let url = requestQuizSessionResultsCSV(token, quizId, sessionId).jsonBody;
-    expect(url).toStrictEqual(expect.any(String));
-    requestQuizSessionUpdate(token, quizId, sessionId, 'END');
-  });
-  test('Fail: session Id does not refer to a valid session within this quiz', () => {
-    expect(() => requestQuizSessionResultsCSV(token, quizId, -1)).toThrow(HTTPError[400]);
+    expect(requestQuizSessionResultsCSV(token, quizId, sessionId)).toStrictEqual({
+      statusCode: 200,
+      jsonBody: { url: expect.any(String) }
+    });
   });
   test('Fail: session is not in FINAL_RESULTS state', () => {
     expect(() => requestQuizSessionResultsCSV(token, quizId, sessionId)).toThrow(HTTPError[400]);
@@ -84,9 +77,15 @@ describe('Testing for GET /v1/admin/quiz/{quizid}/session/{sessionid}/results/cs
     expect(() => requestQuizSessionResultsCSV(token, quizId, sessionId)).toThrow(HTTPError[400]);
   });
   test('Fail: Token is empty or invalid (does not refer to valid logged in user session)', () => {
-    expect(() => requestQuizSessionResultsCSV(token, -1, sessionId)).toThrow(HTTPError[401]);
+    expect(() => requestQuizSessionResultsCSV(token + 'a', quizId, sessionId)).toThrow(HTTPError[401]);
+  });
+  test('Fail: invalid quizId is provided', () => {
+    expect(() => requestQuizSessionResultsCSV(token, quizId + 1, sessionId)).toThrow(HTTPError[403]);
   });
   test('Fail: Valid token is provided, but user is not an owner of this quiz', () => {
     expect(() => requestQuizSessionResultsCSV(anotherToken, quizId, sessionId)).toThrow(HTTPError[403]);
+  });
+  test('Fail: session Id is not a valid session Id for this quiz', () => {
+    expect(() => requestQuizSessionResultsCSV(token, quizId, -1)).toThrow(HTTPError[400]);
   });
 });

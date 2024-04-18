@@ -1,9 +1,9 @@
-import { requestAuthRegister, requestAuthLogin, requestUserPasswordUpdate, requestUserPasswordUpdateV2, clear, errorCode } from '../wrapper';
+import { requestAuthRegister, requestAuthLogin, requestUserPasswordUpdate, requestUserPasswordUpdateV2, requestClear, errorCode } from '../wrapper';
 import HTTPError from 'http-errors';
 
 let token: string;
 beforeEach(() => {
-  clear();
+  requestClear();
   const { jsonBody } = requestAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
   token = jsonBody.token as string;
 });

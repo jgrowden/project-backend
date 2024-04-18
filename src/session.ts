@@ -1,7 +1,6 @@
 import HTTPError from 'http-errors';
 import {
   QuestionType,
-  QuizSessionType,
   SessionAction,
   SessionState,
   getTimeoutData,
@@ -18,12 +17,9 @@ import {
   updateState,
   getUsersRankedByScore,
   getQuestionResults,
-  getUsersRankAndScoreByQuestion,
-  fetchQuizFromSessionId
+  fetchQuizFromSessionId,
+  writeResultsCSV
 } from './helper';
-const { convertArrayToCSV } = require('convert-array-to-csv');
-const converter = require('convert-array-to-csv');
-import fs from 'fs';
 
 export interface SessionIdType {
   sessionId: number;
@@ -211,53 +207,31 @@ export function adminQuizSessionUpdate(
   return {};
 }
 
-export function adminQuizSessionResultsCSV(token: string, quizId: number, sessionId: number): string {
-  const quiz = fetchQuizFromQuizId(quizId);
-  if (!(quiz.quizSessions.find(session => session.quizSessionId === sessionId))) {
-    throw HTTPError(400);
-  }
-  const quizSession = fetchSessionFromSessionId(sessionId);
-  if (quizSession.state !== 'FINAL_RESULTS') {
-    throw HTTPError(400);
-  }
+export function adminQuizSessionResultsCSV(token: string, quizId: number, sessionId: number): {url: string} {
   const user = fetchUserFromSessionId(token);
   if (!user) {
-    throw HTTPError(401);
+    throw HTTPError(401, 'User not found');
   }
-  if (user.authUserId !== quizSession.metadata.ownerId) {
-    throw HTTPError(403);
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Quiz not found');
   }
-  let csvData: string[][] = [];
-  let header: string[] = [];
-  header.push('Player');
-  for(let i = 1; i <= quiz.numQuestions; i++) {
-    header.push(`question${i}score`);
-    header.push(`question${i}rank`);
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'User does not own quiz');
   }
-  csvData.push(header);
+  const session = fetchSessionFromSessionId(sessionId);
+  if (!session) {
+    throw HTTPError(400, 'Session not found');
+  }
+  if (quizId !== fetchQuizFromSessionId(sessionId).quizId) {
+    throw HTTPError(400, 'SessionId is not a session of this quiz');
+  }
+  if (session.state !== 'FINAL_RESULTS') {
+    throw HTTPError(400, 'session is not in FINAL_RESULTS state');
+  }
 
-  for (let i = 0; i < quizSession.players.length; i++) {
-    csvData.push([`${quizSession.players[i].playerName}`]);
-  }
-
-  for (let i = 1; i <= quiz.numQuestions; i++) {
-    let playersData = getUsersRankAndScoreByQuestion(quizSession, i);
-    for (let j = 1; j <= quizSession.players.length; j++) {
-      let playerData = playersData.find(playerData => playerData.name === csvData[j][0]);
-      csvData[j].push(playerData.score.toString());
-      csvData[j].push(playerData.rank.toString());
-    }
-  }
-  const csvFromArrayOfArrays = convertArrayToCSV(csvData, {
-    header,
-    separator: ','
-  });
-  fs.writeFile('../csv-results/quizdata.csv', csvFromArrayOfArrays, (err) => {
-    if (err) throw err;
-  });
-  return '../csv-results/quizdata.csv'
-};
-
+  return writeResultsCSV(sessionId);
+}
 
 /**
  * Retrieves information about a session, including state, the current question,
@@ -339,7 +313,7 @@ export function adminQuizSessionsView(token: string, quizId: number): SessionVie
 *  playerId: number
 * }
 */
-export function adminQuizSessionPlayerJoin(
+export function playerQuizSessionJoin(
   sessionId: number,
   name: string
 ): playerIdType {

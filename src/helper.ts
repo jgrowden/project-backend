@@ -6,10 +6,9 @@ import {
   SessionState,
   QuizSessionType,
   SessionAction,
-  QuestionPlayerAnswersType,
-  PlayerAnswerType,
   newState
 } from './dataStore';
+import fs from 'fs';
 
 export interface ErrorObject {
   error: string;
@@ -25,7 +24,7 @@ export interface ErrorString {
   error: string
 }
 
-interface playerNameWithScoreAndTime {
+export interface playerNameWithScoreAndTime {
   name: string;
   score: number;
   timeToAnswer?: number;
@@ -279,76 +278,77 @@ export const getQuestionResults = (quizSession: QuizSessionType, questionPositio
   };
 };
 
-// comparator function for getUsersRankedByScore
-function cmp (a: playerNameWithScoreAndTime, b: playerNameWithScoreAndTime) {
-  if (a.timeToAnswer < b.timeToAnswer) {
-    return -1;
-  } else if (a.timeToAnswer === b.timeToAnswer) {
-    return 0;
-  }
-  return 1;
-}
-
-// comparator function for getUsersRankedByScore
-function cmp2 (a: playerNameWithScoreAndTime, b: playerNameWithScoreAndTime) {
-  if (a.score > b.score) {
-    return -1;
-  } else if (a.score === b.score) {
-    return 0;
-  }
-  return 1;
-}
-
 /**
- * returns the players in an array containing their rank and score for the given question
+ * Creates the CSV for the results of a session. Returns the path of the
+ * created CSV file.
  *
- * @param quizSession
- * @param questionPosition
- * @returns {playerNameWithScoreAndTime[]}
+ * playerCsvData is a data struct that holds temporary information.
  *
+ * @param sessionId
+ * @returns {
+*  url: string
+* }
 */
-export const getUsersRankAndScoreByQuestion = ( quizSession: QuizSessionType, questionPosition: number ): playerNameWithScoreAndTime[] => {
-  let players: playerNameWithScoreAndTime[];
-  const correctPlayers = getQuestionResults(quizSession, questionPosition).playersCorrectList;
-  const playerAnswers = quizSession.playerAnswers[questionPosition - 1];
-  for (let player of quizSession.players) {
-    if (correctPlayers.find(correctPlayer => correctPlayer === player.playerName)) {
-      let playerAnswer: PlayerAnswerType = playerAnswers.answers.find(playerAnswer => playerAnswer.playerId === player.playerId)
-      players.push({
-        name: player.playerName,
-        score: quizSession.metadata.questions[questionPosition - 1].points,
-        timeToAnswer: playerAnswer.answerTime
-      })
-    } else {
-      players.push({
-        name: player.playerName,
-        score: 0
-      })
-    }
-  }
-  players.sort(cmp);
-  let scalingFactor = 1;
-  for (const player of correctPlayers) {
-    const playerToIncrement = players.find(user => user.name === player);
-    playerToIncrement.score = Math.round(playerToIncrement.score / scalingFactor);
-    scalingFactor++;
-  }
-  players.sort(cmp2);
-  let sameRank: number = 1;
-  for (const player of players) {
-    if (players.indexOf(player) === 0) {
-      players[0].rank = 1;
-      continue;
-    } else {
-      let index: number = players.indexOf(player);
-      if (players[index].score === players[index - 1].score) {
-        players[index].rank = players[index - 1].rank;
-        sameRank++;
-      } else {
-        players[index].rank = players[index - 1].rank + sameRank;
-        sameRank = 1;
+
+interface playerCsvData {
+  name: string;
+  results?: number[];
+  rank?: number;
+  score?: number;
+}
+
+export const writeResultsCSV = (sessionId: number) => {
+  const session = fetchSessionFromSessionId(sessionId);
+
+  const headers = ['player'];
+  const playerInfo: playerCsvData[] = session.players.map(player => {
+    return { name: player.playerName, results: [] };
+  });
+
+  // for each question
+  for (let i = 0; i < session.playerAnswers.length; i++) {
+    headers.push(`question${i + 1}score`, `question${i + 1}rank`);
+
+    // what players got it right?
+    const playersCorrectList: playerNameWithScoreAndTime[] = [];
+    const correctAnswers = session.metadata.questions[i].answers
+      .filter(answer => answer.correct === true).map(answer => answer.answerId).sort().join(',');
+    const responses = session.playerAnswers[i];
+
+    for (const answer of responses.answers) {
+      if (correctAnswers === answer.answerIds.sort().join(',')) {
+        playersCorrectList.push({
+          name: session.players.find(player => player.playerId === answer.playerId).playerName,
+          score: session.metadata.questions[i].points,
+          timeToAnswer: answer.answerTime - responses.questionStartTime,
+          rank: 0
+        });
       }
     }
+
+    // rank the players who got the question right
+    playersCorrectList.sort((a, b) => a.timeToAnswer - b.timeToAnswer);
+    for (let j = 0; j < playersCorrectList.length; j++) {
+      if (j !== 0 && playersCorrectList[j].timeToAnswer === playersCorrectList[j - 1].timeToAnswer) {
+        playersCorrectList[j].rank = playersCorrectList[j - 1].rank;
+      } else {
+        playersCorrectList[j].rank = j + 1;
+      }
+    }
+
+    playerInfo.forEach(player => {
+      const thatPlayer = playersCorrectList.find(correctPlayer => correctPlayer.name === player.name);
+      if (!thatPlayer) {
+        player.results.push(0, 0);
+      } else {
+        player.results.push(thatPlayer.score, thatPlayer.rank);
+      }
+    });
   }
-  return players;
-}
+
+  playerInfo.sort((a, b) => a.name.localeCompare(b.name));
+  const url = `csv_results_${sessionId}.csv`;
+  fs.writeFileSync(`./${url}`, headers.join(',') + '\n' + playerInfo.map(player => player.name + ',' + player.results.join(',')).join('\n'));
+
+  return { url: url };
+};
