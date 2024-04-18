@@ -161,5 +161,22 @@ export function playerSendChat(playerId: number, message: { messageBody: string 
     playerName: player.playerName,
     timeSent: currentTime()
   });
+
   return {};
+}
+
+export function playerViewChats(playerId: number) {
+  const quizSession = fetchQuizSessionFromPlayerId(playerId);
+  if (!quizSession) {
+    throw HTTPError(400, 'PlayerId does not exist');
+  }
+
+  return {
+    messages: quizSession.messages.map(message => ({
+      messageBody: message.messageBody,
+      playerId: message.playerId,
+      playerName: message.playerName,
+      timeSent: message.timeSent,
+    })),
+  };
 }

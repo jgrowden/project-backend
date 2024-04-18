@@ -167,6 +167,9 @@ export const requestSessionResults = (playerId: number) =>
 export const requestSendChat = (playerId: number, message: { messageBody: string }) =>
   requestHelper('POST', `/v1/player/${playerId}/chat`, { message }, {});
 
+export const requestViewChats = (playerId: number) =>
+  requestHelper('GET', `/v1/player/${playerId}/chat`, {}, {});
+
 export const requestClear = () => requestHelper('DELETE', '/v1/clear');
 
 export const errorCode = (statusCode: number) => {

@@ -68,8 +68,9 @@ import {
   playerQuestionAnswer,
   playerQuestionPosition,
   playerQuestionResults,
-  playerSendChat,
   playerSessionResults,
+  playerSendChat,
+  playerViewChats,
   playerStatus
 } from './player';
 import { clear } from './other';
@@ -676,6 +677,13 @@ app.post('/v1/player/:playerid/chat', (req:Request, res: Response) => {
   const { message } = req.body;
   const result = playerSendChat(playerId, message);
   save();
+  res.json(result);
+});
+
+// playerViewChats Route
+app.get('/v1/player/:playerid/chat', (req:Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const result = playerViewChats(playerId);
   res.json(result);
 });
 
