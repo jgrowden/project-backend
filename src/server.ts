@@ -71,15 +71,15 @@ import {
   playerStatus
 } from './player';
 import { clear } from './other';
-import { createClient } from '@vercel/kv';
+// import { createClient } from '@vercel/kv';
 
-const KV_REST_API_URL="https://worthy-perch-30578.upstash.io";
-const KV_REST_API_TOKEN="AXdyASQgZmJiZDRiOTQtOTEyMy00ZjAyLTk4NzMtNWVhMWJjZTYyMTVlNzI4ZTdlMjkwZmY4NDU2NzlkODQ4ZmJlMzk5MWI1MDQ=";
+// const KV_REST_API_URL = 'https://worthy-perch-30578.upstash.io';
+// const KV_REST_API_TOKEN = 'AXdyASQgZmJiZDRiOTQtOTEyMy00ZjAyLTk4NzMtNWVhMWJjZTYyMTVlNzI4ZTdlMjkwZmY4NDU2NzlkODQ4ZmJlMzk5MWI1MDQ=';
 
-const database = createClient({
-  url: KV_REST_API_URL,
-  token: KV_REST_API_TOKEN,
-});
+// const database = createClient({
+//  url: KV_REST_API_URL,
+//  token: KV_REST_API_TOKEN,
+// });
 
 // Set up web app
 const app = express();
