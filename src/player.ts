@@ -6,6 +6,7 @@ import {
 import {
   currentTime,
   fetchQuizSessionFromPlayerId,
+  getUsersRankedByScore,
   getQuestionResults,
 } from './helper';
 
@@ -17,6 +18,13 @@ export interface PlayerStatusReturn {
   state: string;
   numQuestions: number;
   atQuestion: number;
+}
+
+interface questionResultsType {
+  questionId: number;
+  playersCorrectList: string[];
+  averageAnswerTime: number;
+  percentCorrect: number;
 }
 
 export function playerStatus(playerId: number): PlayerStatusReturn {
@@ -110,4 +118,27 @@ export function playerQuestionResults(playerId: number, questionPosition: number
   }
 
   return getQuestionResults(quizSession, questionPosition);
+}
+
+export function playerSessionResults(playerId: number) {
+  const quizSession = fetchQuizSessionFromPlayerId(playerId);
+  if (!quizSession) {
+    throw HTTPError(400, 'PlayerId does not exist');
+  }
+  if (quizSession.state !== 'FINAL_RESULTS') {
+    throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
+  }
+
+  const usersRankedByScore = getUsersRankedByScore(quizSession);
+  const questionResults: questionResultsType[] = [];
+  let currentQuestion = 1;
+  for (let i = 0; i < quizSession.playerAnswers.length; i++) {
+    questionResults.push(getQuestionResults(quizSession, currentQuestion));
+    currentQuestion++;
+  }
+
+  return {
+    usersRankedByScore: usersRankedByScore,
+    questionResults: questionResults
+  };
 }
