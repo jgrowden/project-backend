@@ -7,7 +7,8 @@ import {
   QuizSessionType,
   SessionAction,
   QuestionPlayerAnswersType,
-  PlayerAnswerType
+  PlayerAnswerType,
+  newState
 } from './dataStore';
 
 export interface ErrorObject {
@@ -31,6 +32,11 @@ interface playerNameWithScoreAndTime {
   rank?: number;
 }
 
+/**
+ *
+ * @param sessionId
+ * @returns
+ */
 export const fetchUserFromSessionId = (sessionId: string): UserType | undefined => {
   return getData().users.find(user => user.sessions.some(session => session === sessionId));
 };
@@ -46,8 +52,12 @@ export const fetchDeletedQuizFromQuizId = (quizId: number): QuizType | undefined
 export const fetchQuestionFromQuestionId = (quiz: QuizType, questionId: number): QuestionType | undefined => {
   return quiz.questions.find(question => question.questionId === questionId);
 };
-export const userWithEmailExists = (email: string): UserType | undefined => {
+export const fetchUserfromEmail = (email: string): UserType | undefined => {
   return getData().users.find(user => user.email === email);
+};
+
+export const fetchQuizFromSessionId = (sessionId: number): QuizType | undefined => {
+  return getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.quizSessionId === sessionId));
 };
 
 export const fetchSessionFromSessionId = (sessionId: number): QuizSessionType | undefined => {
@@ -61,7 +71,6 @@ export const fetchQuizSessionFromPlayerId = (playerId: number): QuizSessionType 
   const quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.players.some(player => player.playerId === playerId)));
   if (quiz === undefined) return undefined;
   const session = quiz.quizSessions.find(session => session.players.some(player => player.playerId === playerId));
-  if (session === undefined) return undefined;
   return session;
 };
 
@@ -76,42 +85,56 @@ const newId = (): number => {
   return newUserId;
 };
 
-export const generateNewUserId = (): number => {
-  return newId();
-};
+/**
+ * Function returns a new id. Currently all parameters of any function are
+ * unused.
+ * @returns {number}
+ */
+export const generateNewUserId = (): number => newId();
+export const generateNewQuizId = (): number => newId();
+export const generateNewPlayerId = (sessionId: number): number => newId();
+export const generateNewQuestionId = (): number => newId();
+export const generateQuizSessionId = (): number => newId();
+export const setAnswerId = (): number => newId();
 
-export const generateNewQuizId = (): number => {
-  return newId();
-};
-
-export const generateNewPlayerId = (sessionId: number): number => {
-  return newId();
-};
-
+/**
+ * Function generates a new player id. A player id is 5 letters followed by
+ * 5 numbers: e.g. "sepkg902".
+ * @returns {string}
+ */
 export const generateNewPlayerName = (): string => {
-  const letters = 'abcdefghijklmnopqrstuvwxyz';
-  const numbers = '0123456789';
-  const playerName: string[] = [];
-  let char;
+  const letters = 'abcdefghijklmnopqrstuvwxyz'.split('');
+  const numbers = '0123456789'.split('');
+  const playerName = [];
+  let char = 0;
   for (let i = 0; i < 5; i++) {
-    char = letters.charAt(Math.floor(Math.random() * letters.length));
-    if (!(playerName.includes(char))) {
-      playerName.push(char);
-    }
+    char = Math.floor(Math.random() * letters.length);
+    playerName.push(letters[char]);
+    letters.splice(char, 1);
   }
   for (let i = 0; i < 3; i++) {
-    char = numbers.charAt(Math.floor(Math.random() * numbers.length));
-    if (!(playerName.includes(char))) {
-      playerName.push(char);
-    }
+    char = Math.floor(Math.random() * numbers.length);
+    playerName.push(numbers[char]);
+    numbers.splice(char, 1);
   }
   return playerName.join('');
 };
 
+/**
+ * Function returns the current (unix) time in seconds.
+ * @returns {number}
+ */
 export const currentTime = (): number => {
   return Math.floor(Date.now() / 1000);
 };
 
+/**
+ * Function used for iter2 error handling. Returns error object given some
+ * error code and error message.
+ * @param {string} errorString
+ * @param {number} errorCode
+ * @returns {ErrorObjectWithCode}
+ */
 export const returnError = (errorString: string, errorCode?: number): ErrorObjectWithCode => {
   const err: ErrorString = { error: errorString };
   if (errorCode === undefined) {
@@ -123,65 +146,24 @@ export const returnError = (errorString: string, errorCode?: number): ErrorObjec
   };
 };
 
-export const generateNewQuestionId = (): number => {
-  return newId();
-};
-
-export const generateQuizSessionId = (): number => {
-  return newId();
-};
-
+/**
+ * Function used to check whether a given session action is valid for a
+ * session state, and returns the next session state if it is valid. Returns
+ * undefined if the state and action are invalid.
+ * @param {SessionState} state
+ * @param {SessionAction} action
+ * @returns {SessionState | undefined}
+ */
 export const updateState = (state: SessionState, action: SessionAction): SessionState | undefined => {
-  if (state === SessionState.LOBBY) {
-    if (action === SessionAction.NEXT_QUESTION) {
-      return SessionState.QUESTION_COUNTDOWN;
-    } else if (action === SessionAction.END) {
-      return SessionState.END;
-    }
-  } else if (state === SessionState.QUESTION_COUNTDOWN) {
-    if (action === SessionAction.SKIP_COUNTDOWN) {
-      return SessionState.QUESTION_OPEN;
-    } else if (action === SessionAction.END) {
-      return SessionState.END;
-    }
-  } else if (state === SessionState.QUESTION_OPEN) {
-    if (action === SessionAction.GO_TO_ANSWER) {
-      return SessionState.ANSWER_SHOW;
-    } else if (action === SessionAction.END) {
-      return SessionState.END;
-    }
-  } else if (state === SessionState.QUESTION_CLOSE) {
-    if (action === SessionAction.NEXT_QUESTION) {
-      return SessionState.QUESTION_COUNTDOWN;
-    } else if (action === SessionAction.GO_TO_ANSWER) {
-      return SessionState.ANSWER_SHOW;
-    } else if (action === SessionAction.GO_TO_FINAL_RESULTS) {
-      return SessionState.FINAL_RESULTS;
-    } else if (action === SessionAction.END) {
-      return SessionState.END;
-    }
-  } else if (state === SessionState.ANSWER_SHOW) {
-    if (action === SessionAction.NEXT_QUESTION) {
-      return SessionState.QUESTION_COUNTDOWN;
-    } else if (action === SessionAction.GO_TO_FINAL_RESULTS) {
-      return SessionState.FINAL_RESULTS;
-    } else if (action === SessionAction.END) {
-      return SessionState.END;
-    }
-  } else if (state === SessionState.FINAL_RESULTS) {
-    if (action === SessionAction.END) {
-      return SessionState.END;
-    }
-  } else if (state === SessionState.END) {
-    // do nothing;
-  }
-  return undefined;
+  const entry = newState.find(entry => entry.state === state);
+  const subEntry = entry.actions.find(subEntry => subEntry.action === action);
+  if (!subEntry) return undefined;
+  return subEntry.nextState;
 };
 
 /**
- * Function returns random colour from an array of colours
- * Pops the returned element from original array
- * @returns string
+ * Function returns a random colour from the array of colours provided
+ * @returns {string}, the name of the colour
  */
 export const setRandomColour = (colours: string[]): string => {
   const colourIndex = ~~(Math.random() * colours.length);
@@ -191,66 +173,16 @@ export const setRandomColour = (colours: string[]): string => {
 };
 
 /**
- * Basic ID generation function
- * Maximum of 6 answer Id's per question
- * Collision highly unlikely
- * @returns {number}
+ * Function checks whether a given string is a valid thumbnail - whether
+ * it ends in .jpg,.jpeg or .png, and starts with https://
+ * @returns {boolean}
  */
-export const setAnswerId = (): number => {
-  return newId();
-};
-
 export const isValidThumbnail = (thumbnail: string) => {
   if (!/\.(jpg|jpeg|png)$/i.test(thumbnail) || !/^https?:\/\//.test(thumbnail)) {
     return false;
   }
   return true;
 };
-
-/**
- * Calculates the average time for players to answer a question
- *
- * @param {QuestionPlayerAnswersType} playerAnswers
- * @returns {number} averageTime
- */
-export const calculateQuestionAverageAnswerTime = (playerAnswers: QuestionPlayerAnswersType) => {
-  let totalTimeTaken = 0;
-  let numAnswers = 0;
-
-  for (const answer of playerAnswers.answers) {
-    totalTimeTaken += (answer.answerTime - playerAnswers.questionStartTime);
-    numAnswers++;
-  }
-
-  let averageTime: number;
-  if (numAnswers === 0) {
-    averageTime = 0;
-  } else {
-    averageTime = Math.round(totalTimeTaken / numAnswers);
-  }
-
-  return averageTime;
-};
-
-// comparator function for getUsersRankedByScore
-function cmp (a: playerNameWithScoreAndTime, b: playerNameWithScoreAndTime) {
-  if (a.timeToAnswer < b.timeToAnswer) {
-    return -1;
-  } else if (a.timeToAnswer === b.timeToAnswer) {
-    return 0;
-  }
-  return 1;
-}
-
-// comparator function for getUsersRankedByScore
-function cmp2 (a: playerNameWithScoreAndTime, b: playerNameWithScoreAndTime) {
-  if (a.score > b.score) {
-    return -1;
-  } else if (a.score === b.score) {
-    return 0;
-  }
-  return 1;
-}
 
 /**
  * Calculates the score of each user, and returns it in an array of objects containing their
@@ -267,59 +199,40 @@ function cmp2 (a: playerNameWithScoreAndTime, b: playerNameWithScoreAndTime) {
  * @param {QuizSessionType} quizSession
  * @returns {playerNameWithScoreAndTime[]}
  */
-
 export const getUsersRankedByScore = (quizSession: QuizSessionType) => {
-  const usersRankedByScore: playerNameWithScoreAndTime[] = [];
-  for (const player of quizSession.players) {
-    usersRankedByScore.push({ name: player.playerName, score: 0 });
-  }
-
-  for (const questionResponses of quizSession.playerAnswers) {
+  const usersRankedByScore = quizSession.players.map(player => { return { name: player.playerName, score: 0 }; });
+  for (const responses of quizSession.playerAnswers) {
     const playersCorrectList: playerNameWithScoreAndTime[] = [];
-    const questionAnswersArray = quizSession.metadata.questions[questionResponses.questionPosition - 1].answers;
-    const score = quizSession.metadata.questions[questionResponses.questionPosition - 1].points;
+    const questionAnswers = quizSession.metadata.questions[responses.questionPosition - 1].answers;
+    const answerIds = questionAnswers.filter(answer => answer.correct === true).map(answer => answer.answerId);
+    const correctAnswers = answerIds.sort().join(',');
 
-    for (const playerAnswer of questionResponses.answers) {
-      let allCorrect = true;
-
-      for (const questionAnswer of questionAnswersArray) {
-        const answerFound = playerAnswer.answerIds.find(answerId => answerId === questionAnswer.answerId);
-        if (answerFound === undefined && questionAnswer.correct === false) {
-          // correct, player did not choose incorrect answer
-        } else if (answerFound !== undefined && questionAnswer.correct === false) {
-          // incorrect answer was chosen
-          allCorrect = false;
-        } else if (answerFound === undefined && questionAnswer.correct === true) {
-          // incorrect, did not choose the correct answer
-          allCorrect = false;
-        } else {
-          // correct, player chose the correct answer
-        }
-      }
-
-      // if all answers supplied by the user match the answers of the quiz, their name is saved
-      if (allCorrect === true) {
-        const playerName = quizSession.players.find(player => player.playerId === playerAnswer.playerId).playerName;
-        const timeToAnswer = playerAnswer.answerTime - questionResponses.questionStartTime;
-        playersCorrectList.push({ name: playerName, score: score, timeToAnswer: timeToAnswer });
+    for (const answer of responses.answers) {
+      // compare array of correct answers with array of the player's answers (as strings)
+      if (correctAnswers === answer.answerIds.sort().join(',')) {
+        playersCorrectList.push({
+          name: quizSession.players.find(player => player.playerId === answer.playerId).playerName,
+          score: quizSession.metadata.questions[responses.questionPosition - 1].points,
+          timeToAnswer: answer.answerTime - responses.questionStartTime
+        });
       }
     }
 
-    playersCorrectList.sort(cmp);
+    // Update the scores for each player by how quickly they answered the question correctly.
+    playersCorrectList.sort((a, b) => a.timeToAnswer - b.timeToAnswer);
+    const newArray = playersCorrectList.map((player, index) => {
+      return {
+        name: player.name,
+        score: Math.round(player.score / (index + 1))
+      };
+    });
 
-    // according to spec, the score a player earns is P/N, where P is the question score and N
-    // is the order in which the person submitted the correct answer
-    let scalingFactor = 1;
-    for (const player of playersCorrectList) {
-      const playerToIncrement = usersRankedByScore.find(user => user.name === player.name);
-      playerToIncrement.score += Math.round(score / scalingFactor);
-      scalingFactor++;
+    for (const player of newArray) {
+      usersRankedByScore.find(user => user.name === player.name).score += player.score;
     }
   }
 
-  usersRankedByScore.sort(cmp2);
-
-  return usersRankedByScore;
+  return usersRankedByScore.sort((a, b) => b.score - a.score);
 };
 
 /**
@@ -338,47 +251,31 @@ export const getUsersRankedByScore = (quizSession: QuizSessionType) => {
  */
 export const getQuestionResults = (quizSession: QuizSessionType, questionPosition: number) => {
   const playersCorrectList: string[] = [];
-  const questionAnswersArray = quizSession.metadata.questions[questionPosition - 1].answers;
+  const questionAnswers = quizSession.metadata.questions[questionPosition - 1].answers;
   const playerAnswers = quizSession.playerAnswers[questionPosition - 1];
+  const answerIds = questionAnswers.filter(answer => answer.correct === true).map(answer => answer.answerId);
+  const correctAnswers = answerIds.sort().join(',');
 
-  // for every player's answers, check that it matches the answers to the question
-  for (const playerAnswer of playerAnswers.answers) {
-    let allCorrect = true;
-
-    for (const questionAnswer of questionAnswersArray) {
-      const answerFound = playerAnswer.answerIds.find(answerId => answerId === questionAnswer.answerId);
-      if (answerFound === undefined && questionAnswer.correct === false) {
-        // correct, player did not choose incorrect answer
-      } else if (answerFound !== undefined && questionAnswer.correct === false) {
-        // incorrect answer was chosen
-        allCorrect = false;
-      } else if (answerFound === undefined && questionAnswer.correct === true) {
-        // incorrect, did not choose the correct answer
-        allCorrect = false;
-      } else {
-        // correct, player chose the correct answer
-      }
-    }
-
-    // if all answers supplied by the user match the answers of the quiz, their name is saved
-    if (allCorrect === true) {
-      const playerName = quizSession.players.find(player => player.playerId === playerAnswer.playerId).playerName;
-      playersCorrectList.push(playerName);
+  // find everyone who got the question right
+  for (const answer of playerAnswers.answers) {
+    // compare array of correct answers with array of the player's answers (as strings)
+    if (correctAnswers === answer.answerIds.sort().join(',')) {
+      playersCorrectList.push(quizSession.players.find(player => player.playerId === answer.playerId).playerName);
     }
   }
 
-  const numPlayersCorrect = playersCorrectList.length;
-  const numPlayers = quizSession.players.length;
-  const percentCorrect = Math.round(numPlayersCorrect / numPlayers * 100);
-
-  // sort playersCorrectList in increasing alphabetical order
-  playersCorrectList.sort((a, b) => a.localeCompare(b));
+  // calculate average time taken
+  const totalTime = playerAnswers.answers.reduce((total, answer) => total + answer.answerTime - playerAnswers.questionStartTime, 0);
+  let averageTime = 0;
+  if (playerAnswers.answers.length !== 0) {
+    averageTime = Math.round(totalTime / playerAnswers.answers.length);
+  }
 
   return {
     questionId: quizSession.metadata.questions[questionPosition - 1].questionId,
-    playersCorrectList: playersCorrectList,
-    averageAnswerTime: calculateQuestionAverageAnswerTime(playerAnswers),
-    percentCorrect: percentCorrect
+    playersCorrectList: playersCorrectList.sort((a, b) => a.localeCompare(b)),
+    averageAnswerTime: averageTime,
+    percentCorrect: Math.round(playersCorrectList.length / quizSession.players.length * 100)
   };
 };
 
