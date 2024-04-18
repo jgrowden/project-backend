@@ -1,5 +1,5 @@
 import HTTPError from 'http-errors';
-import { clear, requestAuthRegister, requestQuizCreateV2, requestQuizQuestionCreateV2, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestSendChat } from '../wrapper';
+import { requestClear, requestAuthRegister, requestQuizCreateV2, requestQuizQuestionCreateV2, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestSendChat } from '../wrapper';
 import { QuestionType } from '../../dataStore';
 
 const PLAYER_NAMES = ['person1', 'person2', 'person3'];
@@ -48,11 +48,11 @@ function setupQuizAndSession(numPlayers: number) {
 }
 
 beforeEach(() => {
-  clear();
+  requestClear();
 });
 
 afterEach(() => {
-  clear();
+  requestClear();
 });
 
 describe('playerSendChat testing', () => {
