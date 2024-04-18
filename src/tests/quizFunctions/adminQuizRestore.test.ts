@@ -6,7 +6,7 @@ import {
   requestQuizRestore,
   requestQuizRestoreV2,
   requestQuizTrashInfo,
-  clear,
+  requestClear,
   errorCode
 } from '../wrapper';
 
@@ -17,7 +17,7 @@ describe('adminQuizRestoreV1 http testing', () => {
   let quizId: number;
 
   beforeEach(() => {
-    clear();
+    requestClear();
     const user = requestAuthRegister('hayden.smith@unsw.edu.au', 'haydensmith123', 'Hayden', 'Smith');
     token = user.jsonBody.token as string;
     const quiz = requestQuizCreate(token, 'first quiz', 'amazing quiz');
@@ -25,7 +25,7 @@ describe('adminQuizRestoreV1 http testing', () => {
   });
 
   afterEach(() => {
-    clear();
+    requestClear();
   });
 
   describe('Testing error cases', () => {
@@ -145,7 +145,7 @@ describe('adminQuizRestoreV2 http testing', () => {
   let quizId: number;
 
   beforeEach(() => {
-    clear();
+    requestClear();
     const user = requestAuthRegister('hayden.smith@unsw.edu.au', 'haydensmith123', 'Hayden', 'Smith');
     token = user.jsonBody.token as string;
     const quiz = requestQuizCreate(token, 'first quiz', 'amazing quiz');
@@ -153,7 +153,7 @@ describe('adminQuizRestoreV2 http testing', () => {
   });
 
   afterEach(() => {
-    clear();
+    requestClear();
   });
 
   describe('Testing error cases', () => {

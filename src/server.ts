@@ -59,7 +59,7 @@ import {
   adminQuizSessionInfo,
   adminQuizSessionStart,
   adminQuizSessionsView,
-  adminQuizSessionPlayerJoin,
+  playerQuizSessionJoin,
   adminQuizSessionUpdate,
   adminQuizSessionFinalResults
 } from './session';
@@ -583,10 +583,10 @@ app.get('/v1/admin/quiz/:quizid/sessions', (req: Request, res: Response) => {
   res.json(result);
 });
 
-// adminQuizSessionPlayerJoin Route
+// playerQuizSessionJoin Route
 app.post('/v1/player/join', (req: Request, res: Response) => {
   const { sessionId, name } = req.body;
-  const result = adminQuizSessionPlayerJoin(sessionId, name);
+  const result = playerQuizSessionJoin(sessionId, name);
   save();
   res.json(result);
 });

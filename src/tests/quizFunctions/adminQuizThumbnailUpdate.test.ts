@@ -4,7 +4,7 @@ import {
   requestQuizInfoV2,
   requestQuizCreateV2,
   requestQuizThumbnailUpdate,
-  clear
+  requestClear
 } from '../wrapper';
 import { currentTime } from '../../helper';
 
@@ -12,10 +12,10 @@ const imgUrl = 'http://threeSwordStyle.png';
 let token: string, quizId: number;
 
 afterAll(() => {
-  clear();
+  requestClear();
 });
 beforeEach(() => {
-  clear();
+  requestClear();
   token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token as string;
   quizId = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description').jsonBody.quizId as number;
 });
