@@ -636,6 +636,13 @@ app.get('/v1/player/:playerid/question/:questionposition/results', (req:Request,
   res.json(result);
 });
 
+// playerViewChats Route
+app.get('/v1/player/:playerid/chat', (req:Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const result = playerViewChats(playerId);
+  res.json(result);
+});
+
 // clear Route
 app.delete('/v1/clear', (req: Request, res: Response) => {
   const result = clear();
