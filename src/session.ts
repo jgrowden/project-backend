@@ -16,7 +16,8 @@ import {
   currentTime,
   updateState,
   getUsersRankedByScore,
-  getQuestionResults
+  getQuestionResults,
+  fetchQuizFromSessionId
 } from './helper';
 
 export interface SessionIdType {
@@ -126,7 +127,7 @@ export function adminQuizSessionUpdate(
   if (!session) {
     throw HTTPError(400, 'Session not found');
   }
-  if (session.quizSessionId !== sessionId) {
+  if (quizId !== fetchQuizFromSessionId(sessionId).quizId) {
     throw HTTPError(400, 'SessionId is not a session of this quiz');
   }
 
@@ -323,7 +324,7 @@ export function adminQuizSessionFinalResults(token: string, quizId: number, sess
   if (!session) {
     throw HTTPError(400, 'Session not found');
   }
-  if (session.quizSessionId !== sessionId) {
+  if (quizId !== fetchQuizFromSessionId(sessionId).quizId) {
     throw HTTPError(400, 'SessionId is not a session of this quiz');
   }
 
