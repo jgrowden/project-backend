@@ -145,7 +145,7 @@ export const requestQuizSessionPlayerJoin = (sessionId: number, name: string) =>
 export const requestPlayerStatus = (playerId: number) =>
   requestHelper('GET', `/v1/player/${playerId}`, { playerId }, {});
 
-export const requestQuizSessionResultsCSV = (token: string, quizId: number, sessionId: number) => 
+export const requestQuizSessionResultsCSV = (token: string, quizId: number, sessionId: number) =>
   requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}/results/csv`, { quizId, sessionId }, { token });
 
 export const requestPlayerQuestionPosition = (playerId: number, questionPosition: number) =>
@@ -159,7 +159,7 @@ export const requestQuestionResults = (playerId: number, questionPosition: numbe
 
 export const requestCSV = (filename: string) => {
   requestHelper('GET', `/csv-results/${filename}`, {}, {});
-}
+};
 
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 

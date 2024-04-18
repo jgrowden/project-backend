@@ -1,7 +1,6 @@
 import HTTPError from 'http-errors';
 import {
   QuestionType,
-  QuizSessionType,
   SessionAction,
   SessionState,
   getTimeoutData,
@@ -18,11 +17,9 @@ import {
   updateState,
   getUsersRankedByScore,
   getQuestionResults,
-  getUsersRankAndScoreByQuestion,
   fetchQuizFromSessionId,
-  playerNameWithScoreAndTime
+  writeResultsCSV
 } from './helper';
-import fs from 'fs';
 
 export interface SessionIdType {
   sessionId: number;
@@ -210,12 +207,7 @@ export function adminQuizSessionUpdate(
   return {};
 }
 
-interface playerCsvData {
-  name: string;
-  results: number[];
-}
-
-export function adminQuizSessionResultsCSV(token: string, quizId: number, sessionId: number): string {
+export function adminQuizSessionResultsCSV(token: string, quizId: number, sessionId: number): {url: string} {
   const user = fetchUserFromSessionId(token);
   if (!user) {
     throw HTTPError(401, 'User not found');
@@ -227,89 +219,19 @@ export function adminQuizSessionResultsCSV(token: string, quizId: number, sessio
   if (quiz.ownerId !== user.authUserId) {
     throw HTTPError(403, 'User does not own quiz');
   }
-  const quizSession = fetchSessionFromSessionId(sessionId);
-  if (!quizSession) {
+  const session = fetchSessionFromSessionId(sessionId);
+  if (!session) {
     throw HTTPError(400, 'Session not found');
   }
   if (quizId !== fetchQuizFromSessionId(sessionId).quizId) {
     throw HTTPError(400, 'SessionId is not a session of this quiz');
   }
-  if (quizSession.state !== 'FINAL_RESULTS') {
+  if (session.state !== 'FINAL_RESULTS') {
     throw HTTPError(400, 'session is not in FINAL_RESULTS state');
   }
 
-  let session = quizSession;
-
-  const headers: string[] = ['player'];
-  const playerInfo: playerCsvData[] = session.players.map(player => {return {name: player.name, results: []}});
-
-  const quizLen = session.playerAnswers.length;
-  for (let i = 0; i < quizLen; i++) {
-    headers.push(`question${i + 1}score`, `question${i + 1}rank`);
-    const playersCorrectList: playerNameWithScoreAndTime[] = [];
-    const correctAnswers = session.metadata.questions[i].answers.filter(answer => answer.correct === true).map(answer => answer.answerId).sort().join(',');
-    const responses = session.playerAnswers[i];
-
-    for (const answer of responses.answers) {
-      // compare array of correct answers with array of the player's answers (as strings)
-      if (correctAnswers === answer.answerIds.sort().join(',')) {
-        playersCorrectList.push({
-          name: session.players.find(player => player.playerId === answer.playerId).playerName,
-          score: session.metadata.questions[i].points,
-          timeToAnswer: answer.answerTime - responses.questionStartTime
-        });
-      }
-    }
-    playersCorrectList.sort((a, b) => a.timeToAnswer - b.timeToAnswer);
-
-    let playerRanks = [];
-    for (let j = 0; j < playersCorrectList.length; j++) {
-      if (j === 0) {
-        playerRanks.push({
-          name: playersCorrectList[j].name,
-          rank: 1,
-          score: playersCorrectList[j].score
-        });
-      } else if (j !== 0 && playersCorrectList[j].timeToAnswer === playersCorrectList[j - 1].timeToAnswer) {
-        playerRanks.push({
-          name: playersCorrectList[j].name,
-          rank: playerRanks[j - 1].rank,
-          score: playersCorrectList[j].score
-        });
-      } else {
-        playerRanks.push({
-          name: playersCorrectList[j].name,
-          rank: j + 1,
-          score: playersCorrectList[j].score
-        });
-      }
-    };
-
-    playerInfo.forEach(player => {
-      let playerEntry = playerRanks.find(rankedPlayer => rankedPlayer.name === player.name);
-      if (!playerEntry) {
-        player.results.push(0, 0);
-      } else {
-        player.results.push(playerEntry.score, playerEntry.rank);
-      }
-    })    
-  }
-
-
-  playerInfo.sort((a,b) => {
-    if (a.name === b.name) return 0;
-    if (a.name > b.name) return 1;
-    return -1;
-  });
-  const url = `csv_results_${sessionId}.csv`;
-  fs.writeFileSync(`./${url}`, headers.join(',') + '\n');
-  for (const player of playerInfo) {
-    fs.writeFileSync(`./${url}`, player.name + ',' + player.results.join(',') + '\n');
-  }
-
-  return { url: url };
-};
-
+  return writeResultsCSV(sessionId);
+}
 
 /**
  * Retrieves information about a session, including state, the current question,

@@ -592,7 +592,6 @@ app.get('/v1/admin/quiz/:quizid/session/:sessionid/results/csv', (req: Request, 
   const result = adminQuizSessionResultsCSV(token, quizId, sessionId);
   save();
   res.json(result);
-  
 });
 
 // request CSV file
