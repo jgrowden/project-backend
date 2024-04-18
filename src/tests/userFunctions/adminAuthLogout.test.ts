@@ -1,11 +1,11 @@
-import { clear, errorCode, requestAuthLogin, requestAuthLogout, requestAuthLogoutV2, requestAuthRegister } from '../wrapper';
+import { requestClear, errorCode, requestAuthLogin, requestAuthLogout, requestAuthLogoutV2, requestAuthRegister } from '../wrapper';
 import HTTPError from 'http-errors';
 
 let token1: string;
 let token2: string;
 
 beforeEach(() => {
-  clear();
+  requestClear();
   token1 = requestAuthRegister('hayden.smith@unsw.edu.au', 'haydensmith123', 'Hayden', 'Smith').jsonBody.token as string;
 });
 

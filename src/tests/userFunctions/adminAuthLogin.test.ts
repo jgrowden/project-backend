@@ -1,7 +1,7 @@
-import { requestAuthRegister, requestAuthLogin, clear, errorCode } from '../wrapper';
+import { requestAuthRegister, requestAuthLogin, requestClear, errorCode } from '../wrapper';
 
 beforeEach(() => {
-  clear();
+  requestClear();
 });
 
 describe('Testing adminAuthLogin', () => {

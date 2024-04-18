@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizNameUpdate, clear, errorCode, requestQuizNameUpdateV2 } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizInfo, requestQuizNameUpdate, requestClear, errorCode, requestQuizNameUpdateV2 } from '../wrapper';
 import HTTPError from 'http-errors';
 
 describe('adminQuizNameUpdate http testing', () => {
@@ -7,7 +7,7 @@ describe('adminQuizNameUpdate http testing', () => {
   const name = 'New Quiz Name';
 
   beforeEach(() => {
-    clear();
+    requestClear();
     const user = requestAuthRegister('first.user@gmail.com', 'f1rsTUser', 'First', 'User');
     token = user.jsonBody.token as string;
     const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
@@ -135,7 +135,7 @@ describe('adminQuizNameUpdateV2 http testing', () => {
   const name = 'New Quiz Name';
 
   beforeEach(() => {
-    clear();
+    requestClear();
     const user = requestAuthRegister('first.user@gmail.com', 'f1rsTUser', 'First', 'User');
     token = user.jsonBody.token as string;
     const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');

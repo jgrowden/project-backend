@@ -1,7 +1,7 @@
-import { requestAuthRegister, clear, errorCode } from '../wrapper';
+import { requestAuthRegister, requestClear, errorCode } from '../wrapper';
 
 beforeEach(() => {
-  clear();
+  requestClear();
 });
 
 describe('Testing authRegister', () => {

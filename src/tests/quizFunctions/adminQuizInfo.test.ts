@@ -2,7 +2,7 @@ import {
   requestAuthRegister,
   requestQuizCreate,
   requestQuizInfo,
-  clear,
+  requestClear,
   errorCode,
   requestQuizCreateV2,
   requestQuizInfoV2
@@ -14,7 +14,7 @@ let quizId: number;
 
 describe('Testing GET /v1/admin/quiz/{quizid}:', () => {
   beforeEach(() => {
-    clear();
+    requestClear();
     const user = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
     token = user.jsonBody.token as string;
     const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
@@ -52,7 +52,7 @@ describe('Testing GET /v1/admin/quiz/{quizid}:', () => {
 
 describe('Testing GET /v2/admin/quiz/{quizid}:', () => {
   beforeEach(() => {
-    clear();
+    requestClear();
     const user = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
     token = user.jsonBody.token as string;
     const quiz = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');

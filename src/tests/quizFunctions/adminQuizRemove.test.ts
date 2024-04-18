@@ -7,7 +7,7 @@ import {
   requestQuizSessionStart,
   requestQuizQuestionCreateV2,
   errorCode,
-  clear
+  requestClear
 } from '../wrapper';
 
 import HTTPError from 'http-errors';
@@ -18,7 +18,7 @@ const AUTOSTARTNUM = 10;
 
 describe('Tests for DELETE /v1/admin/quiz/{quizid}:', () => {
   beforeEach(() => {
-    clear();
+    requestClear();
     const user = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
     token = user.jsonBody.token as string;
     const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
@@ -46,7 +46,7 @@ describe('Tests for DELETE /v1/admin/quiz/{quizid}:', () => {
 
 describe('Tests for DELETE /v2/admin/quiz/{quizid}:', () => {
   beforeEach(() => {
-    clear();
+    requestClear();
     const user = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
     token = user.jsonBody.token as string;
     const quiz = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');

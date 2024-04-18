@@ -7,7 +7,7 @@ import {
   requestQuizSessionUpdate,
   requestQuizSessionPlayerJoin,
   requestPlayerQuestionPosition,
-  clear
+  requestClear
 } from '../wrapper';
 import { QuestionType } from '../../dataStore';
 
@@ -22,7 +22,7 @@ let playerId2: number;
 const AUTOSTARTNUM = 10;
 
 beforeEach(() => {
-  clear();
+  requestClear();
   token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token as string;
   quizId = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description').jsonBody.quizId as number;
   const questionBody1: QuestionType = {

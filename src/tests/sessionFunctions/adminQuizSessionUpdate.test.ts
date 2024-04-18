@@ -5,7 +5,7 @@ import {
   requestQuizQuestionCreateV2,
   requestQuizSessionStart,
   requestQuizSessionUpdate,
-  clear
+  requestClear
 } from '../wrapper';
 
 let token: string;
@@ -14,7 +14,7 @@ let sessionId: number;
 const AUTOSTARTNUM = 10;
 
 beforeEach(() => {
-  clear();
+  requestClear();
   token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token as string;
   quizId = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description').jsonBody.quizId as number;
   requestQuizQuestionCreateV2(token, quizId, {
@@ -28,7 +28,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  clear();
+  requestClear();
 });
 
 describe('Tests for PUT /v1/admin/quiz/{quizid}/session/{sessionid}', () => {

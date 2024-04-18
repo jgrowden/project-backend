@@ -7,7 +7,7 @@ import {
   requestQuizSessionPlayerJoin,
   requestQuizSessionPlayerAnswer,
   requestQuizSessionUpdate,
-  clear
+  requestClear
 } from '../wrapper';
 
 import {
@@ -22,7 +22,7 @@ let playerId: number;
 let answerId: number;
 
 beforeEach(() => {
-  clear();
+  requestClear();
   token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token as string;
   quizId = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description').jsonBody.quizId as number;
   requestQuizQuestionCreateV2(token, quizId, {
@@ -40,7 +40,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  clear();
+  requestClear();
 });
 
 describe('Tests for PUT /v1/player/{playerid}/question/{questionposition}/answer', () => {
