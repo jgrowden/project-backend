@@ -20,8 +20,6 @@ import {
   getQuestionResults,
   getUsersRankAndScoreByQuestion
 } from './helper';
-const { convertArrayToCSV } = require('convert-array-to-csv');
-const converter = require('convert-array-to-csv');
 import fs from 'fs';
 
 export interface SessionIdType {
@@ -210,6 +208,11 @@ export function adminQuizSessionUpdate(
   return {};
 }
 
+interface playerCsvData {
+  name: string;
+  results: number[];
+}
+
 export function adminQuizSessionResultsCSV(token: string, quizId: number, sessionId: number): string {
   const quiz = fetchQuizFromQuizId(quizId);
   if (!(quiz.quizSessions.find(session => session.quizSessionId === sessionId))) {
@@ -226,6 +229,42 @@ export function adminQuizSessionResultsCSV(token: string, quizId: number, sessio
   if (user.authUserId !== quizSession.metadata.ownerId) {
     throw HTTPError(403);
   }
+
+  let finalResults = adminQuizSessionFinalResults(token, quizId, sessionId);
+
+  const headers: string[] = [];
+  const playerInfo: playerCsvData[] = [];
+
+  csv[0].push('player');
+  finalResults.questionResults.forEach((result, index) => headers.push(`question${index}score`, `question${index}rank`));
+  
+
+
+
+/**
+ * finalResults = {
+    usersRankedByScore: usersRankedByScore,
+    questionResults: questionResults
+  };
+
+  questionResults = {
+ *  questionId: number,
+ *  playersCorrectList: string[],
+ *  averageAnswerTime: number,
+ *  percentCorrect: number
+ * } []
+ * 
+ * usersRankedByScore = {
+  name: string;
+  score: number;
+} []
+
+
+ */
+
+
+
+
   let csvData: string[][] = [];
   let header: string[] = [];
   header.push('Player');
