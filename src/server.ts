@@ -98,14 +98,21 @@ const HOST: string = process.env.IP || '127.0.0.1';
 
 // Load + Store functions for persistence
 const load = () => {
-  if (fs.existsSync('./toohakData.json')) {
-    const dataFile = fs.readFileSync('./toohakData.json', { encoding: 'utf8' });
+  if (fs.existsSync('toohakData.json')) {
+    const dataFile = fs.readFileSync('toohakData.json', { encoding: 'utf8' });
     setData(JSON.parse(dataFile));
+  } else {
+    fs.writeFileSync('toohakData.json', JSON.stringify({
+      users: [],
+      quizzes: [],
+      deletedQuizzes: [],
+      id: 0
+    }));
   }
 };
 
 const save = () => {
-  fs.writeFileSync('./toohakData.json', JSON.stringify(getData()));
+  fs.writeFileSync('toohakData.json', JSON.stringify(getData()));
 };
 
 // ====================================================================

@@ -2,7 +2,12 @@ import request, { HttpVerb } from 'sync-request';
 import { port, url } from '../config.json';
 import { IncomingHttpHeaders } from 'http';
 import HTTPError from 'http-errors';
-const SERVER_URL = `${url}:${port}`;
+
+//const SERVER_URL = `${url}:${port}`;
+const DEPLOY_URL = 'https://1531-24t1-w15b-eggs.vercel.app';
+
+// pick local or deployed url
+const URL = DEPLOY_URL;
 
 // Return type of returnHelper() function.
 interface RequestHelperReturnType {
@@ -37,9 +42,9 @@ export const requestHelper = (
   let res: ReturnType<typeof request>;
 
   if (headers === undefined) {
-    res = request(method, SERVER_URL + path, { qs, json, timeout: 20000 });
+    res = request(method, URL + path, { qs, json, timeout: 20000 });
   } else {
-    res = request(method, SERVER_URL + path, { qs, headers, json, timeout: 20000 });
+    res = request(method, URL + path, { qs, headers, json, timeout: 20000 });
   }
 
   const bodyString = res.body.toString();
