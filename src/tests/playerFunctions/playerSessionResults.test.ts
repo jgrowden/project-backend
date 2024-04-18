@@ -37,22 +37,22 @@ const questionBody3: QuestionType = {
   thumbnailUrl: 'http://alsosus.com/sus.jpg'
 };
 
-function setupQuizAndSession() {
+function setupQuizAndSession(numPlayers: number, numQuestions: number) {
   const user = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
   const token = user.jsonBody.token as string;
 
   const quiz = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');
   const quizId = quiz.jsonBody.quizId as number;
 
-  const questionIds = [
-    requestQuizQuestionCreateV2(token, quizId, questionBody1).jsonBody.questionId as number,
-    requestQuizQuestionCreateV2(token, quizId, questionBody2).jsonBody.questionId as number,
-    requestQuizQuestionCreateV2(token, quizId, questionBody3).jsonBody.questionId as number,
-  ];
+  const questionBodies = [questionBody1, questionBody2, questionBody3].slice(0, numQuestions);
+  const questionIds = questionBodies.map(questionBody =>
+    requestQuizQuestionCreateV2(token, quizId, questionBody).jsonBody.questionId as number
+  );
 
   const sessionId = requestQuizSessionStart(token, quizId, AUTOSTARTNUM).jsonBody.sessionId as number;
-
-  const playerIds = PLAYER_NAMES.map((name) => requestQuizSessionPlayerJoin(sessionId, name).jsonBody.playerId as number);
+  const playerIds = PLAYER_NAMES.slice(0, numPlayers).map(name =>
+    requestQuizSessionPlayerJoin(sessionId, name).jsonBody.playerId as number
+  );
 
   return { token, quizId, sessionId, questionIds, playerIds };
 }
@@ -82,140 +82,156 @@ describe('playerSessionResults testing', () => {
   let questionIds: number[];
   let playerIds: number[];
 
-  beforeEach(() => {
-    const setup = setupQuizAndSession();
-    token = setup.token;
-    quizId = setup.quizId;
-    sessionId = setup.sessionId;
-    questionIds = setup.questionIds;
-    playerIds = setup.playerIds;
+  describe('tests with 1 player and question', () => {
+    beforeEach(() => {
+      const setup = setupQuizAndSession(1, 1); // Setup with one player and one question for targeted testing
+      token = setup.token;
+      quizId = setup.quizId;
+      sessionId = setup.sessionId;
+      questionIds = setup.questionIds;
+      playerIds = setup.playerIds;
 
-    updateSessionState(token, quizId, sessionId, 'NEXT_QUESTION');
-    updateSessionState(token, quizId, sessionId, 'SKIP_COUNTDOWN');
+      updateSessionState(token, quizId, sessionId, 'NEXT_QUESTION');
+      updateSessionState(token, quizId, sessionId, 'SKIP_COUNTDOWN');
+    });
+
+    test('session id does not refer to a valid session within this quiz', () => {
+      expect(() => requestSessionResults(playerIds[0] + 1)).toThrow(HTTPError[400]);
+    });
+
+    test('session is not in FINAL_RESULTS state', () => {
+      expect(() => requestSessionResults(playerIds[0])).toThrow(HTTPError[400]);
+    });
   });
 
-  test('session id does not refer to a valid session within this quiz', () => {
-    expect(() => requestSessionResults(playerIds[0] + 1)).toThrow(HTTPError[400]);
-  });
+  describe('tests with 3 players and questions', () => {
+    beforeEach(() => {
+      const setup = setupQuizAndSession(3, 3); // Setup with three players and questions for targeted testing
+      token = setup.token;
+      quizId = setup.quizId;
+      sessionId = setup.sessionId;
+      questionIds = setup.questionIds;
+      playerIds = setup.playerIds;
 
-  test('session is not in FINAL_RESULTS state', () => {
-    expect(() => requestSessionResults(playerIds[0])).toThrow(HTTPError[400]);
-  });
+      updateSessionState(token, quizId, sessionId, 'NEXT_QUESTION');
+      updateSessionState(token, quizId, sessionId, 'SKIP_COUNTDOWN');
+    });
 
-  test('successfully get quiz info', () => {
-    answerQuestion(playerIds[0], 1, 0);
-    answerQuestion(playerIds[1], 1, 3);
-    answerQuestion(playerIds[2], 1, 3);
+    test('successfully get quiz info', () => {
+      answerQuestion(playerIds[0], 1, 0);
+      answerQuestion(playerIds[1], 1, 3);
+      answerQuestion(playerIds[2], 1, 3);
 
-    updateSessionState(token, quizId, sessionId, 'GO_TO_ANSWER');
-    updateSessionState(token, quizId, sessionId, 'NEXT_QUESTION');
-    updateSessionState(token, quizId, sessionId, 'SKIP_COUNTDOWN');
+      updateSessionState(token, quizId, sessionId, 'GO_TO_ANSWER');
+      updateSessionState(token, quizId, sessionId, 'NEXT_QUESTION');
+      updateSessionState(token, quizId, sessionId, 'SKIP_COUNTDOWN');
 
-    answerQuestion(playerIds[0], 2, 0);
-    answerQuestion(playerIds[2], 2, 0);
-    sleepSync(1100);
-    answerQuestion(playerIds[1], 2, 0);
-    sleepSync(1100);
+      answerQuestion(playerIds[0], 2, 0);
+      answerQuestion(playerIds[2], 2, 0);
+      sleepSync(1100);
+      answerQuestion(playerIds[1], 2, 0);
+      sleepSync(1100);
 
-    expect(requestQuizSessionInfo(token, quizId, sessionId).jsonBody.state).toStrictEqual('QUESTION_CLOSE');
-    updateSessionState(token, quizId, sessionId, 'GO_TO_ANSWER');
-    updateSessionState(token, quizId, sessionId, 'NEXT_QUESTION');
-    updateSessionState(token, quizId, sessionId, 'SKIP_COUNTDOWN');
-    updateSessionState(token, quizId, sessionId, 'GO_TO_ANSWER');
-    updateSessionState(token, quizId, sessionId, 'GO_TO_FINAL_RESULTS');
+      expect(requestQuizSessionInfo(token, quizId, sessionId).jsonBody.state).toStrictEqual('QUESTION_CLOSE');
+      updateSessionState(token, quizId, sessionId, 'GO_TO_ANSWER');
+      updateSessionState(token, quizId, sessionId, 'NEXT_QUESTION');
+      updateSessionState(token, quizId, sessionId, 'SKIP_COUNTDOWN');
+      updateSessionState(token, quizId, sessionId, 'GO_TO_ANSWER');
+      updateSessionState(token, quizId, sessionId, 'GO_TO_FINAL_RESULTS');
 
-    expect(requestSessionResults(playerIds[0])).toStrictEqual(
-      {
-        statusCode: 200,
-        jsonBody: {
-          usersRankedByScore: [
-            { name: PLAYER_NAMES[1], score: 12 },
-            { name: PLAYER_NAMES[2], score: 8 },
-            { name: PLAYER_NAMES[0], score: 6 }
-          ],
-          questionResults: [
-            {
-              questionId: questionIds[0],
-              playersCorrectList: [PLAYER_NAMES[1], PLAYER_NAMES[2]],
-              averageAnswerTime: expect.any(Number), // should be 0, generalised just in case
-              percentCorrect: 67
-            },
-            {
-              questionId: questionIds[1],
-              playersCorrectList: [PLAYER_NAMES[0], PLAYER_NAMES[1], PLAYER_NAMES[2]],
-              averageAnswerTime: expect.any(Number), // should be 1, generalised just in case
-              percentCorrect: 100
-            },
-            {
-              questionId: questionIds[2],
-              playersCorrectList: [],
-              averageAnswerTime: 0, // no answers, should be 0
-              percentCorrect: 0
-            }
-          ]
+      expect(requestSessionResults(playerIds[0])).toStrictEqual(
+        {
+          statusCode: 200,
+          jsonBody: {
+            usersRankedByScore: [
+              { name: PLAYER_NAMES[1], score: 12 },
+              { name: PLAYER_NAMES[2], score: 8 },
+              { name: PLAYER_NAMES[0], score: 6 }
+            ],
+            questionResults: [
+              {
+                questionId: questionIds[0],
+                playersCorrectList: [PLAYER_NAMES[1], PLAYER_NAMES[2]],
+                averageAnswerTime: expect.any(Number), // should be 0, generalised just in case
+                percentCorrect: 67
+              },
+              {
+                questionId: questionIds[1],
+                playersCorrectList: [PLAYER_NAMES[0], PLAYER_NAMES[1], PLAYER_NAMES[2]],
+                averageAnswerTime: expect.any(Number), // should be 1, generalised just in case
+                percentCorrect: 100
+              },
+              {
+                questionId: questionIds[2],
+                playersCorrectList: [],
+                averageAnswerTime: 0, // no answers, should be 0
+                percentCorrect: 0
+              }
+            ]
+          }
         }
-      }
-    );
-  });
+      );
+    });
 
-  test('successfully get quiz info test 2', () => {
-    answerQuestion(playerIds[2], 1, 3);
-    answerQuestion(playerIds[1], 1, 3);
-    answerQuestion(playerIds[0], 1, 3);
+    test('successfully get quiz info test 2', () => {
+      answerQuestion(playerIds[2], 1, 3);
+      answerQuestion(playerIds[1], 1, 3);
+      answerQuestion(playerIds[0], 1, 3);
 
-    updateSessionState(token, quizId, sessionId, 'GO_TO_ANSWER');
-    updateSessionState(token, quizId, sessionId, 'NEXT_QUESTION');
+      updateSessionState(token, quizId, sessionId, 'GO_TO_ANSWER');
+      updateSessionState(token, quizId, sessionId, 'NEXT_QUESTION');
 
-    // test that state is open after 3 seconds
-    sleepSync(3100);
-    expect(requestQuizSessionInfo(token, quizId, sessionId).jsonBody.state).toStrictEqual('QUESTION_OPEN');
+      // test that state is open after 3 seconds
+      sleepSync(3100);
+      expect(requestQuizSessionInfo(token, quizId, sessionId).jsonBody.state).toStrictEqual('QUESTION_OPEN');
 
-    answerQuestion(playerIds[0], 2, 0);
-    answerQuestion(playerIds[1], 2, 0);
-    answerQuestion(playerIds[2], 2, 0);
+      answerQuestion(playerIds[0], 2, 0);
+      answerQuestion(playerIds[1], 2, 0);
+      answerQuestion(playerIds[2], 2, 0);
 
-    updateSessionState(token, quizId, sessionId, 'GO_TO_ANSWER');
-    updateSessionState(token, quizId, sessionId, 'NEXT_QUESTION');
-    updateSessionState(token, quizId, sessionId, 'SKIP_COUNTDOWN');
+      updateSessionState(token, quizId, sessionId, 'GO_TO_ANSWER');
+      updateSessionState(token, quizId, sessionId, 'NEXT_QUESTION');
+      updateSessionState(token, quizId, sessionId, 'SKIP_COUNTDOWN');
 
-    answerQuestion(playerIds[2], 3, 0);
-    answerQuestion(playerIds[1], 3, 0);
-    answerQuestion(playerIds[0], 3, 0);
+      answerQuestion(playerIds[2], 3, 0);
+      answerQuestion(playerIds[1], 3, 0);
+      answerQuestion(playerIds[0], 3, 0);
 
-    updateSessionState(token, quizId, sessionId, 'GO_TO_ANSWER');
-    updateSessionState(token, quizId, sessionId, 'GO_TO_FINAL_RESULTS');
+      updateSessionState(token, quizId, sessionId, 'GO_TO_ANSWER');
+      updateSessionState(token, quizId, sessionId, 'GO_TO_FINAL_RESULTS');
 
-    expect(requestSessionResults(playerIds[1])).toStrictEqual(
-      {
-        statusCode: 200,
-        jsonBody: {
-          usersRankedByScore: [
-            { name: PLAYER_NAMES[2], score: 20 },
-            { name: PLAYER_NAMES[0], score: 12 },
-            { name: PLAYER_NAMES[1], score: 12 }
-          ],
-          questionResults: [
-            {
-              questionId: questionIds[0],
-              playersCorrectList: [PLAYER_NAMES[0], PLAYER_NAMES[1], PLAYER_NAMES[2]],
-              averageAnswerTime: expect.any(Number), // should be 0, generalised just in case
-              percentCorrect: 100
-            },
-            {
-              questionId: questionIds[1],
-              playersCorrectList: [PLAYER_NAMES[0], PLAYER_NAMES[1], PLAYER_NAMES[2]],
-              averageAnswerTime: expect.any(Number), // should be 0 , generalised just in case
-              percentCorrect: 100
-            },
-            {
-              questionId: questionIds[2],
-              playersCorrectList: [PLAYER_NAMES[0], PLAYER_NAMES[1], PLAYER_NAMES[2]],
-              averageAnswerTime: expect.any(Number), // should be 0 , generalised just in case
-              percentCorrect: 100
-            }
-          ]
+      expect(requestSessionResults(playerIds[1])).toStrictEqual(
+        {
+          statusCode: 200,
+          jsonBody: {
+            usersRankedByScore: [
+              { name: PLAYER_NAMES[2], score: 20 },
+              { name: PLAYER_NAMES[0], score: 12 },
+              { name: PLAYER_NAMES[1], score: 12 }
+            ],
+            questionResults: [
+              {
+                questionId: questionIds[0],
+                playersCorrectList: [PLAYER_NAMES[0], PLAYER_NAMES[1], PLAYER_NAMES[2]],
+                averageAnswerTime: expect.any(Number), // should be 0, generalised just in case
+                percentCorrect: 100
+              },
+              {
+                questionId: questionIds[1],
+                playersCorrectList: [PLAYER_NAMES[0], PLAYER_NAMES[1], PLAYER_NAMES[2]],
+                averageAnswerTime: expect.any(Number), // should be 0 , generalised just in case
+                percentCorrect: 100
+              },
+              {
+                questionId: questionIds[2],
+                playersCorrectList: [PLAYER_NAMES[0], PLAYER_NAMES[1], PLAYER_NAMES[2]],
+                averageAnswerTime: expect.any(Number), // should be 0 , generalised just in case
+                percentCorrect: 100
+              }
+            ]
+          }
         }
-      }
-    );
+      );
+    });
   });
 });
