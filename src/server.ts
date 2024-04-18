@@ -68,10 +68,21 @@ import {
   playerQuestionAnswer,
   playerQuestionPosition,
   playerQuestionResults,
+  playerSendChat,
+  playerSessionResults,
   playerStatus
 } from './player';
-
 import { clear } from './other';
+// import { createClient } from '@vercel/kv';
+
+// const KV_REST_API_URL = 'https://worthy-perch-30578.upstash.io';
+// const KV_REST_API_TOKEN = 'AXdyASQgZmJiZDRiOTQtOTEyMy00ZjAyLTk4NzMtNWVhMWJjZTYyMTVlNzI4ZTdlMjkwZmY4NDU2NzlkODQ4ZmJlMzk5MWI1MDQ=';
+
+// const database = createClient({
+//  url: KV_REST_API_URL,
+//  token: KV_REST_API_TOKEN,
+// });
+
 // Set up web app
 const app = express();
 // Use middleware that allows us to access the JSON body of requests
@@ -90,14 +101,14 @@ const HOST: string = process.env.IP || '127.0.0.1';
 
 // Load + Store functions for persistence
 const load = () => {
-  if (fs.existsSync('./toohakData.json')) {
-    const dataFile = fs.readFileSync('./toohakData.json', { encoding: 'utf8' });
+  if (fs.existsSync('/tmp/toohakData.json')) {
+    const dataFile = fs.readFileSync('/tmp/toohakData.json', { encoding: 'utf8' });
     setData(JSON.parse(dataFile));
   }
 };
 
 const save = () => {
-  fs.writeFileSync('./toohakData.json', JSON.stringify(getData()));
+  fs.writeFileSync('/tmp/toohakData.json', JSON.stringify(getData()));
 };
 
 // ====================================================================
@@ -649,6 +660,22 @@ app.get('/v1/player/:playerid/question/:questionposition/results', (req:Request,
   const playerId = parseInt(req.params.playerid);
   const questionPosition = parseInt(req.params.questionposition);
   const result = playerQuestionResults(playerId, questionPosition);
+  res.json(result);
+});
+
+// playerSessionResults Route
+app.get('/v1/player/:playerid/results', (req:Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const result = playerSessionResults(playerId);
+  res.json(result);
+});
+
+// playerSendChat Route
+app.post('/v1/player/:playerid/chat', (req:Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const { message } = req.body;
+  const result = playerSendChat(playerId, message);
+  save();
   res.json(result);
 });
 

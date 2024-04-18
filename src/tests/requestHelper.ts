@@ -1,8 +1,16 @@
-import request, { HttpVerb } from 'sync-request-curl';
+
 import { port, url } from '../config.json';
 import { IncomingHttpHeaders } from 'http';
 import HTTPError from 'http-errors';
+
+// sync-request-curl is faster, though lab09 says that sync-request should be used instead when working with the deployed server
+import request, { HttpVerb } from 'sync-request-curl';
+
 const SERVER_URL = `${url}:${port}`;
+// const DEPLOY_URL = 'https://1531-24t1-w15b-eggs.vercel.app';
+
+// pick local or deployed url
+const URL = SERVER_URL;
 
 // Return type of returnHelper() function.
 interface RequestHelperReturnType {
@@ -18,7 +26,6 @@ interface RequestHelperReturnType {
  *    - the headers input may be omitted
  *  - when putting the token in the header: requestHelper('PUT', '/path', {email, password}, {token});
  */
-//
 //
 export const requestHelper = (
   method: HttpVerb,
@@ -37,9 +44,9 @@ export const requestHelper = (
   let res: ReturnType<typeof request>;
 
   if (headers === undefined) {
-    res = request(method, SERVER_URL + path, { qs, json, timeout: 20000 });
+    res = request(method, URL + path, { qs, json, timeout: 20000 });
   } else {
-    res = request(method, SERVER_URL + path, { qs, headers, json, timeout: 20000 });
+    res = request(method, URL + path, { qs, headers, json, timeout: 20000 });
   }
 
   const bodyString = res.body.toString();
