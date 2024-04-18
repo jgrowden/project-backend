@@ -29,34 +29,37 @@ interface playerNameWithScoreAndTime {
   timeToAnswer?: number;
 }
 
-/**
- *
- * @param sessionId
- * @returns
- */
+// Given a sessionId (token), return the corresponding user if it exists
 export const fetchUserFromSessionId = (sessionId: string): UserType | undefined => {
   return getData().users.find(user => user.sessions.some(session => session === sessionId));
 };
 
+// Given a quizId, return the corresponding quiz (non-trash) if it exists
 export const fetchQuizFromQuizId = (quizId: number): QuizType | undefined => {
   return getData().quizzes.find(quiz => quiz.quizId === quizId);
 };
 
+// Given a quizId, return the corresponding quiz (in trash) if it exists
 export const fetchDeletedQuizFromQuizId = (quizId: number): QuizType | undefined => {
   return getData().deletedQuizzes.find(quiz => quiz.quizId === quizId);
 };
 
+// Given a quiz (non-trash) and a questionId, return the corresponding question if it exists
 export const fetchQuestionFromQuestionId = (quiz: QuizType, questionId: number): QuestionType | undefined => {
   return quiz.questions.find(question => question.questionId === questionId);
 };
+
+// Given an email, return the corresponding user if it exists
 export const fetchUserfromEmail = (email: string): UserType | undefined => {
   return getData().users.find(user => user.email === email);
 };
 
+// Given a quiz sessionId, return the corresponding quiz if it exists
 export const fetchQuizFromSessionId = (sessionId: number): QuizType | undefined => {
   return getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.quizSessionId === sessionId));
 };
 
+// Given a quiz sessionId, return the corresponding quiz session if it exists
 export const fetchSessionFromSessionId = (sessionId: number): QuizSessionType | undefined => {
   const quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.quizSessionId === sessionId));
   if (quiz === undefined) return undefined;
@@ -64,6 +67,7 @@ export const fetchSessionFromSessionId = (sessionId: number): QuizSessionType | 
   return session;
 };
 
+// Given a playerId, return the corresponding quiz session that player is in, if it exists
 export const fetchQuizSessionFromPlayerId = (playerId: number): QuizSessionType | undefined => {
   const quiz = getData().quizzes.find(quiz => quiz.quizSessions.some(session => session.players.some(player => player.playerId === playerId)));
   if (quiz === undefined) return undefined;
@@ -71,11 +75,13 @@ export const fetchQuizSessionFromPlayerId = (playerId: number): QuizSessionType 
   return session;
 };
 
-// generates psudorandom numbers, max 524287 unique Ids
+// Generates psudorandom numbers, max 524287 unique Ids
 export const hash = (i: number): number => {
   return ((((524287 * i) % 39916801) + 39916801) % 39916801);
 };
 
+// Utilises 'hash' to create a unique Id
+// 'Id' is incremented upon every call to ensure uniqueness
 const newId = (): number => {
   const newUserId = hash(getData().id);
   getData().id++;
@@ -171,7 +177,8 @@ export const setRandomColour = (colours: string[]): string => {
 
 /**
  * Function checks whether a given string is a valid thumbnail - whether
- * it ends in .jpg,.jpeg or .png, and starts with https://
+ * it ends in .jpg,.jpeg or .png (case-insensitive)
+ * and starts with https:// or http://
  * @returns {boolean}
  */
 export const isValidThumbnail = (thumbnail: string) => {
@@ -233,7 +240,7 @@ export const getUsersRankedByScore = (quizSession: QuizSessionType) => {
 };
 
 /**
- * returns the results of a question, including the questionId, the players
+ * Returns the results of a question, including the questionId, the players
  * who answered correctly, the average answer time and the percent of
  * players who got the correct answer
  *
