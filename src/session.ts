@@ -286,7 +286,7 @@ export function adminQuizSessionsView(token: string, quizId: number): SessionVie
 *  playerId: number
 * }
 */
-export function adminQuizSessionPlayerJoin(
+export function playerQuizSessionJoin(
   sessionId: number,
   name: string
 ): playerIdType {

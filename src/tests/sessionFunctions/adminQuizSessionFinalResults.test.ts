@@ -1,5 +1,5 @@
 import HTTPError from 'http-errors';
-import { clear, requestAuthRegister, requestPlayerQuestionPosition, requestQuizCreateV2, requestQuizQuestionCreateV2, requestQuizSessionFinalResults, requestQuizSessionInfo, requestQuizSessionPlayerAnswer, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestQuizSessionUpdate } from '../wrapper';
+import { requestClear, requestAuthRegister, requestPlayerQuestionPosition, requestQuizCreateV2, requestQuizQuestionCreateV2, requestQuizSessionFinalResults, requestQuizSessionInfo, requestQuizSessionPlayerAnswer, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestQuizSessionUpdate } from '../wrapper';
 import { AnswerType, QuestionType } from '../../dataStore';
 
 // Taken from week 8 labs
@@ -11,10 +11,10 @@ function sleepSync(ms: number) {
 }
 
 beforeEach(() => {
-  clear();
+  requestClear();
 });
 afterEach(() => {
-  clear();
+  requestClear();
 });
 
 let quizId1: number;

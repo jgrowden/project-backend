@@ -1,8 +1,8 @@
-import { clear, requestUserDetails, requestAuthRegister, errorCode, requestUserDetailsV2 } from '../wrapper';
+import { requestClear, requestUserDetails, requestAuthRegister, errorCode, requestUserDetailsV2 } from '../wrapper';
 import HTTPError from 'http-errors';
 
 beforeEach(() => {
-  clear();
+  requestClear();
 });
 
 describe('adminUserDetails testing', () => {
