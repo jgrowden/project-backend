@@ -4,7 +4,7 @@ import {
   requestQuizInfo,
   requestQuizInfoV2,
   requestQuizCreateV2,
-  clear,
+  requestClear,
   errorCode
 } from '../wrapper';
 
@@ -13,7 +13,7 @@ import HTTPError from 'http-errors';
 let token: string;
 
 beforeEach(() => {
-  clear();
+  requestClear();
   token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token as string;
 });
 

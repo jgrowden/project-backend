@@ -7,7 +7,7 @@ import {
   requestQuizChangeOwnerV2,
   requestQuizSessionStart,
   requestQuizQuestionCreateV2,
-  clear,
+  requestClear,
   requestQuizList
 } from '../wrapper';
 import HTTPError from 'http-errors';
@@ -18,7 +18,7 @@ let quiz1Id: number;
 
 describe('Testing POST /v1/admin/quiz/{quizid}/transfer', () => {
   beforeEach(() => {
-    clear();
+    requestClear();
     const user1 = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
     User1Token = user1.jsonBody.token as string;
     const user2 = requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo');
@@ -74,7 +74,7 @@ describe('Testing POST /v1/admin/quiz/{quizid}/transfer', () => {
 
 describe('Testing POST /v2/admin/quiz/{quizid}/transfer', () => {
   beforeEach(() => {
-    clear();
+    requestClear();
     const user1 = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
     User1Token = user1.jsonBody.token as string;
     const user2 = requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo');
