@@ -658,7 +658,7 @@ app.use((req: Request, res: Response) => {
       4. You've forgotten a leading slash (/), e.g. you have posts/list instead
          of /posts/list in your server.ts or test file
   `;
-  res.json({ error });
+  res.status(404).json({ error });
 });
 
 // For handling errors
