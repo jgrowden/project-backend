@@ -98,21 +98,14 @@ const HOST: string = process.env.IP || '127.0.0.1';
 
 // Load + Store functions for persistence
 const load = () => {
-  if (fs.existsSync('toohakData.json')) {
-    const dataFile = fs.readFileSync('toohakData.json', { encoding: 'utf8' });
+  if (fs.existsSync('/tmp/toohakData.json')) {
+    const dataFile = fs.readFileSync('/tmp/toohakData.json', { encoding: 'utf8' });
     setData(JSON.parse(dataFile));
-  } else {
-    fs.writeFileSync('toohakData.json', JSON.stringify({
-      users: [],
-      quizzes: [],
-      deletedQuizzes: [],
-      id: 0
-    }));
   }
 };
 
 const save = () => {
-  fs.writeFileSync('toohakData.json', JSON.stringify(getData()));
+  fs.writeFileSync('/tmp/toohakData.json', JSON.stringify(getData()));
 };
 
 // ====================================================================
@@ -122,19 +115,6 @@ const save = () => {
 app.get('/echo', (req: Request, res: Response) => {
   const data = req.query.echo as string;
   return res.json(echo(data));
-});
-
-// vercel test route to get data
-app.get('/data', async (req: Request, res: Response) => {
-  const data = await database.hgetall("data:names");
-  res.status(200).json(data);
-});
-
-// vercel test route to write data
-app.put('/data', async (req: Request, res: Response) => {
-  const { data } = req.body;
-  await database.hset("data:names", { data });
-  return res.status(200).json({});
 });
 
 // adminAuthRegister Route
