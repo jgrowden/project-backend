@@ -2,19 +2,8 @@ import HTTPError from 'http-errors';
 import { clear, requestAuthRegister, requestQuizCreateV2, requestQuizQuestionCreateV2, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestSendChat } from '../wrapper';
 import { QuestionType } from '../../dataStore';
 
-beforeEach(() => {
-  clear();
-});
-afterEach(() => {
-  clear();
-});
-
-let quizId1: number;
-let token1: string;
-let sessionId1: number;
-let player1: number;
-let player2: number;
-let player3: number;
+const PLAYER_NAMES = ['person1', 'person2', 'person3'];
+const AUTOSTARTNUM = 10;
 
 const questionBody1: QuestionType = {
   question: 'Who is the imposter?',
@@ -40,39 +29,69 @@ const questionBody3: QuestionType = {
   thumbnailUrl: 'http://alsosus.com/sus.jpg'
 };
 
-const AUTOSTARTNUM = 10;
+function setupQuizAndSession(numPlayers: number) {
+  const user = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
+  const token = user.jsonBody.token as string;
+
+  const quiz = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');
+  const quizId = quiz.jsonBody.quizId as number;
+
+  requestQuizQuestionCreateV2(token, quizId, questionBody1);
+  requestQuizQuestionCreateV2(token, quizId, questionBody2);
+  requestQuizQuestionCreateV2(token, quizId, questionBody3);
+
+  const sessionId = requestQuizSessionStart(token, quizId, AUTOSTARTNUM).jsonBody.sessionId as number;
+
+  const playerIds = PLAYER_NAMES.slice(0, numPlayers).map((name) => requestQuizSessionPlayerJoin(sessionId, name).jsonBody.playerId as number);
+
+  return { token, quizId, sessionId, playerIds };
+}
+
+beforeEach(() => {
+  clear();
+});
+
+afterEach(() => {
+  clear();
+});
 
 describe('playerSendChat testing', () => {
+  let playerIds: number[];
+
   beforeEach(() => {
-    const user = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
-    token1 = user.jsonBody.token as string;
-
-    const quiz1 = requestQuizCreateV2(token1, 'Quiz Name', 'Quiz Description');
-    quizId1 = quiz1.jsonBody.quizId as number;
-
-    requestQuizQuestionCreateV2(token1, quizId1, questionBody1)
-    requestQuizQuestionCreateV2(token1, quizId1, questionBody2)
-    requestQuizQuestionCreateV2(token1, quizId1, questionBody3)
-    sessionId1 = requestQuizSessionStart(token1, quizId1, AUTOSTARTNUM).jsonBody.sessionId as number;
-
-    player1 = requestQuizSessionPlayerJoin(sessionId1, 'person1').jsonBody.playerId as number;
+    clear();
   });
 
   test('player id does not refer to a valid player', () => {
-    expect(() => requestSendChat(player1 + 1, { messageBody: 'hi' })).toThrow(HTTPError[400]);
+    const setup = setupQuizAndSession(1); // Only register one player
+    playerIds = setup.playerIds;
+
+    expect(() => requestSendChat(playerIds[0] + 1, { messageBody: 'hi' })).toThrow(HTTPError[400]);
   });
 
   test('message too long or short', () => {
-    expect(() => requestSendChat(player1, { messageBody: '' })).toThrow(HTTPError[400]);
-    expect(() => requestSendChat(player1, { messageBody: '01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890' })).toThrow(HTTPError[400]);
+    const setup = setupQuizAndSession(1); // Only register one player
+    playerIds = setup.playerIds;
+
+    expect(() => requestSendChat(playerIds[0], { messageBody: '' })).toThrow(HTTPError[400]);
+    expect(() => requestSendChat(playerIds[0], { messageBody: '01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890' })).toThrow(HTTPError[400]);
   });
 
   test('successfully send chat', () => {
-    player2 = requestQuizSessionPlayerJoin(sessionId1, 'person2').jsonBody.playerId as number;
-    player3 = requestQuizSessionPlayerJoin(sessionId1, 'person3').jsonBody.playerId as number;
+    const setup = setupQuizAndSession(3); // Register three players
+    playerIds = setup.playerIds;
 
-    requestSendChat(player1, { messageBody: 'hi everyone!' });
-    requestSendChat(player2, { messageBody: 'hey player1, how are we all?' });
-    requestSendChat(player3, { messageBody: 'fantastic' });
+    expect(requestSendChat(playerIds[0], { messageBody: 'hi everyone!' })).toStrictEqual({
+      statusCode: 200,
+      jsonBody: { }
+    });
+    expect(requestSendChat(playerIds[1], { messageBody: 'hey player1, how are we all?' })).toStrictEqual({
+      statusCode: 200,
+      jsonBody: { }
+    });
+    expect(requestSendChat(playerIds[2], { messageBody: 'fantastic' })).toStrictEqual({
+      statusCode: 200,
+      jsonBody: { }
+    });
   });
 });
