@@ -59,7 +59,7 @@ import {
   adminQuizSessionInfo,
   adminQuizSessionStart,
   adminQuizSessionsView,
-  adminQuizSessionPlayerJoin,
+  playerQuizSessionJoin,
   adminQuizSessionUpdate,
   adminQuizSessionFinalResults,
   adminQuizSessionResultsCSV
@@ -599,10 +599,10 @@ app.get('/csv-results/:filename', (req, res) => {
   res.sendFile(req.params.filename, { root: '.' });
 });
 
-// adminQuizSessionPlayerJoin Route
+// playerQuizSessionJoin Route
 app.post('/v1/player/join', (req: Request, res: Response) => {
   const { sessionId, name } = req.body;
-  const result = adminQuizSessionPlayerJoin(sessionId, name);
+  const result = playerQuizSessionJoin(sessionId, name);
   save();
   res.json(result);
 });
@@ -674,7 +674,7 @@ app.use((req: Request, res: Response) => {
       4. You've forgotten a leading slash (/), e.g. you have posts/list instead
          of /posts/list in your server.ts or test file
   `;
-  res.json({ error });
+  res.status(404).json({ error });
 });
 
 // For handling errors

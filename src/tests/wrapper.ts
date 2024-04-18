@@ -161,7 +161,7 @@ export const requestCSV = (filename: string) => {
   requestHelper('GET', `/csv-results/${filename}`, {}, {});
 };
 
-export const clear = () => requestHelper('DELETE', '/v1/clear');
+export const requestClear = () => requestHelper('DELETE', '/v1/clear');
 
 export const errorCode = (statusCode: number) => {
   return { statusCode: statusCode, jsonBody: { error: expect.any(String) } };

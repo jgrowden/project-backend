@@ -7,7 +7,7 @@ import {
   requestQuizInfoV2,
   requestQuizQuestionCreateV2,
   errorCode,
-  clear
+  requestClear
 } from '../wrapper';
 
 import { QuestionType } from '../../dataStore';
@@ -20,7 +20,7 @@ let questionBody: QuestionType;
 
 describe('Testing POST /v1/admin/quiz/{quizid}:', () => {
   beforeEach(() => {
-    clear();
+    requestClear();
     const user = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
     token = user.jsonBody.token as string;
     const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
@@ -132,7 +132,7 @@ describe('Testing POST /v1/admin/quiz/{quizid}:', () => {
 
 describe('Testing POST /v2/admin/quiz/{quizid}:', () => {
   beforeEach(() => {
-    clear();
+    requestClear();
     const user = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
     token = user.jsonBody.token as string;
     const quiz = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');

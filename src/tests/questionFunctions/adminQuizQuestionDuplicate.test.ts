@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizCreateV2, requestQuizInfo, requestQuizInfoV2, requestQuizQuestionCreate, requestQuizQuestionCreateV2, requestQuizQuestionDuplicate, requestQuizQuestionDuplicateV2, clear, errorCode } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizCreateV2, requestQuizInfo, requestQuizInfoV2, requestQuizQuestionCreate, requestQuizQuestionCreateV2, requestQuizQuestionDuplicate, requestQuizQuestionDuplicateV2, requestClear, errorCode } from '../wrapper';
 import { QuestionType } from '../../dataStore';
 import HTTPError from 'http-errors';
 
@@ -9,7 +9,7 @@ let questionId2: number;
 
 describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
   beforeEach(() => {
-    clear();
+    requestClear();
     const user = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
     token = user.jsonBody.token as string;
     const quiz = requestQuizCreate(token, 'Quiz Name', 'Quiz Description');
@@ -241,7 +241,7 @@ describe('Testing /v1/admin/quiz/{quizid}/question/{questionid}/move:', () => {
 
 describe('Testing /v2/admin/quiz/{quizid}/question/{questionid}/move:', () => {
   beforeEach(() => {
-    clear();
+    requestClear();
     const user = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
     token = user.jsonBody.token as string;
     const quiz = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description');

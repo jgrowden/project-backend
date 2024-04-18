@@ -1,4 +1,4 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizDelete, requestQuizTrashInfo, requestQuizTrashEmpty, clear, errorCode, requestQuizTrashEmptyV2 } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizDelete, requestQuizTrashInfo, requestQuizTrashEmpty, requestClear, errorCode, requestQuizTrashEmptyV2 } from '../wrapper';
 import HTTPError from 'http-errors';
 
 describe('adminQuizEmptyTrashV1 http testing', () => {
@@ -8,7 +8,7 @@ describe('adminQuizEmptyTrashV1 http testing', () => {
   let quizId3: number;
 
   beforeEach(() => {
-    clear();
+    requestClear();
     const user = requestAuthRegister('hayden.smith@unsw.edu.au', 'haydensmith123', 'Hayden', 'Smith');
     token = user.jsonBody.token as string;
     const quiz1 = requestQuizCreate(token, 'Quiz 1', 'Description 1');
@@ -33,7 +33,7 @@ describe('adminQuizEmptyTrashV1 http testing', () => {
     });
 
     test('Error 403: Quiz does not exist', () => {
-      clear();
+      requestClear();
       const user = requestAuthRegister('hayden.smith@unsw.edu.au', 'haydensmith123', 'Hayden', 'Smith');
       token = user.jsonBody.token as string;
       expect(requestQuizTrashEmpty(token, [1])).toStrictEqual(errorCode(403));
@@ -78,7 +78,7 @@ describe('adminQuizEmptyTrashV2 http testing', () => {
   let quizId3: number;
 
   beforeEach(() => {
-    clear();
+    requestClear();
     const user = requestAuthRegister('hayden.smith@unsw.edu.au', 'haydensmith123', 'Hayden', 'Smith');
     token = user.jsonBody.token as string;
     const quiz1 = requestQuizCreate(token, 'Quiz 1', 'Description 1');
@@ -103,7 +103,7 @@ describe('adminQuizEmptyTrashV2 http testing', () => {
     });
 
     test('Error 403: Quiz does not exist', () => {
-      clear();
+      requestClear();
       const user = requestAuthRegister('hayden.smith@unsw.edu.au', 'haydensmith123', 'Hayden', 'Smith');
       token = user.jsonBody.token as string;
       expect(() => requestQuizTrashEmptyV2(token, [1])).toThrow(HTTPError[403]);

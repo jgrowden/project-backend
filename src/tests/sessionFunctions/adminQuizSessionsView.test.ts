@@ -1,7 +1,7 @@
 import HTTPError from 'http-errors';
 import { QuestionType } from '../../dataStore';
 import {
-  clear,
+  requestClear,
   requestAuthRegister,
   requestQuizCreateV2,
   requestQuizQuestionCreateV2,
@@ -13,7 +13,7 @@ import {
 let token: string, quizId: number, questionBody: QuestionType;
 const AUTOSTARTNUM = 10;
 beforeEach(() => {
-  clear();
+  requestClear();
   token = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs').jsonBody.token as string;
   quizId = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description').jsonBody.quizId as number;
   questionBody = {
@@ -43,7 +43,7 @@ beforeEach(() => {
   requestQuizQuestionCreateV2(token, quizId, questionBody);
 });
 afterAll(() => {
-  clear();
+  requestClear();
 });
 
 describe('adminQuizSessionsView', () => {

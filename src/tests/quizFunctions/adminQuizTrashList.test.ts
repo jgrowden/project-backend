@@ -1,6 +1,6 @@
 import {
   errorCode,
-  clear,
+  requestClear,
   requestAuthRegister,
   requestQuizCreate,
   requestQuizDelete,
@@ -17,7 +17,7 @@ let quiz2: number;
 let quiz3: number;
 
 beforeEach(() => {
-  clear();
+  requestClear();
   token1 = requestAuthRegister('hayden.smith@unsw.edu.au', 'haydensmith123', 'Hayden', 'Smith').jsonBody.token as string;
 });
 
