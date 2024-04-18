@@ -1,5 +1,5 @@
 import HTTPError from 'http-errors';
-import { clear, requestAuthRegister, requestPlayerQuestionPosition, requestQuizCreateV2, requestQuizQuestionCreateV2, requestSessionResults, requestQuizSessionInfo, requestQuizSessionPlayerAnswer, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestQuizSessionUpdate } from '../wrapper';
+import { requsetClear, requestAuthRegister, requestPlayerQuestionPosition, requestQuizCreateV2, requestQuizQuestionCreateV2, requestSessionResults, requestQuizSessionInfo, requestQuizSessionPlayerAnswer, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestQuizSessionUpdate } from '../wrapper';
 import { AnswerType, QuestionType } from '../../dataStore';
 
 // Taken from week 8 labs
@@ -68,11 +68,11 @@ function updateSessionState(token: string, quizId: number, sessionId: number, ac
 }
 
 beforeEach(() => {
-  clear();
+  requestClear();
 });
 
 afterEach(() => {
-  clear();
+  requestClear();
 });
 
 describe('playerSessionResults testing', () => {
