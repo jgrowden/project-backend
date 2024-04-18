@@ -9,7 +9,7 @@ import {
   newState
 } from './dataStore';
 import fs from 'fs';
-
+import { port, url } from './config.json';
 export interface ErrorObject {
   error: string;
   statusCode?: number;
@@ -30,6 +30,7 @@ export interface playerNameWithScoreAndTime {
   timeToAnswer?: number;
   rank?: number;
 }
+const SERVER_URL = `${url}:${port}`;
 
 // Given a sessionId (token), return the corresponding user if it exists
 export const fetchUserFromSessionId = (sessionId: string): UserType | undefined => {
@@ -304,6 +305,13 @@ interface playerCsvData {
   score?: number;
 }
 
+/**
+ * Formats the session and player information such that it is suitable
+ * for a .csv file
+ * Returns the url to the .csv file
+ * @param sessionId
+ * @returns {url: string}
+ */
 export const writeResultsCSV = (sessionId: number) => {
   const session = fetchSessionFromSessionId(sessionId);
 
@@ -354,8 +362,11 @@ export const writeResultsCSV = (sessionId: number) => {
   }
 
   playerInfo.sort((a, b) => a.name.localeCompare(b.name));
-  const url = `csv_results_${sessionId}.csv`;
-  fs.writeFileSync(`./${url}`, headers.join(',') + '\n' + playerInfo.map(player => player.name + ',' + player.results.join(',')).join('\n'));
+  const url = `${SERVER_URL}/csv_results/${sessionId}.csv`;
+  if (!fs.existsSync('./csv_results')) {
+    fs.mkdirSync('./csv_results');
+  }
+  fs.writeFileSync(`./csv_results/${sessionId}.csv`, headers.join(',') + '\n' + playerInfo.map(player => player.name + ',' + player.results.join(',')).join('\n'));
 
   return { url: url };
 };
