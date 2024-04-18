@@ -238,15 +238,17 @@ export function adminQuizSessionResultsCSV(token: string, quizId: number, sessio
     throw HTTPError(400, 'session is not in FINAL_RESULTS state');
   }
 
+  let session = quizSession;
+
   const headers: string[] = ['player'];
   const playerInfo: playerCsvData[] = session.players.map(player => {return {name: player.name, results: []}});
 
   const quizLen = session.playerAnswers.length;
   for (let i = 0; i < quizLen; i++) {
-    headers.push(`question${index}score`, `question${index}rank`);
+    headers.push(`question${i + 1}score`, `question${i + 1}rank`);
     const playersCorrectList: playerNameWithScoreAndTime[] = [];
     const correctAnswers = session.metadata.questions[i].answers.filter(answer => answer.correct === true).map(answer => answer.answerId).sort().join(',');
-    const response = session.playerAnswers[i];
+    const responses = session.playerAnswers[i];
 
     for (const answer of responses.answers) {
       // compare array of correct answers with array of the player's answers (as strings)
@@ -293,15 +295,19 @@ export function adminQuizSessionResultsCSV(token: string, quizId: number, sessio
     })    
   }
 
-  const url = `csv/csv_results_${sessionId}.csv`;
-  
-  fs.writeFileSync(`./${url}`, header.join(',') + '\n');
-  playerInfo.sort((a,b) => a.name.localCompare(b.name));
+
+  playerInfo.sort((a,b) => {
+    if (a.name === b.name) return 0;
+    if (a.name > b.name) return 1;
+    return -1;
+  });
+  const url = `csv_results_${sessionId}.csv`;
+  fs.writeFileSync(`./${url}`, headers.join(',') + '\n');
   for (const player of playerInfo) {
     fs.writeFileSync(`./${url}`, player.name + ',' + player.results.join(',') + '\n');
   }
 
-  return { url : url };
+  return { url: url };
 };
 
 

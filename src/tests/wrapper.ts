@@ -157,6 +157,10 @@ export const requestQuizSessionPlayerAnswer = (playerId: number, questionPositio
 export const requestQuestionResults = (playerId: number, questionPosition: number) =>
   requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}/results`, {}, {});
 
+export const requestCSV = (filename: string) => {
+  requestHelper('GET', `/csv-results/${filename}`, {}, {});
+}
+
 export const clear = () => requestHelper('DELETE', '/v1/clear');
 
 export const errorCode = (statusCode: number) => {

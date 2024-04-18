@@ -588,7 +588,7 @@ app.get('/v1/admin/quiz/:quizid/sessions', (req: Request, res: Response) => {
 app.get('/v1/admin/quiz/:quizid/session/:sessionid/results/csv', (req: Request, res: Response) => {
   const token = req.header('token');
   const quizId = parseInt(req.params.quizid);
-  const sessionId = parseInt(req.params.sessionId);
+  const sessionId = parseInt(req.params.sessionid);
   const result = adminQuizSessionResultsCSV(token, quizId, sessionId);
   save();
   res.json(result);
@@ -597,7 +597,7 @@ app.get('/v1/admin/quiz/:quizid/session/:sessionid/results/csv', (req: Request, 
 
 // request CSV file
 app.get('/csv-results/:filename', (req, res) => {
-  res.sendFile(req.params.filename, { root: '../csv-results' });
+  res.sendFile(req.params.filename, { root: '.' });
 });
 
 // adminQuizSessionPlayerJoin Route

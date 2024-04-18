@@ -7,7 +7,9 @@ import {
   requestQuizSessionUpdate,
   requestQuizSessionPlayerJoin,
   requestQuizSessionResultsCSV,
-  clear
+  clear,
+  requestQuizInfo,requestQuizSessionInfo,
+  requestCSV
 } from '../wrapper';
 import { QuestionType } from '../../dataStore';
 
@@ -65,10 +67,13 @@ describe('Testing for GET /v1/admin/quiz/{quizid}/session/{sessionid}/results/cs
     requestQuizSessionUpdate(token, quizId, sessionId, 'SKIP_COUNTDOWN');
     requestQuizSessionUpdate(token, quizId, sessionId, 'GO_TO_ANSWER');
     requestQuizSessionUpdate(token, quizId, sessionId, 'GO_TO_FINAL_RESULTS');
+    console.log(requestQuizInfo(token, quizId));
+    console.log(requestQuizSessionInfo(token, quizId, sessionId));
     expect(requestQuizSessionResultsCSV(token, quizId, sessionId)).toStrictEqual({
       statusCode: 200,
       jsonBody: { url: expect.any(String)}
     });
+    console.log(requestCSV(`csv_results_${sessionId}.csv`));
   });
   test('Fail: session is not in FINAL_RESULTS state', () => {
     expect(() => requestQuizSessionResultsCSV(token, quizId, sessionId)).toThrow(HTTPError[400]);
