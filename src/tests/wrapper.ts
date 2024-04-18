@@ -157,6 +157,9 @@ export const requestQuestionResults = (playerId: number, questionPosition: numbe
 export const requestSessionResults = (playerId: number) =>
   requestHelper('GET', `/v1/player/${playerId}/results`, {}, {});
 
+export const requestSendChat = (playerId: number, message: { messageBody: string }) =>
+  requestHelper('POST', `/v1/player/${playerId}/chat`, { message }, {});
+
 export const requestClear = () => requestHelper('DELETE', '/v1/clear');
 
 export const errorCode = (statusCode: number) => {
