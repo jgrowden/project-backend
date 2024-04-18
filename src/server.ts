@@ -69,8 +69,17 @@ import {
   playerQuestionResults,
   playerStatus
 } from './player';
-
 import { clear } from './other';
+import { createClient } from '@vercel/kv';
+
+const KV_REST_API_URL="https://worthy-perch-30578.upstash.io";
+const KV_REST_API_TOKEN="AXdyASQgZmJiZDRiOTQtOTEyMy00ZjAyLTk4NzMtNWVhMWJjZTYyMTVlNzI4ZTdlMjkwZmY4NDU2NzlkODQ4ZmJlMzk5MWI1MDQ=";
+
+const database = createClient({
+  url: KV_REST_API_URL,
+  token: KV_REST_API_TOKEN,
+});
+
 // Set up web app
 const app = express();
 // Use middleware that allows us to access the JSON body of requests
@@ -106,6 +115,19 @@ const save = () => {
 app.get('/echo', (req: Request, res: Response) => {
   const data = req.query.echo as string;
   return res.json(echo(data));
+});
+
+// vercel test route to get data
+app.get('/data', async (req: Request, res: Response) => {
+  const data = await database.hgetall("data:names");
+  res.status(200).json(data);
+});
+
+// vercel test route to write data
+app.put('/data', async (req: Request, res: Response) => {
+  const { data } = req.body;
+  await database.hset("data:names", { data });
+  return res.status(200).json({});
 });
 
 // adminAuthRegister Route
