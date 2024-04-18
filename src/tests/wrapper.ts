@@ -37,8 +37,17 @@ export const requestQuizInfo = (token: string, quizId: number) =>
 export const requestQuizInfoV2 = (token: string, quizId: number) =>
   requestHelper('GET', `/v2/admin/quiz/${quizId}`, {}, { token });
 
+export const requestQuizNameUpdate = (token: string, quizId: number, name: string) =>
+  requestHelper('PUT', `/v1/admin/quiz/${quizId}/name`, { token, name });
+
+export const requestQuizNameUpdateV2 = (token: string, quizId: number, name: string) =>
+  requestHelper('PUT', `/v2/admin/quiz/${quizId}/name`, { name }, { token });
+
 export const requestQuizDescriptionUpdate = (token: string, quizId: number, description: string) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/description`, { token, description });
+
+export const requestQuizDescriptionUpdateV2 = (token: string, quizId: number, description: string) =>
+  requestHelper('PUT', `/v2/admin/quiz/${quizId}/description`, { description }, { token });
 
 export const requestQuizQuestionCreate = (token: string, quizId: number, questionBody: QuestionType) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/question`, { token, questionBody });
@@ -55,8 +64,14 @@ export const requestQuizTrashInfoV2 = (token: string) =>
 export const requestQuizRestore = (token: string, quizId: number) =>
   requestHelper('POST', `/v1/admin/quiz/${quizId}/restore`, { token });
 
+export const requestQuizRestoreV2 = (token: string, quizId: number) =>
+  requestHelper('POST', `/v2/admin/quiz/${quizId}/restore`, {}, { token });
+
 export const requestQuizTrashEmpty = (token: string, quizIds: number[]) =>
   requestHelper('DELETE', '/v1/admin/quiz/trash/empty', { token, quizIds: JSON.stringify(quizIds) });
+
+export const requestQuizTrashEmptyV2 = (token: string, quizIds: number[]) =>
+  requestHelper('DELETE', '/v2/admin/quiz/trash/empty', { quizIds: JSON.stringify(quizIds) }, { token });
 
 export const requestUserDetails = (token: string) =>
   requestHelper('GET', '/v1/admin/user/details', { token });
@@ -75,9 +90,6 @@ export const requestUserPasswordUpdate = (token: string, oldPassword: string, ne
 
 export const requestUserPasswordUpdateV2 = (token: string, oldPassword: string, newPassword: string) =>
   requestHelper('PUT', '/v2/admin/user/password', { oldPassword, newPassword }, { token });
-
-export const requestQuizNameUpdate = (token: string, quizId: number, name: string) =>
-  requestHelper('PUT', `/v1/admin/quiz/${quizId}/name`, { token, name });
 
 export const requestQuestionUpdate = (token: string, quizId: number, questionId: number, questionBody: QuestionType) =>
   requestHelper('PUT', `/v1/admin/quiz/${quizId}/question/${questionId}`, { token, questionBody });

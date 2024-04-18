@@ -18,7 +18,8 @@ import {
   updateState,
   getUsersRankedByScore,
   getQuestionResults,
-  getUsersRankAndScoreByQuestion
+  getUsersRankAndScoreByQuestion,
+  fetchQuizFromSessionId
 } from './helper';
 const { convertArrayToCSV } = require('convert-array-to-csv');
 const converter = require('convert-array-to-csv');
@@ -131,7 +132,7 @@ export function adminQuizSessionUpdate(
   if (!session) {
     throw HTTPError(400, 'Session not found');
   }
-  if (session.quizSessionId !== sessionId) {
+  if (quizId !== fetchQuizFromSessionId(sessionId).quizId) {
     throw HTTPError(400, 'SessionId is not a session of this quiz');
   }
 
@@ -376,7 +377,7 @@ export function adminQuizSessionFinalResults(token: string, quizId: number, sess
   if (!session) {
     throw HTTPError(400, 'Session not found');
   }
-  if (session.quizSessionId !== sessionId) {
+  if (quizId !== fetchQuizFromSessionId(sessionId).quizId) {
     throw HTTPError(400, 'SessionId is not a session of this quiz');
   }
 
