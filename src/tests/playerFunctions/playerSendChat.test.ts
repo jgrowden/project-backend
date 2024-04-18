@@ -50,31 +50,15 @@ describe('playerSendChat testing', () => {
     const quiz1 = requestQuizCreateV2(token1, 'Quiz Name', 'Quiz Description');
     quizId1 = quiz1.jsonBody.quizId as number;
 
-    requestQuizQuestionCreateV2(token1, quizId1, questionBody1).jsonBody.questionId as number;
-    requestQuizQuestionCreateV2(token1, quizId1, questionBody2).jsonBody.questionId as number;
-    requestQuizQuestionCreateV2(token1, quizId1, questionBody3).jsonBody.questionId as number;
+    requestQuizQuestionCreateV2(token1, quizId1, questionBody1)
+    requestQuizQuestionCreateV2(token1, quizId1, questionBody2)
+    requestQuizQuestionCreateV2(token1, quizId1, questionBody3)
     sessionId1 = requestQuizSessionStart(token1, quizId1, AUTOSTARTNUM).jsonBody.sessionId as number;
 
     player1 = requestQuizSessionPlayerJoin(sessionId1, 'person1').jsonBody.playerId as number;
-    player2 = requestQuizSessionPlayerJoin(sessionId1, 'person2').jsonBody.playerId as number;
-    player3 = requestQuizSessionPlayerJoin(sessionId1, 'person3').jsonBody.playerId as number;
   });
 
   test('player id does not refer to a valid player', () => {
-    clear();
-    const user = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
-    token1 = user.jsonBody.token as string;
-
-    const quiz1 = requestQuizCreateV2(token1, 'Quiz Name', 'Quiz Description');
-    quizId1 = quiz1.jsonBody.quizId as number;
-
-    requestQuizQuestionCreateV2(token1, quizId1, questionBody1).jsonBody.questionId as number;
-    requestQuizQuestionCreateV2(token1, quizId1, questionBody2).jsonBody.questionId as number;
-    requestQuizQuestionCreateV2(token1, quizId1, questionBody3).jsonBody.questionId as number;
-    sessionId1 = requestQuizSessionStart(token1, quizId1, AUTOSTARTNUM).jsonBody.sessionId as number;
-
-    player1 = requestQuizSessionPlayerJoin(sessionId1, 'person1').jsonBody.playerId as number;
-
     expect(() => requestSendChat(player1 + 1, { messageBody: 'hi' })).toThrow(HTTPError[400]);
   });
 
@@ -84,6 +68,9 @@ describe('playerSendChat testing', () => {
   });
 
   test('successfully send chat', () => {
+    player2 = requestQuizSessionPlayerJoin(sessionId1, 'person2').jsonBody.playerId as number;
+    player3 = requestQuizSessionPlayerJoin(sessionId1, 'person3').jsonBody.playerId as number;
+
     requestSendChat(player1, { messageBody: 'hi everyone!' });
     requestSendChat(player2, { messageBody: 'hey player1, how are we all?' });
     requestSendChat(player3, { messageBody: 'fantastic' });
