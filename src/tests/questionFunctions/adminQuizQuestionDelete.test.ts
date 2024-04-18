@@ -10,7 +10,7 @@ import {
   requestQuestionDelete,
   requestQuestionDeleteV2,
   requestQuizSessionStart,
-  clear,
+  requestClear,
   errorCode
 } from '../wrapper';
 import { QuestionType } from '../../dataStore';
@@ -21,10 +21,10 @@ let questionId: number;
 let questionBody: QuestionType;
 
 afterAll(() => {
-  clear();
+  requestClear();
 });
 beforeEach(() => {
-  clear();
+  requestClear();
   const user = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
   token = user.jsonBody.token as string;
 });

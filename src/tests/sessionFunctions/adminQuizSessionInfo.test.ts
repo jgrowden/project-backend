@@ -1,7 +1,7 @@
 import HTTPError from 'http-errors';
 import { QuestionType } from '../../dataStore';
 import {
-  clear,
+  requestClear,
   requestAuthRegister,
   requestQuizCreateV2,
   requestQuizSessionStart,
@@ -11,10 +11,10 @@ import {
 } from '../wrapper';
 
 beforeEach(() => {
-  clear();
+  requestClear();
 });
 afterEach(() => {
-  clear();
+  requestClear();
 });
 
 let quizId1: number;

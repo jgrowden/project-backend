@@ -157,7 +157,7 @@ export const requestQuestionResults = (playerId: number, questionPosition: numbe
 export const requestSendChat = (playerId: number, message: { messageBody: string }) =>
   requestHelper('POST', `/v1/player/${playerId}/chat`, { message }, {});
 
-export const clear = () => requestHelper('DELETE', '/v1/clear');
+export const requestClear = () => requestHelper('DELETE', '/v1/clear');
 
 export const errorCode = (statusCode: number) => {
   return { statusCode: statusCode, jsonBody: { error: expect.any(String) } };
