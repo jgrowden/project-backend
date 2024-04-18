@@ -59,7 +59,7 @@ describe('playerSendChat testing', () => {
   let playerIds: number[];
 
   beforeEach(() => {
-    clear();
+    requestClear();
   });
 
   test('player id does not refer to a valid player', () => {
