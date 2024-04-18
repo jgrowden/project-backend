@@ -61,25 +61,27 @@ import {
   adminQuizSessionsView,
   playerQuizSessionJoin,
   adminQuizSessionUpdate,
-  adminQuizSessionFinalResults
+  adminQuizSessionFinalResults,
+  adminQuizSessionResultsCSV
 } from './session';
 import {
   playerQuestionAnswer,
   playerQuestionPosition,
   playerQuestionResults,
+  playerSendChat,
   playerSessionResults,
   playerStatus
 } from './player';
 import { clear } from './other';
-import { createClient } from '@vercel/kv';
+// import { createClient } from '@vercel/kv';
 
-const KV_REST_API_URL="https://worthy-perch-30578.upstash.io";
-const KV_REST_API_TOKEN="AXdyASQgZmJiZDRiOTQtOTEyMy00ZjAyLTk4NzMtNWVhMWJjZTYyMTVlNzI4ZTdlMjkwZmY4NDU2NzlkODQ4ZmJlMzk5MWI1MDQ=";
+// const KV_REST_API_URL = 'https://worthy-perch-30578.upstash.io';
+// const KV_REST_API_TOKEN = 'AXdyASQgZmJiZDRiOTQtOTEyMy00ZjAyLTk4NzMtNWVhMWJjZTYyMTVlNzI4ZTdlMjkwZmY4NDU2NzlkODQ4ZmJlMzk5MWI1MDQ=';
 
-const database = createClient({
-  url: KV_REST_API_URL,
-  token: KV_REST_API_TOKEN,
-});
+// const database = createClient({
+//  url: KV_REST_API_URL,
+//  token: KV_REST_API_TOKEN,
+// });
 
 // Set up web app
 const app = express();
@@ -593,6 +595,21 @@ app.get('/v1/admin/quiz/:quizid/sessions', (req: Request, res: Response) => {
   res.json(result);
 });
 
+// adminQuizSessionResultsCSV Route
+app.get('/v1/admin/quiz/:quizid/session/:sessionid/results/csv', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const quizId = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.params.sessionid);
+  const result = adminQuizSessionResultsCSV(token, quizId, sessionId);
+  save();
+  res.json(result);
+});
+
+// request CSV file
+app.get('/csv-results/:filename', (req, res) => {
+  res.sendFile(req.params.filename, { root: '.' });
+});
+
 // playerQuizSessionJoin Route
 app.post('/v1/player/join', (req: Request, res: Response) => {
   const { sessionId, name } = req.body;
@@ -650,6 +667,15 @@ app.get('/v1/player/:playerid/question/:questionposition/results', (req:Request,
 app.get('/v1/player/:playerid/results', (req:Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
   const result = playerSessionResults(playerId);
+  res.json(result);
+});
+
+// playerSendChat Route
+app.post('/v1/player/:playerid/chat', (req:Request, res: Response) => {
+  const playerId = parseInt(req.params.playerid);
+  const { message } = req.body;
+  const result = playerSendChat(playerId, message);
+  save();
   res.json(result);
 });
 

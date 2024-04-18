@@ -17,7 +17,8 @@ import {
   updateState,
   getUsersRankedByScore,
   getQuestionResults,
-  fetchQuizFromSessionId
+  fetchQuizFromSessionId,
+  writeResultsCSV
 } from './helper';
 
 export interface SessionIdType {
@@ -204,6 +205,32 @@ export function adminQuizSessionUpdate(
     session.atQuestion = 0;
   }
   return {};
+}
+
+export function adminQuizSessionResultsCSV(token: string, quizId: number, sessionId: number): {url: string} {
+  const user = fetchUserFromSessionId(token);
+  if (!user) {
+    throw HTTPError(401, 'User not found');
+  }
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Quiz not found');
+  }
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'User does not own quiz');
+  }
+  const session = fetchSessionFromSessionId(sessionId);
+  if (!session) {
+    throw HTTPError(400, 'Session not found');
+  }
+  if (quizId !== fetchQuizFromSessionId(sessionId).quizId) {
+    throw HTTPError(400, 'SessionId is not a session of this quiz');
+  }
+  if (session.state !== 'FINAL_RESULTS') {
+    throw HTTPError(400, 'session is not in FINAL_RESULTS state');
+  }
+
+  return writeResultsCSV(sessionId);
 }
 
 /**

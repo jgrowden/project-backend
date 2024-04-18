@@ -8,6 +8,7 @@ import {
   SessionAction,
   newState
 } from './dataStore';
+import fs from 'fs';
 
 export interface ErrorObject {
   error: string;
@@ -23,10 +24,11 @@ export interface ErrorString {
   error: string
 }
 
-interface playerNameWithScoreAndTime {
+export interface playerNameWithScoreAndTime {
   name: string;
   score: number;
   timeToAnswer?: number;
+  rank?: number;
 }
 
 // Given a sessionId (token), return the corresponding user if it exists
@@ -281,4 +283,79 @@ export const getQuestionResults = (quizSession: QuizSessionType, questionPositio
     averageAnswerTime: averageTime,
     percentCorrect: Math.round(playersCorrectList.length / quizSession.players.length * 100)
   };
+};
+
+/**
+ * Creates the CSV for the results of a session. Returns the path of the
+ * created CSV file.
+ *
+ * playerCsvData is a data struct that holds temporary information.
+ *
+ * @param sessionId
+ * @returns {
+*  url: string
+* }
+*/
+
+interface playerCsvData {
+  name: string;
+  results?: number[];
+  rank?: number;
+  score?: number;
+}
+
+export const writeResultsCSV = (sessionId: number) => {
+  const session = fetchSessionFromSessionId(sessionId);
+
+  const headers = ['player'];
+  const playerInfo: playerCsvData[] = session.players.map(player => {
+    return { name: player.playerName, results: [] };
+  });
+
+  // for each question
+  for (let i = 0; i < session.playerAnswers.length; i++) {
+    headers.push(`question${i + 1}score`, `question${i + 1}rank`);
+
+    // what players got it right?
+    const playersCorrectList: playerNameWithScoreAndTime[] = [];
+    const correctAnswers = session.metadata.questions[i].answers
+      .filter(answer => answer.correct === true).map(answer => answer.answerId).sort().join(',');
+    const responses = session.playerAnswers[i];
+
+    for (const answer of responses.answers) {
+      if (correctAnswers === answer.answerIds.sort().join(',')) {
+        playersCorrectList.push({
+          name: session.players.find(player => player.playerId === answer.playerId).playerName,
+          score: session.metadata.questions[i].points,
+          timeToAnswer: answer.answerTime - responses.questionStartTime,
+          rank: 0
+        });
+      }
+    }
+
+    // rank the players who got the question right
+    playersCorrectList.sort((a, b) => a.timeToAnswer - b.timeToAnswer);
+    for (let j = 0; j < playersCorrectList.length; j++) {
+      if (j !== 0 && playersCorrectList[j].timeToAnswer === playersCorrectList[j - 1].timeToAnswer) {
+        playersCorrectList[j].rank = playersCorrectList[j - 1].rank;
+      } else {
+        playersCorrectList[j].rank = j + 1;
+      }
+    }
+
+    playerInfo.forEach(player => {
+      const thatPlayer = playersCorrectList.find(correctPlayer => correctPlayer.name === player.name);
+      if (!thatPlayer) {
+        player.results.push(0, 0);
+      } else {
+        player.results.push(thatPlayer.score, thatPlayer.rank);
+      }
+    });
+  }
+
+  playerInfo.sort((a, b) => a.name.localeCompare(b.name));
+  const url = `csv_results_${sessionId}.csv`;
+  fs.writeFileSync(`./${url}`, headers.join(',') + '\n' + playerInfo.map(player => player.name + ',' + player.results.join(',')).join('\n'));
+
+  return { url: url };
 };

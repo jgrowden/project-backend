@@ -27,6 +27,9 @@ interface questionResultsType {
   percentCorrect: number;
 }
 
+const messageMinLength = 1;
+const messageMaxLength = 100;
+
 export function playerStatus(playerId: number): PlayerStatusReturn {
   const quizSession = fetchQuizSessionFromPlayerId(playerId);
   if (!quizSession) {
@@ -141,4 +144,22 @@ export function playerSessionResults(playerId: number) {
     usersRankedByScore: usersRankedByScore,
     questionResults: questionResults
   };
+}
+
+export function playerSendChat(playerId: number, message: { messageBody: string }) {
+  const quizSession = fetchQuizSessionFromPlayerId(playerId);
+  if (!quizSession) {
+    throw HTTPError(400, 'PlayerId does not exist');
+  }
+  if (message.messageBody.length < messageMinLength || message.messageBody.length > messageMaxLength) {
+    throw HTTPError(400, 'Invalid message length');
+  }
+  const player = quizSession.players.find(p => p.playerId === playerId);
+  quizSession.messages.push({
+    messageBody: message.messageBody,
+    playerId: playerId,
+    playerName: player.playerName,
+    timeSent: currentTime()
+  });
+  return {};
 }
