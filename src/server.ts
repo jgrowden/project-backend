@@ -631,6 +631,7 @@ app.post('/v1/player/:playerid/chat', (req:Request, res: Response) => {
   const playerId = parseInt(req.params.playerid);
   const { message } = req.body;
   const result = playerSendChat(playerId, message);
+  save();
   res.json(result);
 });
 

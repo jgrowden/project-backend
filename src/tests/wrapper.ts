@@ -151,7 +151,7 @@ export const requestQuizSessionPlayerAnswer = (playerId: number, questionPositio
 export const requestQuestionResults = (playerId: number, questionPosition: number) =>
   requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}/results`, {}, {});
 
-export const requestSendChat = (playerId: number, message: string) =>
+export const requestSendChat = (playerId: number, message: { messageBody: string }) =>
   requestHelper('POST', `/v1/player/${playerId}/chat`, { message }, {});
 
 export const clear = () => requestHelper('DELETE', '/v1/clear');

@@ -203,17 +203,17 @@ describe('playerSendChat testing', () => {
 
     player1 = requestQuizSessionPlayerJoin(sessionId1, 'person1').jsonBody.playerId as number;
 
-    expect(() => requestSendChat(player1 + 1, 'hi')).toThrow(HTTPError[400]);
+    expect(() => requestSendChat(player1 + 1, { messageBody: 'hi' })).toThrow(HTTPError[400]);
   });
 
   test('message too long or short', () => {
-    expect(() => requestSendChat(player1, '')).toThrow(HTTPError[400]);
-    expect(() => requestSendChat(player1, '01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890')).toThrow(HTTPError[400]);
+    expect(() => requestSendChat(player1, { messageBody: '' })).toThrow(HTTPError[400]);
+    expect(() => requestSendChat(player1, { messageBody: '01234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890' })).toThrow(HTTPError[400]);
   });
 
   test('successfully send chat', () => {
-    requestSendChat(player1, 'hi everyone!');
-    requestSendChat(player2, 'hey player1, how are we all?');
-    requestSendChat(player3, 'fantastic');
+    requestSendChat(player1, { messageBody: 'hi everyone!' });
+    requestSendChat(player2, { messageBody: 'hey player1, how are we all?' });
+    requestSendChat(player3, { messageBody: 'fantastic' });
   });
 });

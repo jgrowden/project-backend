@@ -115,23 +115,20 @@ export function playerQuestionResults(playerId: number, questionPosition: number
   return getQuestionResults(quizSession, questionPosition);
 }
 
-export function playerSendChat(playerId: number, message: string) {
+export function playerSendChat(playerId: number, message: { messageBody: string }) {
   const quizSession = fetchQuizSessionFromPlayerId(playerId);
   if (!quizSession) {
     throw HTTPError(400, 'PlayerId does not exist');
   }
-  if (message.length < messageMinLength || message.length > messageMaxLength) {
+  if (message.messageBody.length < messageMinLength || message.messageBody.length > messageMaxLength) {
     throw HTTPError(400, 'Invalid message length');
   }
-
   const player = quizSession.players.find(p => p.playerId === playerId);
-
   quizSession.messages.push({
-    messageBody: message,
+    messageBody: message.messageBody,
     playerId: playerId,
     playerName: player.playerName,
     timeSent: currentTime()
   });
-
   return {};
 }
