@@ -1,12 +1,12 @@
 import HTTPError from 'http-errors';
-import { clear, requestAuthRegister, requestQuizCreateV2, requestQuizQuestionCreateV2, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestSendChat, requestViewChats } from '../wrapper';
+import { requestClear, requestAuthRegister, requestQuizCreateV2, requestQuizQuestionCreateV2, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestSendChat, requestViewChats } from '../wrapper';
 import { QuestionType } from '../../dataStore';
 
 beforeEach(() => {
-  clear();
+  requestClear();
 });
 afterEach(() => {
-  clear();
+  requestClear();
 });
 
 let quizId1: number;
@@ -114,7 +114,7 @@ describe('playerViewChats testing', () => {
   });
 
   test('player id does not refer to a valid player', () => {
-    clear();
+    requestClear();
     const user = requestAuthRegister('gon.freecs@gmail.com', 'GonF1shing', 'Gon', 'Freecs');
     token1 = user.jsonBody.token as string;
 
