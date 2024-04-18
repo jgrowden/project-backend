@@ -39,6 +39,10 @@ describe('adminQuizThumbnailUpdate', () => {
     expect(() => requestQuizThumbnailUpdate(token, quizId, 'https://photo.com.au')).toThrow(HTTPError[400]);
   });
 
+  test('400, empty imgUrl string', () => {
+    expect(() => requestQuizThumbnailUpdate(token, quizId, '')).toThrow(HTTPError[400]);
+  });
+
   test('200, success', () => {
     expect(requestQuizThumbnailUpdate(token, quizId, 'https://GodUsopp.jpg')).toStrictEqual({
       statusCode: 200,
