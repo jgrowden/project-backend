@@ -25,7 +25,7 @@ export interface ErrorString {
   error: string
 }
 
-interface playerNameWithScoreAndTime {
+export interface playerNameWithScoreAndTime {
   name: string;
   score: number;
   timeToAnswer?: number;

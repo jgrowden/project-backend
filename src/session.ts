@@ -19,7 +19,8 @@ import {
   getUsersRankedByScore,
   getQuestionResults,
   getUsersRankAndScoreByQuestion,
-  fetchQuizFromSessionId
+  fetchQuizFromSessionId,
+  playerNameWithScoreAndTime
 } from './helper';
 import fs from 'fs';
 
@@ -215,86 +216,92 @@ interface playerCsvData {
 }
 
 export function adminQuizSessionResultsCSV(token: string, quizId: number, sessionId: number): string {
-  const quiz = fetchQuizFromQuizId(quizId);
-  if (!(quiz.quizSessions.find(session => session.quizSessionId === sessionId))) {
-    throw HTTPError(400);
-  }
-  const quizSession = fetchSessionFromSessionId(sessionId);
-  if (quizSession.state !== 'FINAL_RESULTS') {
-    throw HTTPError(400);
-  }
   const user = fetchUserFromSessionId(token);
   if (!user) {
-    throw HTTPError(401);
+    throw HTTPError(401, 'User not found');
   }
-  if (user.authUserId !== quizSession.metadata.ownerId) {
-    throw HTTPError(403);
+  const quiz = fetchQuizFromQuizId(quizId);
+  if (!quiz) {
+    throw HTTPError(403, 'Quiz not found');
   }
-
-  let finalResults = adminQuizSessionFinalResults(token, quizId, sessionId);
-
-  const headers: string[] = [];
-  const playerInfo: playerCsvData[] = [];
-
-  csv[0].push('player');
-  finalResults.questionResults.forEach((result, index) => headers.push(`question${index}score`, `question${index}rank`));
-  
-
-
-
-/**
- * finalResults = {
-    usersRankedByScore: usersRankedByScore,
-    questionResults: questionResults
-  };
-
-  questionResults = {
- *  questionId: number,
- *  playersCorrectList: string[],
- *  averageAnswerTime: number,
- *  percentCorrect: number
- * } []
- * 
- * usersRankedByScore = {
-  name: string;
-  score: number;
-} []
-
-
- */
-
-
-
-
-  let csvData: string[][] = [];
-  let header: string[] = [];
-  header.push('Player');
-  for(let i = 1; i <= quiz.numQuestions; i++) {
-    header.push(`question${i}score`);
-    header.push(`question${i}rank`);
+  if (quiz.ownerId !== user.authUserId) {
+    throw HTTPError(403, 'User does not own quiz');
   }
-  csvData.push(header);
-
-  for (let i = 0; i < quizSession.players.length; i++) {
-    csvData.push([`${quizSession.players[i].playerName}`]);
+  const quizSession = fetchSessionFromSessionId(sessionId);
+  if (!quizSession) {
+    throw HTTPError(400, 'Session not found');
+  }
+  if (quizId !== fetchQuizFromSessionId(sessionId).quizId) {
+    throw HTTPError(400, 'SessionId is not a session of this quiz');
+  }
+  if (quizSession.state !== 'FINAL_RESULTS') {
+    throw HTTPError(400, 'session is not in FINAL_RESULTS state');
   }
 
-  for (let i = 1; i <= quiz.numQuestions; i++) {
-    let playersData = getUsersRankAndScoreByQuestion(quizSession, i);
-    for (let j = 1; j <= quizSession.players.length; j++) {
-      let playerData = playersData.find(playerData => playerData.name === csvData[j][0]);
-      csvData[j].push(playerData.score.toString());
-      csvData[j].push(playerData.rank.toString());
+  const headers: string[] = ['player'];
+  const playerInfo: playerCsvData[] = session.players.map(player => {return {name: player.name, results: []}});
+
+  const quizLen = session.playerAnswers.length;
+  for (let i = 0; i < quizLen; i++) {
+    headers.push(`question${index}score`, `question${index}rank`);
+    const playersCorrectList: playerNameWithScoreAndTime[] = [];
+    const correctAnswers = session.metadata.questions[i].answers.filter(answer => answer.correct === true).map(answer => answer.answerId).sort().join(',');
+    const response = session.playerAnswers[i];
+
+    for (const answer of responses.answers) {
+      // compare array of correct answers with array of the player's answers (as strings)
+      if (correctAnswers === answer.answerIds.sort().join(',')) {
+        playersCorrectList.push({
+          name: session.players.find(player => player.playerId === answer.playerId).playerName,
+          score: session.metadata.questions[i].points,
+          timeToAnswer: answer.answerTime - responses.questionStartTime
+        });
+      }
     }
+    playersCorrectList.sort((a, b) => a.timeToAnswer - b.timeToAnswer);
+
+    let playerRanks = [];
+    for (let j = 0; j < playersCorrectList.length; j++) {
+      if (j === 0) {
+        playerRanks.push({
+          name: playersCorrectList[j].name,
+          rank: 1,
+          score: playersCorrectList[j].score
+        });
+      } else if (j !== 0 && playersCorrectList[j].timeToAnswer === playersCorrectList[j - 1].timeToAnswer) {
+        playerRanks.push({
+          name: playersCorrectList[j].name,
+          rank: playerRanks[j - 1].rank,
+          score: playersCorrectList[j].score
+        });
+      } else {
+        playerRanks.push({
+          name: playersCorrectList[j].name,
+          rank: j + 1,
+          score: playersCorrectList[j].score
+        });
+      }
+    };
+
+    playerInfo.forEach(player => {
+      let playerEntry = playerRanks.find(rankedPlayer => rankedPlayer.name === player.name);
+      if (!playerEntry) {
+        player.results.push(0, 0);
+      } else {
+        player.results.push(playerEntry.score, playerEntry.rank);
+      }
+    })    
   }
-  const csvFromArrayOfArrays = convertArrayToCSV(csvData, {
-    header,
-    separator: ','
-  });
-  fs.writeFile('../csv-results/quizdata.csv', csvFromArrayOfArrays, (err) => {
-    if (err) throw err;
-  });
-  return '../csv-results/quizdata.csv'
+
+  const url = `csv/csv_results_${sessionId}.csv`;
+  
+  fs.writeFileSync(`./${url}`, header.join(',') + '\n');
+  playerInfo.sort((a,b) => a.name.localCompare(b.name));
+  for (const player of playerInfo) {
+    fs.writeFileSync(`./${url}`, player.name + ',' + player.results.join(',') + '\n');
+  }
+
+  return { url : url };
 };
 
 
