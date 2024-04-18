@@ -6,6 +6,7 @@ import {
 import {
   currentTime,
   fetchQuizSessionFromPlayerId,
+  getUsersRankedByScore,
   getQuestionResults,
 } from './helper';
 
@@ -18,6 +19,16 @@ export interface PlayerStatusReturn {
   numQuestions: number;
   atQuestion: number;
 }
+
+interface questionResultsType {
+  questionId: number;
+  playersCorrectList: string[];
+  averageAnswerTime: number;
+  percentCorrect: number;
+}
+
+const messageMinLength = 1;
+const messageMaxLength = 100;
 
 export function playerStatus(playerId: number): PlayerStatusReturn {
   const quizSession = fetchQuizSessionFromPlayerId(playerId);
@@ -112,11 +123,60 @@ export function playerQuestionResults(playerId: number, questionPosition: number
   return getQuestionResults(quizSession, questionPosition);
 }
 
-export function playerViewChat(playerId: number) {
+export function playerSessionResults(playerId: number) {
+  const quizSession = fetchQuizSessionFromPlayerId(playerId);
+  if (!quizSession) {
+    throw HTTPError(400, 'PlayerId does not exist');
+  }
+  if (quizSession.state !== 'FINAL_RESULTS') {
+    throw HTTPError(400, 'Session is not in FINAL_RESULTS state');
+  }
+
+  const usersRankedByScore = getUsersRankedByScore(quizSession);
+  const questionResults: questionResultsType[] = [];
+  let currentQuestion = 1;
+  for (let i = 0; i < quizSession.playerAnswers.length; i++) {
+    questionResults.push(getQuestionResults(quizSession, currentQuestion));
+    currentQuestion++;
+  }
+
+  return {
+    usersRankedByScore: usersRankedByScore,
+    questionResults: questionResults
+  };
+}
+
+export function playerSendChat(playerId: number, message: { messageBody: string }) {
+  const quizSession = fetchQuizSessionFromPlayerId(playerId);
+  if (!quizSession) {
+    throw HTTPError(400, 'PlayerId does not exist');
+  }
+  if (message.messageBody.length < messageMinLength || message.messageBody.length > messageMaxLength) {
+    throw HTTPError(400, 'Invalid message length');
+  }
+  const player = quizSession.players.find(p => p.playerId === playerId);
+  quizSession.messages.push({
+    messageBody: message.messageBody,
+    playerId: playerId,
+    playerName: player.playerName,
+    timeSent: currentTime()
+  });
+
+  return {};
+}
+
+export function playerViewChats(playerId: number) {
   const quizSession = fetchQuizSessionFromPlayerId(playerId);
   if (!quizSession) {
     throw HTTPError(400, 'PlayerId does not exist');
   }
 
-  return quizSession.messages;
+  return {
+    messages: quizSession.messages.map(message => ({
+      messageBody: message.messageBody,
+      playerId: message.playerId,
+      playerName: message.playerName,
+      timeSent: message.timeSent,
+    })),
+  };
 }
