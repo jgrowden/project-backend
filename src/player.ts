@@ -111,3 +111,12 @@ export function playerQuestionResults(playerId: number, questionPosition: number
 
   return getQuestionResults(quizSession, questionPosition);
 }
+
+export function playerViewChat(playerId: number) {
+  const quizSession = fetchQuizSessionFromPlayerId(playerId);
+  if (!quizSession) {
+    throw HTTPError(400, 'PlayerId does not exist');
+  }
+
+  return quizSession.messages;
+}
