@@ -1,5 +1,5 @@
 import HTTPError from 'http-errors';
-import { clear, requestAuthRegister, requestPlayerQuestionPosition, requestQuizCreateV2, requestQuizQuestionCreateV2, requestQuizSessionFinalResults, requestQuizSessionInfo, requestQuizSessionPlayerAnswer, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestQuizSessionUpdate } from '../wrapper';
+import { requestClear, requestAuthRegister, requestPlayerQuestionPosition, requestQuizCreateV2, requestQuizQuestionCreateV2, requestQuizSessionFinalResults, requestQuizSessionInfo, requestQuizSessionPlayerAnswer, requestQuizSessionPlayerJoin, requestQuizSessionStart, requestQuizSessionUpdate } from '../wrapper';
 import { AnswerType, QuestionType } from '../../dataStore';
 
 // Taken from week 8 labs
@@ -11,10 +11,10 @@ function sleepSync(ms: number) {
 }
 
 beforeEach(() => {
-  clear();
+  requestClear();
 });
 afterEach(() => {
-  clear();
+  requestClear();
 });
 
 let quizId1: number;
@@ -138,8 +138,25 @@ describe('adminQuizSessionFinalResults testing', () => {
     expect(() => requestQuizSessionFinalResults(token1, quizId1, sessionId1 + 1)).toThrow(HTTPError[400]);
   });
 
+  test('session id belongs to some other quiz', () => {
+    const token3 = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token as string;
+    const quiz3Id = requestQuizCreateV2(token3, 'Quiz Name', 'Quiz Description').jsonBody.quizId as number;
+    requestQuizQuestionCreateV2(token3, quiz3Id, {
+      question: 'How tall am I?',
+      duration: 5,
+      points: 4,
+      answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }],
+      thumbnailUrl: 'http://example.com/birb.jpg'
+    });
+    expect(() => requestQuizSessionFinalResults(token3, quiz3Id, sessionId1)).toThrow(HTTPError[400]);
+  });
+
   test('session is not in FINAL_RESULTS state', () => {
     expect(() => requestQuizSessionFinalResults(token1, quizId1, sessionId1)).toThrow(HTTPError[400]);
+  });
+
+  test('invalid quizId', () => {
+    expect(() => requestQuizSessionFinalResults(token1, quizId1 + 1, sessionId1)).toThrow(HTTPError[403]);
   });
 
   test('token is empty or invalid', () => {

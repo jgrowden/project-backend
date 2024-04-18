@@ -5,7 +5,7 @@ import { sha256 } from 'js-sha256';
 import HTTPError from 'http-errors';
 import {
   fetchUserFromSessionId,
-  userWithEmailExists,
+  fetchUserfromEmail,
   generateNewUserId,
   returnError,
   ErrorObjectWithCode
@@ -65,7 +65,7 @@ export function adminAuthRegister(
 ): TokenType | ErrorObjectWithCode {
   const data = getData();
 
-  const duplicateEmail = userWithEmailExists(email);
+  const duplicateEmail = fetchUserfromEmail(email);
   if (duplicateEmail !== undefined) {
     return returnError('User with given email already exists');
   }
@@ -129,7 +129,7 @@ export function adminAuthRegister(
  * @returns {{sessionId: string}} sessionId - the user's unique identification string
  */
 export function adminAuthLogin(email: string, password: string): TokenType | ErrorObjectWithCode {
-  const user = userWithEmailExists(email);
+  const user = fetchUserfromEmail(email);
   if (!user) {
     return returnError('user doesn\'t exist');
   }

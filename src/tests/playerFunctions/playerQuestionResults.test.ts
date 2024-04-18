@@ -1,6 +1,6 @@
 import HTTPError from 'http-errors';
 import {
-  clear,
+  requestClear,
   requestAuthRegister,
   requestPlayerQuestionPosition,
   requestQuestionResults,
@@ -14,10 +14,10 @@ import {
 import { AnswerType } from '../../dataStore';
 
 beforeAll(() => {
-  clear();
+  requestClear();
 });
 afterEach(() => {
-  clear();
+  requestClear();
 });
 
 let token1: string;

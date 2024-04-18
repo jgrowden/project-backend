@@ -5,7 +5,7 @@ import {
   requestQuizQuestionCreateV2,
   requestQuizSessionStart,
   requestQuizSessionUpdate,
-  clear
+  requestClear
 } from '../wrapper';
 
 let token: string;
@@ -14,7 +14,7 @@ let sessionId: number;
 const AUTOSTARTNUM = 10;
 
 beforeEach(() => {
-  clear();
+  requestClear();
   token = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp').jsonBody.token as string;
   quizId = requestQuizCreateV2(token, 'Quiz Name', 'Quiz Description').jsonBody.quizId as number;
   requestQuizQuestionCreateV2(token, quizId, {
@@ -28,7 +28,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  clear();
+  requestClear();
 });
 
 describe('Tests for PUT /v1/admin/quiz/{quizid}/session/{sessionid}', () => {
@@ -62,10 +62,14 @@ describe('Tests for PUT /v1/admin/quiz/{quizid}/session/{sessionid}', () => {
   test('Fail: invalid sessionId', () => {
     expect(() => requestQuizSessionUpdate(token, quizId, sessionId + 1, 'NEXT_QUESTION')).toThrow(HTTPError[400]);
   });
+  test('Fail: SessionId is not a session of this quiz', () => {
+    const otherQuizId = requestQuizCreateV2(token, 'New Quiz Name', 'New Quiz Description').jsonBody.quizId as number;
+    expect(() => requestQuizSessionUpdate(token, otherQuizId, sessionId, 'NEXT_QUESTION')).toThrow(HTTPError[400]);
+  });
   test('Fail: non-existent action', () => {
     expect(() => requestQuizSessionUpdate(token, quizId, sessionId, 'SPAGHETTI')).toThrow(HTTPError[400]);
   });
   test('Fail: invalid action on current state', () => {
-    expect(() => requestQuizSessionUpdate(token, quizId, sessionId, 'GO_TO_ANSWER')).toThrow(HTTPError[400]);
+    expect(() => requestQuizSessionUpdate(token, quizId, sessionId, 'GO_TO_FINAL_RESULTS')).toThrow(HTTPError[400]);
   });
 });

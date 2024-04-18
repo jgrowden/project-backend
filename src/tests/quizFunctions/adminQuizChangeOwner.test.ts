@@ -5,7 +5,9 @@ import {
   requestQuizCreateV2,
   requestQuizChangeOwner,
   requestQuizChangeOwnerV2,
-  clear,
+  requestQuizSessionStart,
+  requestQuizQuestionCreateV2,
+  requestClear,
   requestQuizList
 } from '../wrapper';
 import HTTPError from 'http-errors';
@@ -16,7 +18,7 @@ let quiz1Id: number;
 
 describe('Testing POST /v1/admin/quiz/{quizid}/transfer', () => {
   beforeEach(() => {
-    clear();
+    requestClear();
     const user1 = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
     User1Token = user1.jsonBody.token as string;
     const user2 = requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo');
@@ -72,7 +74,7 @@ describe('Testing POST /v1/admin/quiz/{quizid}/transfer', () => {
 
 describe('Testing POST /v2/admin/quiz/{quizid}/transfer', () => {
   beforeEach(() => {
-    clear();
+    requestClear();
     const user1 = requestAuthRegister('go.d.usopp@gmail.com', 'S0geking', 'God', 'Usopp');
     User1Token = user1.jsonBody.token as string;
     const user2 = requestAuthRegister('doffy@gmail.com', 'String-Str1ng', 'Donquixote', 'Doflamingo');
@@ -117,10 +119,20 @@ describe('Testing POST /v2/admin/quiz/{quizid}/transfer', () => {
   test('Failing test: token is invalid', () => {
     expect(() => requestQuizChangeOwnerV2(quiz1Id, User1Token + 'a', 'doffy@gmail.com')).toThrow(HTTPError[401]);
   });
+  test('Failing test: some session is not in END state', () => {
+    requestQuizQuestionCreateV2(User1Token, quiz1Id, {
+      question: 'How tall am I?',
+      duration: 5,
+      points: 4,
+      answers: [{ answer: 'Answer!', correct: true }, { answer: 'Another Answer!', correct: true }],
+      thumbnailUrl: 'http://example.com/birb.jpg'
+    });
+    requestQuizSessionStart(User1Token, quiz1Id, 4);
+    expect(() => requestQuizChangeOwnerV2(quiz1Id, User1Token, 'doffy@gmail.com')).toThrow(HTTPError[400]);
+  });
   test('Failing test: quizId is invalid', () => {
     expect(() => requestQuizChangeOwnerV2(quiz1Id + 1, User1Token, 'doffy@gmail.com')).toThrow(HTTPError[403]);
   });
-  // test for END state
   test('Failing test: user does not own quiz', () => {
     requestAuthRegister('president@unswunsociety.org.au', 'Passw0rd', 'No', 'Itsnotme');
     expect(() => requestQuizChangeOwnerV2(quiz1Id, User2Token, 'president@unswunsociety.org.au')).toThrow(HTTPError[403]);

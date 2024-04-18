@@ -1,7 +1,7 @@
 import HTTPError from 'http-errors';
 import { QuestionType } from '../../dataStore';
 import {
-  clear,
+  requestClear,
   requestAuthRegister,
   requestQuizCreateV2,
   requestQuizQuestionCreateV2,
@@ -10,10 +10,10 @@ import {
 } from '../wrapper';
 
 beforeAll(() => {
-  clear();
+  requestClear();
 });
 afterEach(() => {
-  clear();
+  requestClear();
 });
 const AUTOSTARTNUM = 10;
 const SESSION = {

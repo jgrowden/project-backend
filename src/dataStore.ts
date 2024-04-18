@@ -158,3 +158,96 @@ export function setData(newData: DataType) {
 export function setTimeoutData(newTimeoutData: TimeoutDataType[]) {
   timeoutData = newTimeoutData;
 }
+
+export const newState = [
+  {
+    state: SessionState.LOBBY,
+    actions: [
+      {
+        action: SessionAction.NEXT_QUESTION,
+        nextState: SessionState.QUESTION_COUNTDOWN
+      },
+      {
+        action: SessionAction.END,
+        nextState: SessionState.END
+      }
+    ]
+  },
+  {
+    state: SessionState.QUESTION_COUNTDOWN,
+    actions: [
+      {
+        action: SessionAction.SKIP_COUNTDOWN,
+        nextState: SessionState.QUESTION_OPEN
+      },
+      {
+        action: SessionAction.END,
+        nextState: SessionState.END
+      }
+    ]
+  },
+  {
+    state: SessionState.QUESTION_OPEN,
+    actions: [
+      {
+        action: SessionAction.GO_TO_ANSWER,
+        nextState: SessionState.ANSWER_SHOW
+      },
+      {
+        action: SessionAction.END,
+        nextState: SessionState.END
+      }
+    ]
+  },
+  {
+    state: SessionState.QUESTION_CLOSE,
+    actions: [
+      {
+        action: SessionAction.NEXT_QUESTION,
+        nextState: SessionState.QUESTION_COUNTDOWN
+      },
+      {
+        action: SessionAction.GO_TO_ANSWER,
+        nextState: SessionState.ANSWER_SHOW
+      },
+      {
+        action: SessionAction.GO_TO_FINAL_RESULTS,
+        nextState: SessionState.FINAL_RESULTS
+      },
+      {
+        action: SessionAction.END,
+        nextState: SessionState.END
+      }
+    ]
+  },
+  {
+    state: SessionState.ANSWER_SHOW,
+    actions: [
+      {
+        action: SessionAction.NEXT_QUESTION,
+        nextState: SessionState.QUESTION_COUNTDOWN
+      },
+      {
+        action: SessionAction.GO_TO_FINAL_RESULTS,
+        nextState: SessionState.FINAL_RESULTS
+      },
+      {
+        action: SessionAction.END,
+        nextState: SessionState.END
+      }
+    ]
+  },
+  {
+    state: SessionState.FINAL_RESULTS,
+    actions: [
+      {
+        action: SessionAction.END,
+        nextState: SessionState.END
+      }
+    ]
+  },
+  {
+    state: SessionState.END,
+    actions: [/* Nothing */]
+  }
+];

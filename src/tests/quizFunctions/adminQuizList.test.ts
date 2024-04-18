@@ -1,9 +1,9 @@
-import { requestAuthRegister, requestQuizCreate, requestQuizList, requestQuizListV2, clear, errorCode } from '../wrapper';
+import { requestAuthRegister, requestQuizCreate, requestQuizList, requestQuizListV2, requestClear, errorCode } from '../wrapper';
 import HTTPError from 'http-errors';
 
 describe('adminQuizList V1', () => {
   beforeEach(() => {
-    clear();
+    requestClear();
   });
   test('returning list of quizzes', () => {
     const user = requestAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
@@ -79,7 +79,7 @@ describe('adminQuizList V1', () => {
   test('invalid token', () => {
     const user = requestAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
     const token = user.jsonBody.token as string;
-    clear();
+    requestClear();
     expect(requestQuizList(token))
       .toStrictEqual(errorCode(401));
   });
@@ -87,7 +87,7 @@ describe('adminQuizList V1', () => {
 
 describe('adminQuizList V2', () => {
   beforeEach(() => {
-    clear();
+    requestClear();
   });
   test('returning list of quizzes', () => {
     const user = requestAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
@@ -163,7 +163,7 @@ describe('adminQuizList V2', () => {
   test('invalid token', () => {
     const user = requestAuthRegister('email@gmail.com', 'p@ssw0rd', 'first-name', 'last-name');
     const token = user.jsonBody.token as string;
-    clear();
+    requestClear();
     expect(() => requestQuizListV2(token))
       .toThrow(HTTPError[401]);
   });
