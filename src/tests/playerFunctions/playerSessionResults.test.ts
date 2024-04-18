@@ -24,7 +24,7 @@ let player1: number;
 let player2: number;
 let player3: number;
 
-let questionBody1: QuestionType = {
+const questionBody1: QuestionType = {
   question: 'Who is the imposter?',
   duration: 1,
   points: 10,
@@ -32,7 +32,7 @@ let questionBody1: QuestionType = {
   thumbnailUrl: 'http://sus.com/sus.jpg'
 };
 
-let questionBody2: QuestionType = {
+const questionBody2: QuestionType = {
   question: 'Why last vented in electrical?',
   duration: 2,
   points: 6,
@@ -41,7 +41,7 @@ let questionBody2: QuestionType = {
   thumbnailUrl: 'http://alsosus.com/sus.jpg'
 };
 
-let questionBody3: QuestionType = {
+const questionBody3: QuestionType = {
   question: 'How many imposters are left?',
   duration: 10,
   points: 8,
