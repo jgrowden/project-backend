@@ -146,7 +146,7 @@ export const requestPlayerStatus = (playerId: number) =>
   requestHelper('GET', `/v1/player/${playerId}`, { playerId }, {});
 
 export const requestQuizSessionResultsCSV = (token: string, quizId: number, sessionId: number) =>
-  requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}/results/csv`, { quizId, sessionId }, { token });
+  requestHelper('GET', `/v1/admin/quiz/${quizId}/session/${sessionId}/results/csv`, {}, { token });
 
 export const requestPlayerQuestionPosition = (playerId: number, questionPosition: number) =>
   requestHelper('GET', `/v1/player/${playerId}/question/${questionPosition}`, { playerId, questionPosition }, {});

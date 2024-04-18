@@ -607,8 +607,8 @@ app.get('/v1/admin/quiz/:quizid/session/:sessionid/results/csv', (req: Request, 
 });
 
 // request CSV file
-app.get('/csv-results/:filename', (req, res) => {
-  res.sendFile(req.params.filename, { root: '.' });
+app.get('/csv_results/:filename', (req, res) => {
+  res.sendFile(req.params.filename, { root: './csv_results' });
 });
 
 // playerQuizSessionJoin Route
