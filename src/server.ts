@@ -61,7 +61,8 @@ import {
   adminQuizSessionsView,
   playerQuizSessionJoin,
   adminQuizSessionUpdate,
-  adminQuizSessionFinalResults
+  adminQuizSessionFinalResults,
+  adminQuizSessionResultsCSV
 } from './session';
 import {
   playerQuestionAnswer,
@@ -592,6 +593,21 @@ app.get('/v1/admin/quiz/:quizid/sessions', (req: Request, res: Response) => {
   const result = adminQuizSessionsView(token, quizId);
   save();
   res.json(result);
+});
+
+// adminQuizSessionResultsCSV Route
+app.get('/v1/admin/quiz/:quizid/session/:sessionid/results/csv', (req: Request, res: Response) => {
+  const token = req.header('token');
+  const quizId = parseInt(req.params.quizid);
+  const sessionId = parseInt(req.params.sessionid);
+  const result = adminQuizSessionResultsCSV(token, quizId, sessionId);
+  save();
+  res.json(result);
+});
+
+// request CSV file
+app.get('/csv-results/:filename', (req, res) => {
+  res.sendFile(req.params.filename, { root: '.' });
 });
 
 // playerQuizSessionJoin Route
