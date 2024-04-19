@@ -1,5 +1,5 @@
 // YOU SHOULD MODIFY THIS OBJECT BELOW ONLY
-
+import { requestHelper } from './tests/requestHelper';
 export interface UserType {
   email: string;
   password: string;
@@ -251,3 +251,20 @@ export const newState = [
     actions: [/* Nothing */]
   }
 ];
+
+export const getDataDeploy = (): Data => {
+  try {
+    const res = requestHelper('GET', '/data', {});
+    return res.data;
+  } catch (e) {
+    return {
+      users: [],
+      quizzes: [],
+      deletedQuizzes: []
+    };
+  }
+};
+
+export const setDataDeploy = (newData: Data) => {
+  requestHelper('PUT', '/data', { data: newData });
+};

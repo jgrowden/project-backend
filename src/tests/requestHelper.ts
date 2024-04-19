@@ -4,13 +4,13 @@ import { IncomingHttpHeaders } from 'http';
 import HTTPError from 'http-errors';
 
 // sync-request-curl is faster, though lab09 says that sync-request should be used instead when working with the deployed server
-import request, { HttpVerb } from 'sync-request-curl';
+import request, { HttpVerb } from 'sync-request';
 
-const SERVER_URL = `${url}:${port}`;
-// const DEPLOY_URL = 'https://1531-24t1-w15b-eggs.vercel.app';
+//const SERVER_URL = `${url}:${port}`;
+const DEPLOY_URL = 'https://1531-24t1-w15b-eggss.vercel.app';
 
 // pick local or deployed url
-const URL = SERVER_URL;
+const URL = DEPLOY_URL;
 
 // Return type of returnHelper() function.
 interface RequestHelperReturnType {
