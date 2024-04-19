@@ -7,7 +7,7 @@ import HTTPError from 'http-errors';
 import request, { HttpVerb } from 'sync-request';
 
 //const SERVER_URL = `${url}:${port}`;
-const DEPLOY_URL = 'https://1531-24t1-w15b-eggss.vercel.app';
+const DEPLOY_URL = 'https://1531-24t1-w15b-eggs.vercel.app';
 
 // pick local or deployed url
 const URL = DEPLOY_URL;
