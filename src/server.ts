@@ -76,7 +76,7 @@ import {
 import { clear } from './other';
 import { createClient } from '@vercel/kv';
 
-const KV_REST_API_UR = "https://regular-fish-41693.upstash.io";
+const KV_REST_API_URL = "https://regular-fish-41693.upstash.io";
 const KV_REST_API_TOKEN = "AaLdASQgNzNhNGQ1MjYtOWYzMy00ZmMzLWI4NGUtMTkyM2U2ZGYzMjUxNDY0OGQ3ZjYyYjVkNGU2MWI0ZWRjM2FmMWU2NTEyYzc=";
 
 const database = createClient({

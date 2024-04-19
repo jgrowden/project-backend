@@ -252,7 +252,7 @@ export const newState = [
   }
 ];
 
-export const getDataDeploy = (): Data => {
+export const getDataDeploy = (): DataType => {
   try {
     const res = requestHelper('GET', '/data', {});
     return res.data;
@@ -265,6 +265,6 @@ export const getDataDeploy = (): Data => {
   }
 };
 
-export const setDataDeploy = (newData: Data) => {
+export const setDataDeploy = (newData: DataType) => {
   requestHelper('PUT', '/data', { data: newData });
 };
