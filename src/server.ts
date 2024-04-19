@@ -74,15 +74,16 @@ import {
   playerStatus
 } from './player';
 import { clear } from './other';
-// import { createClient } from '@vercel/kv';
+import { createClient } from '@vercel/kv';
 
-// const KV_REST_API_URL = 'https://worthy-perch-30578.upstash.io';
-// const KV_REST_API_TOKEN = 'AXdyASQgZmJiZDRiOTQtOTEyMy00ZjAyLTk4NzMtNWVhMWJjZTYyMTVlNzI4ZTdlMjkwZmY4NDU2NzlkODQ4ZmJlMzk5MWI1MDQ=';
 
-// const database = createClient({
-//  url: KV_REST_API_URL,
-//  token: KV_REST_API_TOKEN,
-// });
+const KV_REST_API_UR = "https://regular-fish-41693.upstash.io";
+const KV_REST_API_TOKEN = "AaLdASQgNzNhNGQ1MjYtOWYzMy00ZmMzLWI4NGUtMTkyM2U2ZGYzMjUxNDY0OGQ3ZjYyYjVkNGU2MWI0ZWRjM2FmMWU2NTEyYzc=";
+
+const database = createClient({
+  url: KV_REST_API_URL,
+  token: KV_REST_API_TOKEN,
+});
 
 // Set up web app
 const app = express();
@@ -100,17 +101,30 @@ app.use('/docs', sui.serve, sui.setup(YAML.parse(file), { swaggerOptions: { docE
 const PORT: number = parseInt(process.env.PORT || config.port);
 const HOST: string = process.env.IP || '127.0.0.1';
 
-// Load + Store functions for persistence
+// Load + Store functions for persistence (LOCAL)
 const load = () => {
   if (fs.existsSync('/tmp/toohakData.json')) {
     const dataFile = fs.readFileSync('/tmp/toohakData.json', { encoding: 'utf8' });
     setData(JSON.parse(dataFile));
   }
 };
-
 const save = () => {
   fs.writeFileSync('/tmp/toohakData.json', JSON.stringify(getData()));
 };
+
+// Deployed Database
+// Load + Save
+app.get('/data', async (req: Request, res: Response) => {
+  const data = await database.hgetall("data");
+  res.status(200).json(data);
+});
+
+app.put('/data', async (req: Request, res: Response) => {
+  const { data } = req.body;
+  await database.hset("data", { data });
+  return res.status(200).json({});
+});
+
 
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
