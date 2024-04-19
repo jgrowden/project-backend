@@ -9,7 +9,7 @@ import sui from 'swagger-ui-express';
 import fs from 'fs';
 import path from 'path';
 import process from 'process';
-import { getData, setData } from './dataStore';
+import { getData, setData, getDataDeploy, setDataDeploy } from './dataStore';
 import {
   adminAuthRegister,
   adminAuthLogin,
@@ -731,12 +731,14 @@ app.use(errorHandler());
 // start server
 const server = app.listen(PORT, HOST, () => {
   // DO NOT CHANGE THIS LINE
+  getDataDeploy();
   load();
   console.log(`⚡️ Server started on port ${PORT} at ${HOST}`);
 });
 
 // For coverage, handle Ctrl+C gracefully
 process.on('SIGINT', () => {
+  setDataDeploy(getData());
   save();
   clear();
   server.close(() => console.log('Shutting down server gracefully.'));
