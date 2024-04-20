@@ -76,8 +76,8 @@ import {
 import { clear } from './other';
 import { createClient } from '@vercel/kv';
 
-const KV_REST_API_URL = "https://regular-fish-41693.upstash.io";
-const KV_REST_API_TOKEN = "AaLdASQgNzNhNGQ1MjYtOWYzMy00ZmMzLWI4NGUtMTkyM2U2ZGYzMjUxNDY0OGQ3ZjYyYjVkNGU2MWI0ZWRjM2FmMWU2NTEyYzc=";
+const KV_REST_API_URL = 'https://regular-fish-41693.upstash.io';
+const KV_REST_API_TOKEN = 'AaLdASQgNzNhNGQ1MjYtOWYzMy00ZmMzLWI4NGUtMTkyM2U2ZGYzMjUxNDY0OGQ3ZjYyYjVkNGU2MWI0ZWRjM2FmMWU2NTEyYzc=';
 
 const database = createClient({
   url: KV_REST_API_URL,
@@ -114,22 +114,22 @@ const HOST: string = process.env.IP || '127.0.0.1';
 // Deployed Database
 // Load + Save
 app.get('/data', async (req: Request, res: Response) => {
-  const data = await database.hgetall("data");
+  const data = await database.hgetall('data');
   res.status(200).json(data);
 });
 
 app.put('/data', async (req: Request, res: Response) => {
   const { data } = req.body;
-  await database.hset("data", { data });
+  await database.hset('data', { data });
   return res.status(200).json({});
 });
 
 const load = () => {
   setData(getDataDeploy());
-}
+};
 const save = () => {
   setDataDeploy(getData());
-}
+};
 
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================

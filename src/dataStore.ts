@@ -260,7 +260,8 @@ export const getDataDeploy = (): DataType => {
     return {
       users: [],
       quizzes: [],
-      deletedQuizzes: []
+      deletedQuizzes: [],
+      id: 0
     };
   }
 };
