@@ -2,8 +2,6 @@
 import { port, url } from '../config.json';
 import { IncomingHttpHeaders } from 'http';
 import HTTPError from 'http-errors';
-
-// sync-request-curl is faster, though lab09 says that sync-request should be used instead when working with the deployed server
 import request, { HttpVerb } from 'sync-request';
 
 //const SERVER_URL = `${url}:${port}`;

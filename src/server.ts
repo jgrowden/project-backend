@@ -101,15 +101,15 @@ const PORT: number = parseInt(process.env.PORT || config.port);
 const HOST: string = process.env.IP || '127.0.0.1';
 
 // Load + Store functions for persistence (LOCAL)
-const load = () => {
-  if (fs.existsSync('/tmp/toohakData.json')) {
-    const dataFile = fs.readFileSync('/tmp/toohakData.json', { encoding: 'utf8' });
-    setData(JSON.parse(dataFile));
-  }
-};
-const save = () => {
-  fs.writeFileSync('/tmp/toohakData.json', JSON.stringify(getData()));
-};
+// const load = () => {
+//   if (fs.existsSync('/tmp/toohakData.json')) {
+//     const dataFile = fs.readFileSync('/tmp/toohakData.json', { encoding: 'utf8' });
+//     setData(JSON.parse(dataFile));
+//   }
+// };
+// const save = () => {
+//   fs.writeFileSync('/tmp/toohakData.json', JSON.stringify(getData()));
+// };
 
 // Deployed Database
 // Load + Save
@@ -124,6 +124,12 @@ app.put('/data', async (req: Request, res: Response) => {
   return res.status(200).json({});
 });
 
+const load = () => {
+  setData(getDataDeploy());
+}
+const save = () => {
+  setDataDeploy(getData());
+}
 
 // ====================================================================
 //  ================= WORK IS DONE BELOW THIS LINE ===================
